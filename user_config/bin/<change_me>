@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# . CONFIG.sh
+
+# set -o xtrace       ## To debug scripts
+# set -o errexit      ## To exit on error
+# set -o errunset     ## To exit if a variable is referenced but not set
+
+
+function main() {
+    call_path=`pwd`
+    path=""
+
+    if [[ ! "${1::1}" == /* ]]; then
+        path="${call_path}/${1}"
+    else
+        path="${1}"
+    fi
+
+    # NOTE: Remove if you want to pass file(s) besides directories...
+    if [ ! -d "${path}" ]; then
+        echo "<change_me>: Path given not a directory..."
+        exit 1
+    fi
+
+    cd "/opt/"
+    python /opt/<change_me>.zip "$@"
+}
+main "$@";

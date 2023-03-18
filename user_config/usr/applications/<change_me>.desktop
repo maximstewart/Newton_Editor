@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=<change_me>
+GenericName=<change_me>
+Comment=<change_me>
+Exec=/bin/<change_me> %F
+Icon=/usr/share/<change_me>/icons/<change_me>.png
+Type=Application
+StartupNotify=true
+Categories=System;FileTools;Utility;Core;GTK;FileManager;
+MimeType=
+Terminal=false
