@@ -33,6 +33,7 @@ class EditorNotebook(Gtk.Notebook):
 
     def _subscribe_to_events(self):
         # event_system.subscribe("set_buffer_language", self.action_controller, *("set_buffer_language",))
+        event_system.subscribe("create_view", self.create_view)
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
         event_system.subscribe("set_buffer_style", self.action_controller)
@@ -67,7 +68,7 @@ class EditorNotebook(Gtk.Notebook):
     def _load_widgets(self):
         self.create_view()
 
-    def create_view(self, widget = None, eve = None):
+    def create_view(self, widget = None, eve = None, gfile = None):
         container =  SourceViewContainer(self.close_tab)
 
         index = self.append_page(container, container.get_tab_widget())
@@ -76,8 +77,12 @@ class EditorNotebook(Gtk.Notebook):
         ctx = self.get_style_context()
         ctx.add_class("notebook-unselected-focus")
         self.set_tab_reorderable(container, True)
-        self.show_all()
 
+        if gfile:
+            source_view = container.get_source_view()
+            source_view.open_file(gfile)
+
+        self.show_all()
         self.set_current_page(index)
 
     def close_tab(self, button, scroll_view, source_view, eve = None):

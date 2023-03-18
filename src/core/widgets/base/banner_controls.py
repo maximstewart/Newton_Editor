@@ -33,6 +33,6 @@ class BannerControls(Gtk.Box):
 
     def _load_widgets(self):
         self.add(ToggleLineHighlight())
-        self.add(ScaleUpButton())
         self.add(ScaleDownButton())
+        self.add(ScaleUpButton())
         self.pack_end(ThemeButton(), False, False, 0)

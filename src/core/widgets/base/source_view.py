@@ -2,9 +2,13 @@
 
 # Lib imports
 import gi
+gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '4')
-from gi.repository import GtkSource
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import Gio
+from gi.repository import GtkSource
 
 # Application imports
 
@@ -16,13 +20,16 @@ class SourceView(GtkSource.View):
 
         self._language_manager     = GtkSource.LanguageManager()
         self._style_scheme_manager = GtkSource.StyleSchemeManager()
+
         self._general_style_tag    = None
         self._file_watcher         = None
+        self._is_changed           = False
 
         self._buffer = self.get_buffer()
 
         self._setup_styling()
         self._setup_signals()
+        self._set_up_dnd()
         self._subscribe_to_events()
         self._load_widgets()
 
@@ -47,6 +54,7 @@ class SourceView(GtkSource.View):
         self.set_vexpand(True)
 
     def _setup_signals(self):
+        self.connect("drag-data-received",  self._on_drag_data_received)
         ...
 
     def _subscribe_to_events(self):
@@ -118,3 +126,53 @@ class SourceView(GtkSource.View):
 
         tag.set_property('scale', tag.get_property('scale') - scale_step)
         self._buffer.apply_tag(tag, start_itr, end_itr)
+
+
+    def _set_up_dnd(self):
+        URI_TARGET_TYPE  = 80
+        uri_target       = Gtk.TargetEntry.new('text/uri-list', Gtk.TargetFlags(0), URI_TARGET_TYPE)
+        targets          = [ uri_target ]
+        self.drag_dest_set_target_list(targets)
+
+    def _on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
+        if info == 80:
+            uris  = data.get_uris()
+
+            if len(uris) == 0:
+                uris = data.get_text().split("\n")
+
+            if self._is_changed:
+                # self.maybe_saved()
+                ...
+
+            gfile = Gio.File.new_for_uri(uris[0])
+            self.open_file(gfile)
+
+            uris.pop(0)
+            for uri in uris:
+                gfile = Gio.File.new_for_uri(uri)
+                event_system.emit('create_view', (None, None, gfile,))
+
+
+    def open_file(self, gfile, *args):
+        info         = gfile.query_info("standard::content-type", 0, cancellable=None)
+        content_type = info.get_content_type()
+        lm           = self._language_manager.guess_language(None, content_type)
+
+        if settings.is_debug():
+            logger.debug(f"Detected Content Type: {content_type}")
+
+        with open(gfile.get_path(), 'r') as f:
+            data = f.read()
+            self._buffer.set_text(data)
+            self.set_buffer_language( lm.get_id() )
+
+            # self.current_file = myfile
+            # self.current_filename = myfile.rpartition("/")[2]
+            # self.current_folder = path.dirname(myfile)
+            f.close()
+            # self.headerbar.set_subtitle(myfile)
+            # self.status_label.set_text(f"'{myfile}' loaded")
+            # self.headerbar.set_title("TextEdit")
+            self.grab_focus()
+            # self.is_changed = False

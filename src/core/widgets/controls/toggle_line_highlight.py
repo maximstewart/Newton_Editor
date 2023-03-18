@@ -9,7 +9,7 @@ from gi.repository import Gtk
 
 
 
-class ToggleLineHighlight(Gtk.ToggleButton):
+class ToggleLineHighlight(Gtk.Button):
     def __init__(self):
         super(ToggleLineHighlight, self).__init__()
 
@@ -20,7 +20,11 @@ class ToggleLineHighlight(Gtk.ToggleButton):
 
 
     def _setup_styling(self):
-        self.set_label("Toggle Line Highlight")
+        self.set_label("Line Highlight")
+        # self.set_image( Gtk.Image.new_from_icon_name("gtk-add", 4) )
+        self.set_always_show_image(True)
+        self.set_image_position(1) # Left - 0, Right = 1
+        self.set_hexpand(False)
 
     def _setup_signals(self):
         self.connect("released", self._emit_toggle_eve)
