@@ -1,3 +1,3 @@
 """
-    Generic Mixins Module
+    Mixins module
 """

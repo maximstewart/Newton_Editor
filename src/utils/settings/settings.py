@@ -66,6 +66,7 @@ class Settings(StartCheckMixin):
 
 
         with open(self._KEY_BINDINGS_FILE) as file:
+            print(self._KEY_BINDINGS_FILE)
             bindings = json.load(file)["keybindings"]
             keybindings.configure(bindings)
 

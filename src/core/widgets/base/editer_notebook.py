@@ -37,10 +37,15 @@ class EditorNotebook(Gtk.Notebook):
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
         event_system.subscribe("set_buffer_style", self.action_controller)
+        event_system.subscribe("open_files", self._open_files)
         event_system.subscribe("toggle_highlight_line", self.action_controller)
-        event_system.subscribe("scale_up_text", self.action_controller)
-        event_system.subscribe("scale_down_text", self.action_controller)
+        event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
+        event_system.subscribe("keyboard_scale_down_text", self._keyboard_scale_down_text)
+        event_system.subscribe("keyboard_create_tab", self.create_view)
+        event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
 
+    def _open_files(self):
+        print("Open file stub...")
 
     def _add_action_widgets(self):
         start_box = Gtk.Box()
@@ -85,18 +90,25 @@ class EditorNotebook(Gtk.Notebook):
         self.show_all()
         self.set_current_page(index)
 
-    def close_tab(self, button, scroll_view, source_view, eve = None):
+    def close_tab(self, button, container, source_view, eve = None):
         if self.get_n_pages() == 1:
             return
 
-        page_num = self.page_num(scroll_view)
+        page_num = self.page_num(container)
         watcher  = source_view.get_file_watcher()
         if watcher:
             watcher.cancel()
 
         self.remove_page(page_num)
 
+    def _keyboard_close_tab(self):
+        self.action_controller("close_tab")
 
+    def _keyboard_scale_up_text(self):
+        self.action_controller("scale_up_text")
+
+    def _keyboard_scale_down_text(self):
+        self.action_controller("scale_down_text")
 
     def _text_search(self, widget = None, eve = None):
         self.action_controller("do_text_search", widget.get_text())
@@ -118,6 +130,8 @@ class EditorNotebook(Gtk.Notebook):
             self.scale_up_text(source_view)
         if action == "scale_down_text":
             self.scale_down_text(source_view)
+        if action == "close_tab":
+            self.close_tab(None, container, source_view)
 
     def do_text_search(self, query = ""):
         source_view.scale_down_text()

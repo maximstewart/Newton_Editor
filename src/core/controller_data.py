@@ -14,12 +14,15 @@ class ControllerData:
     ''' ControllerData contains most of the state of the app at ay given time. It also has some support methods. '''
 
     def setup_controller_data(self) -> None:
-        self.window        = settings.get_main_window()
-        self.builder       = None
-        self.core_widget   = None
+        self.window      = settings.get_main_window()
+        self.builder     = None
+        self.core_widget = None
+        self.ctrl_down   = False
+        self.shift_down  = False
+        self.alt_down    = False
 
         self.load_glade_file()
-        self.plugins       = PluginsController()
+        self.plugins     = PluginsController()
 
 
     def clear_console(self) -> None:

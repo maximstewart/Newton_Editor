@@ -12,16 +12,15 @@ from gi.repository import Gdk
 
 
 def err(log = ""):
-    """Print an error message"""
     print(log)
 
 
 class KeymapError(Exception):
-    """Custom exception for errors in keybinding configurations"""
+    """ Custom exception for errors in keybinding configurations """
 
 MODIFIER = re.compile('<([^<]+)>')
 class Keybindings:
-    """Class to handle loading and lookup of Terminator keybindings"""
+    """ Class to handle loading and lookup of Terminator keybindings """
 
     modifiers = {
         'ctrl':     Gdk.ModifierType.CONTROL_MASK,
@@ -44,12 +43,12 @@ class Keybindings:
         self.configure({})
 
     def configure(self, bindings):
-        """Accept new bindings and reconfigure with them"""
+        """ Accept new bindings and reconfigure with them """
         self.keys = bindings
         self.reload()
 
     def reload(self):
-        """Parse bindings and mangle into an appropriate form"""
+        """ Parse bindings and mangle into an appropriate form """
         self._lookup = {}
         self._masks  = 0
 
@@ -66,10 +65,10 @@ class Keybindings:
 
                 try:
                     keyval, mask = self._parsebinding(binding)
-                    # Does much the same, but with poorer error handling.
-                    #keyval, mask = Gtk.accelerator_parse(binding)
+                    # Does much the same, but with worse error handling.
+                    # keyval, mask = Gtk.accelerator_parse(binding)
                 except KeymapError as e:
-                  err ("keybinding reload failed to parse binding '%s': %s" % (binding, e))
+                  err(f"Keybinding reload failed to parse binding '{binding}': {e}")
                 else:
                     if mask & Gdk.ModifierType.SHIFT_MASK:
                         if keyval == Gdk.KEY_Tab:
@@ -88,7 +87,7 @@ class Keybindings:
                     self._masks |= mask
 
     def _parsebinding(self, binding):
-        """Parse an individual binding using Gtk's binding function"""
+        """ Parse an individual binding using Gtk's binding function """
         mask = 0
         modifiers = re.findall(MODIFIER, binding)
 
@@ -103,25 +102,25 @@ class Keybindings:
         keyval = Gdk.keyval_from_name(key)
 
         if keyval == 0:
-            raise KeymapError("Key '%s' is unrecognised..." % key)
+            raise KeymapError(f"Key '{key}' is unrecognised...")
         return (keyval, mask)
 
     def _lookup_modifier(self, modifier):
-        """Map modifier names to gtk values"""
+        """ Map modifier names to gtk values """
         try:
             return self.modifiers[modifier.lower()]
         except KeyError:
-            raise KeymapError("Unhandled modifier '<%s>'" % modifier)
+            raise KeymapError(f"Unhandled modifier '<{modifier}>'")
 
     def lookup(self, event):
-        """Translate a keyboard event into a mapped key"""
+        """ Translate a keyboard event into a mapped key """
         try:
             _found, keyval, _egp, _lvl, consumed = self.keymap.translate_keyboard_state(
                                               event.hardware_keycode,
                                               Gdk.ModifierType(event.get_state() & ~Gdk.ModifierType.LOCK_MASK),
                                               event.group)
         except TypeError:
-            err ("Keybinding lookup failed to translate keyboard event: %s" % dir(event))
+            err(f"Keybinding lookup failed to translate keyboard event: {dir(event)}")
             return None
 
         mask = (event.get_state() & ~consumed) & self._masks
