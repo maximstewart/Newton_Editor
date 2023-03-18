@@ -8,6 +8,7 @@ from gi.repository import Gtk
 # Application imports
 
 
+
 class ToggleLineHighlight(Gtk.ToggleButton):
     def __init__(self):
         super(ToggleLineHighlight, self).__init__()
@@ -31,4 +32,4 @@ class ToggleLineHighlight(Gtk.ToggleButton):
         ...
 
     def _emit_toggle_eve(self, widget, eve = None):
-        event_system.emit('toggle_highlight_line')
+        event_system.emit('toggle_highlight_line', ("toggle_highlight_line",))

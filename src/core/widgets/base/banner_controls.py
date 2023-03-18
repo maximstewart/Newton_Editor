@@ -6,6 +6,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
+from ..controls.theme_button import ThemeButton
 from ..controls.toggle_line_highlight import ToggleLineHighlight
 from ..controls.scale_up_button import ScaleUpButton
 from ..controls.scale_down_button import ScaleDownButton
@@ -31,9 +32,7 @@ class BannerControls(Gtk.Box):
         ...
 
     def _load_widgets(self):
-        # styles_chooser_button = GtkSource.StyleSchemeChooserButton()
-
         self.add(ToggleLineHighlight())
-        # self.add(styles_chooser_button)
         self.add(ScaleUpButton())
         self.add(ScaleDownButton())
+        self.pack_end(ThemeButton(), False, False, 0)

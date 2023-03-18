@@ -32,4 +32,4 @@ class ScaleUpButton(Gtk.Button):
         ...
 
     def _emit_scale_eve(self, widget, eve = None):
-        event_system.emit('scale_up_text')
+        event_system.emit('scale_up_text', ("scale_up_text",))

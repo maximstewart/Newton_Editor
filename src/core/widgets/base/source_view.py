@@ -4,6 +4,7 @@
 import gi
 gi.require_version('GtkSource', '4')
 from gi.repository import GtkSource
+from gi.repository import Gio
 
 # Application imports
 
@@ -16,6 +17,7 @@ class SourceView(GtkSource.View):
         self._language_manager     = GtkSource.LanguageManager()
         self._style_scheme_manager = GtkSource.StyleSchemeManager()
         self._general_style_tag    = None
+        self._file_watcher         = None
 
         self._buffer = self.get_buffer()
 
@@ -34,13 +36,13 @@ class SourceView(GtkSource.View):
         self.set_auto_indent(True)
         self.set_monospace(True)
         self.set_tab_width(4)
-        # self.set_show_right_margin(True)
-        # self.set_right_margin_position(80)
+        self.set_show_right_margin(True)
+        self.set_right_margin_position(80)
         self.set_background_pattern(0) # 0 = None, 1 = Grid
 
-        self._set_buffer_language()
-        self._set_buffer_style()
         self._create_default_tag()
+        self.set_buffer_language()
+        self.set_buffer_style()
 
         self.set_vexpand(True)
 
@@ -48,12 +50,7 @@ class SourceView(GtkSource.View):
         ...
 
     def _subscribe_to_events(self):
-        event_system.subscribe("set_buffer_language", self._set_buffer_language)
-        event_system.subscribe("set_buffer_style", self._set_buffer_style)
-        event_system.subscribe("toggle_highlight_line", self.toggle_highlight_line)
-        event_system.subscribe("scale_up_text", self.scale_up_text)
-        event_system.subscribe("scale_down_text", self.scale_down_text)
-
+        ...
 
     def _load_widgets(self):
         ...
@@ -63,17 +60,46 @@ class SourceView(GtkSource.View):
         self._general_style_tag.set_property('size', 100)
         self._general_style_tag.set_property('scale', 100)
 
-    def _set_buffer_language(self, language = "python3"):
+    def set_buffer_language(self, language = "python3"):
         self._buffer.set_language( self._language_manager.get_language(language) )
 
-    def _set_buffer_style(self, style = "tango"):
+    def set_buffer_style(self, style = "tango"):
         self._buffer.set_style_scheme( self._style_scheme_manager.get_scheme(style) )
 
+
     def get_file_watcher(self):
-        return None
+        return self._file_watcher
+
+    def create_file_watcher(self, file_path = None):
+        if not file_path:
+            return
+
+        if self._file_watcher:
+            self._file_watcher.cancel()
+            self._file_watcher = None
+
+        self._file_watcher = Gio.File.new_for_path(file_path) \
+                                        .monitor_file([
+                                                        Gio.FileMonitorFlags.WATCH_MOVES,
+                                                        Gio.FileMonitorFlags.WATCH_HARD_LINKS
+                                                    ], Gio.Cancellable())
+
+        self._file_watcher.connect("changed", self.file_watch_updates)
+
+    def file_watch_updates(self, file_monitor, file, other_file=None, eve_type=None, data=None):
+        if settings.is_debug():
+            logger.debug(eve_type)
+
+        if eve_type in [Gio.FileMonitorEvent.CREATED,
+                        Gio.FileMonitorEvent.DELETED,
+                        Gio.FileMonitorEvent.RENAMED]:
+            ...
+
+        if eve_type in [ Gio.FileMonitorEvent.CHANGED ]:
+            ...
 
 
-    def toggle_highlight_line(self, widget=None, eve=None):
+    def toggle_highlight_line(self, widget = None, eve = None):
         self.set_highlight_current_line( not self.get_highlight_current_line() )
 
     def scale_up_text(self, scale_step = 10):
