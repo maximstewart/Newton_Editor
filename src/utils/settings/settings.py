@@ -29,7 +29,7 @@ class Settings(StartCheckMixin):
         self._CSS_FILE          = f"{self._HOME_CONFIG_PATH}/stylesheet.css"
         self._KEY_BINDINGS_FILE = f"{self._HOME_CONFIG_PATH}/key-bindings.json"
         self._PID_FILE          = f"{self._HOME_CONFIG_PATH}/{app_name.lower()}.pid"
-        self._WINDOW_ICON       = f"{self._DEFAULT_ICONS}/icons/{app_name.lower()}.png"
+        self._WINDOW_ICON       = f"{self._DEFAULT_ICONS}/{app_name.lower()}.png"
 
         if not os.path.exists(self._HOME_CONFIG_PATH):
             os.mkdir(self._HOME_CONFIG_PATH)
@@ -73,6 +73,7 @@ class Settings(StartCheckMixin):
         self._main_window_w = 800
         self._main_window_h = 600
         self._builder       = None
+        self.PAINT_BG_COLOR = (0, 0, 0, 0.54)
 
         self._trace_debug   = False
         self._debug         = False
@@ -107,10 +108,11 @@ class Settings(StartCheckMixin):
 
         return monitors
 
-    def get_main_window(self)      -> any:   return self._main_window
-    def get_main_window_width(self) -> Gtk.ApplicationWindow:  return self._main_window_w
-    def get_main_window_height(self) -> Gtk.ApplicationWindow: return self._main_window_h
+    def get_main_window(self)        -> any: return self._main_window
+    def get_main_window_width(self)  -> any: return self._main_window_w
+    def get_main_window_height(self) -> any: return self._main_window_h
     def get_builder(self)          -> any:   return self._builder
+    def get_paint_bg_color(self)   -> any:   return self.PAINT_BG_COLOR
     def get_glade_file(self)       -> str:   return self._GLADE_FILE
 
     def get_plugins_path(self)     -> str:   return self._PLUGINS_PATH

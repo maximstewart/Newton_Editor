@@ -6,15 +6,14 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-
+from .widgets.base.banner_controls import BannerControls
+from .widgets.base.editer_notebook import EditorNotebook
 
 
 
 class CoreWidget(Gtk.Box):
     def __init__(self):
         super(CoreWidget, self).__init__()
-
-        self._builder = settings.get_builder()
 
         self._setup_styling()
         self._setup_signals()
@@ -30,15 +29,5 @@ class CoreWidget(Gtk.Box):
         ...
 
     def _load_widgets(self):
-        glade_box = self._builder.get_object("glade_box")
-        button    = Gtk.Button(label="Click Me!")
-
-        button.connect("clicked", self._hello_world)
-
-        self.add(button)
-        self.add(glade_box)
-
-
-
-    def _hello_world(self, widget=None, eve=None):
-        print("Hello, World!")
+        self.add(BannerControls())
+        self.add(EditorNotebook())

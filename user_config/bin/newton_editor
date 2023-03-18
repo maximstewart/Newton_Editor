@@ -19,11 +19,11 @@ function main() {
 
     # NOTE: Remove if you want to pass file(s) besides directories...
     if [ ! -d "${path}" ]; then
-        echo "<change_me>: Path given not a directory..."
+        echo "Newton Editor: Path given not a directory..."
         exit 1
     fi
 
     cd "/opt/"
-    python /opt/<change_me>.zip "$@"
+    python /opt/newton_editor.zip "$@"
 }
 main "$@";
