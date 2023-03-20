@@ -26,7 +26,11 @@ class KeyboardSignalsMixin:
         self.alt_down   = False
 
     def on_global_key_press_controller(self, eve, user_data):
-        keyname = Gdk.keyval_name(user_data.keyval).lower()
+        keyname   = Gdk.keyval_name(user_data.keyval).lower()
+        modifiers = Gdk.ModifierType(user_data.get_state() & ~Gdk.ModifierType.LOCK_MASK)
+
+        self.was_midified_key = True if modifiers != 0 else False
+
         if keyname.replace("_l", "").replace("_r", "") in ["control", "alt", "shift"]:
             if "control" in keyname:
                 self.ctrl_down    = True
@@ -37,8 +41,12 @@ class KeyboardSignalsMixin:
 
     def on_global_key_release_controller(self, widget, event):
         """ Handler for keyboard events """
-        keyname = Gdk.keyval_name(event.keyval).lower()
+        keyname   = Gdk.keyval_name(event.keyval).lower()
+        modifiers = Gdk.ModifierType(event.get_state() & ~Gdk.ModifierType.LOCK_MASK)
+
         if keyname.replace("_l", "").replace("_r", "") in ["control", "alt", "shift"]:
+            should_return = self.was_midified_key and (self.ctrl_down or self.shift_down or self.alt_down)
+
             if "control" in keyname:
                 self.ctrl_down    = False
             if "shift" in keyname:
@@ -46,7 +54,16 @@ class KeyboardSignalsMixin:
             if "alt" in keyname:
                 self.alt_down     = False
 
+            # NOTE: In effect a filter after releasing a modifier and we have a modifier mapped
+            if should_return:
+                self.was_midified_key = False
+                return
+
         mapping = keybindings.lookup(event)
+        logger.debug(f"on_global_key_release_controller > key > {keyname}")
+        logger.debug(f"on_global_key_release_controller > keyval > {event.keyval}")
+        logger.debug(f"on_global_key_release_controller > mapping > {mapping}")
+
         if mapping:
             # See if in controller scope
             try:
@@ -62,8 +79,6 @@ class KeyboardSignalsMixin:
 
                 self.handle_key_event_system(sender, eve_type)
         else:
-            logger.debug(f"on_global_key_release_controller > key > {keyname}")
-
             if self.ctrl_down:
                 if not keyname in ["1", "kp_1", "2", "kp_2", "3", "kp_3", "4", "kp_4"]:
                     self.handle_key_event_system(None, mapping)

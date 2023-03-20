@@ -3,7 +3,10 @@
 # Lib imports
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import Gio
 
 # Application imports
 from .sourceview_container import SourceViewContainer
@@ -29,6 +32,7 @@ class EditorNotebook(Gtk.Notebook):
         self.set_scrollable(True)
 
     def _setup_signals(self):
+        # self.connect("button-press-event", self._dbl_click_create_view)
         ...
 
     def _subscribe_to_events(self):
@@ -37,15 +41,13 @@ class EditorNotebook(Gtk.Notebook):
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
         event_system.subscribe("set_buffer_style", self.action_controller)
-        event_system.subscribe("open_files", self._open_files)
-        event_system.subscribe("toggle_highlight_line", self.action_controller)
+        event_system.subscribe("toggle_highlight_line", self._toggle_highlight_line)
+        event_system.subscribe("keyboard_create_tab", self._keyboard_create_tab)
+        event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
+        event_system.subscribe("keyboard_prev_tab", self._keyboard_prev_tab)
+        event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
         event_system.subscribe("keyboard_scale_down_text", self._keyboard_scale_down_text)
-        event_system.subscribe("keyboard_create_tab", self.create_view)
-        event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
-
-    def _open_files(self):
-        print("Open file stub...")
 
     def _add_action_widgets(self):
         start_box = Gtk.Box()
@@ -72,6 +74,9 @@ class EditorNotebook(Gtk.Notebook):
 
     def _load_widgets(self):
         self.create_view()
+
+    def _keyboard_create_tab(self, _gfile):
+        self.create_view(gfile=_gfile)
 
     def create_view(self, widget = None, eve = None, gfile = None):
         container =  SourceViewContainer(self.close_tab)
@@ -101,8 +106,21 @@ class EditorNotebook(Gtk.Notebook):
 
         self.remove_page(page_num)
 
+    def _dbl_click_create_view(self, notebook, eve):
+        if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
+            ...
+
+    def _toggle_highlight_line(self):
+        self.action_controller("toggle_highlight_line")
+
     def _keyboard_close_tab(self):
         self.action_controller("close_tab")
+
+    def _keyboard_next_tab(self):
+        self.action_controller("keyboard_next_tab")
+
+    def _keyboard_prev_tab(self):
+        self.action_controller("keyboard_prev_tab")
 
     def _keyboard_scale_up_text(self):
         self.action_controller("scale_up_text")
@@ -132,6 +150,11 @@ class EditorNotebook(Gtk.Notebook):
             self.scale_down_text(source_view)
         if action == "close_tab":
             self.close_tab(None, container, source_view)
+        if action == "keyboard_prev_tab":
+            self.keyboard_prev_tab(page_num)
+        if action == "keyboard_next_tab":
+            self.keyboard_next_tab(page_num)
+
 
     def do_text_search(self, query = ""):
         source_view.scale_down_text()
@@ -141,6 +164,14 @@ class EditorNotebook(Gtk.Notebook):
 
     def set_buffer_style(self, source_view, style = "tango"):
         source_view.set_buffer_style(style)
+
+    def keyboard_prev_tab(self, page_num):
+        page_num = self.get_n_pages() - 1 if page_num == 0 else page_num - 1
+        self.set_current_page(page_num)
+
+    def keyboard_next_tab(self, page_num):
+        page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
+        self.set_current_page(page_num)
 
     def scale_up_text(self, source_view):
         source_view.scale_up_text()

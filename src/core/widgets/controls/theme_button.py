@@ -65,6 +65,8 @@ class ThemeButton(Gtk.Button):
         self.set_image( Gtk.Image.new_from_icon_name("gtk-page-setup", 4) )
         self.set_always_show_image(True)
         self.set_image_position(1) # Left - 0, Right = 1
+        self.set_margin_left(5)
+        # self.set_margin_right(5)
 
     def _setup_signals(self):
         self.connect("clicked", self._show_popover)

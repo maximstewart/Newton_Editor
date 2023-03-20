@@ -6,10 +6,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from ..controls.theme_button import ThemeButton
-from ..controls.toggle_line_highlight import ToggleLineHighlight
+from ..controls.open_file_button import OpenFileButton
 from ..controls.scale_up_button import ScaleUpButton
 from ..controls.scale_down_button import ScaleDownButton
+from ..controls.toggle_line_highlight import ToggleLineHighlight
+from ..controls.theme_button import ThemeButton
 
 
 
@@ -17,12 +18,13 @@ class BannerControls(Gtk.Box):
     def __init__(self):
         super(BannerControls, self).__init__()
 
-
         self._setup_styling()
         self._setup_signals()
+        self._subscribe_to_events()
         self._load_widgets()
 
         self.show_all()
+        self.hide()
 
 
     def _setup_styling(self):
@@ -31,8 +33,15 @@ class BannerControls(Gtk.Box):
     def _setup_signals(self):
         ...
 
+    def _subscribe_to_events(self):
+        event_system.subscribe("tggl_top_main_menubar", self._tggl_top_main_menubar)
+
     def _load_widgets(self):
-        self.add(ToggleLineHighlight())
-        self.add(ScaleDownButton())
+        self.add(OpenFileButton())
         self.add(ScaleUpButton())
+        self.add(ScaleDownButton())
+        self.add(ToggleLineHighlight())
         self.pack_end(ThemeButton(), False, False, 0)
+
+    def _tggl_top_main_menubar(self):
+        self.show() if not self.is_visible() else self.hide()

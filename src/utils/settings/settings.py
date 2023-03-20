@@ -29,6 +29,8 @@ class Settings(StartCheckMixin):
         self._CSS_FILE          = f"{self._HOME_CONFIG_PATH}/stylesheet.css"
         self._KEY_BINDINGS_FILE = f"{self._HOME_CONFIG_PATH}/key-bindings.json"
         self._PID_FILE          = f"{self._HOME_CONFIG_PATH}/{app_name.lower()}.pid"
+        self._UI_WIDEGTS_PATH   = f"{self._HOME_CONFIG_PATH}/ui_widgets"
+        self._CONTEXT_MENU      = f"{self._HOME_CONFIG_PATH}/contexct_menu.json"
         self._WINDOW_ICON       = f"{self._DEFAULT_ICONS}/{app_name.lower()}.png"
 
         if not os.path.exists(self._HOME_CONFIG_PATH):
@@ -63,12 +65,25 @@ class Settings(StartCheckMixin):
             self._WINDOW_ICON  = f"{self._USR_PATH}/icons/{app_name.lower()}.png"
             if not os.path.exists(self._WINDOW_ICON):
                 raise MissingConfigError("Unable to find the application icon.")
+        if not os.path.exists(self._UI_WIDEGTS_PATH):
+            self._UI_WIDEGTS_PATH = f"{self._USR_PATH}/ui_widgets"
+        if not os.path.exists(self._CONTEXT_MENU):
+            self._CONTEXT_MENU    = f"{self._USR_PATH}/contexct_menu.json"
 
 
-        with open(self._KEY_BINDINGS_FILE) as file:
-            print(self._KEY_BINDINGS_FILE)
-            bindings = json.load(file)["keybindings"]
-            keybindings.configure(bindings)
+        try:
+            with open(self._KEY_BINDINGS_FILE) as file:
+                bindings = json.load(file)["keybindings"]
+                keybindings.configure(bindings)
+        except Exception as e:
+            print( f"Settings: {self._KEY_BINDINGS_FILE}\n\t\t{repr(e)}" )
+
+        try:
+            with open(self._CONTEXT_MENU) as file:
+                self._context_menu_data = json.load(file)
+        except Exception as e:
+            print( f"Settings: {self._CONTEXT_MENU}\n\t\t{repr(e)}" )
+
 
         self._main_window   = None
         self._main_window_w = 800
@@ -115,6 +130,8 @@ class Settings(StartCheckMixin):
     def get_builder(self)          -> any:   return self._builder
     def get_paint_bg_color(self)   -> any:   return self.PAINT_BG_COLOR
     def get_glade_file(self)       -> str:   return self._GLADE_FILE
+    def get_ui_widgets_path(self)  -> str:   return self._UI_WIDEGTS_PATH
+
 
     def get_plugins_path(self)     -> str:   return self._PLUGINS_PATH
     def get_icon_theme(self)       -> str:   return self._ICON_THEME

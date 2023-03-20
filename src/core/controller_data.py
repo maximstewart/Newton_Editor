@@ -17,6 +17,7 @@ class ControllerData:
         self.window      = settings.get_main_window()
         self.builder     = None
         self.core_widget = None
+        self.was_midified_key = False
         self.ctrl_down   = False
         self.shift_down  = False
         self.alt_down    = False

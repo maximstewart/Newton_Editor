@@ -2,12 +2,18 @@
     "keybindings": {
         "help"                   : "F1",
         "open_terminal"          : "F4",
-        "tggl_top_main_menubar"  : "<Alt>h",
+        "tggl_top_main_menubar"  : "Alt_L",
         "tear_down"              : "<Control>q",
         "toggle_highlight_line"  : "<Control>h",
         "open_files"             : "<Control>o",
         "keyboard_create_tab"    : "<Control>t",
         "keyboard_close_tab"     : "<Control>w",
+        "keyboard_up"            : "Up",
+        "keyboard_down"          : "Down",
+        "keyboard_left"          : "Left",
+        "keyboard_riht"          : "Right",
+        "keyboard_prev_tab"      : "<Control>Page_Up",
+        "keyboard_next_tab"      : "<Control>Page_Down",
         "keyboard_scale_up_text"   : "<Control>equal",
         "keyboard_scale_down_text" : "<Control>minus"
     }

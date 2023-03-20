@@ -54,11 +54,14 @@ class SourceView(GtkSource.View):
         self.set_vexpand(True)
 
     def _setup_signals(self):
-        self.connect("drag-data-received",  self._on_drag_data_received)
-        ...
+        self.connect("drag-data-received", self._on_drag_data_received)
+        self._buffer.connect("mark-set", self._on_cursor_move)
+        # self.completion.add_provider(srcCompleteonSnippets)
+        # self.completion.add_provider(srcCompleteonWords)
 
     def _subscribe_to_events(self):
         ...
+
 
     def _load_widgets(self):
         ...
@@ -155,17 +158,23 @@ class SourceView(GtkSource.View):
 
 
     def open_file(self, gfile, *args):
-        info         = gfile.query_info("standard::content-type", 0, cancellable=None)
+        info         = gfile.query_info("standard::*", 0, cancellable=None)
         content_type = info.get_content_type()
+        display_name = info.get_display_name()
+        tab_widget   = self.get_parent().get_tab_widget()
         lm           = self._language_manager.guess_language(None, content_type)
 
-        if settings.is_debug():
-            logger.debug(f"Detected Content Type: {content_type}")
+        tab_widget.set_tab_label(display_name)
+        event_system.emit("set_bottom_labels", (gfile, info))
 
+        logger.debug(f"Detected Content Type: {content_type}")
         with open(gfile.get_path(), 'r') as f:
             data = f.read()
             self._buffer.set_text(data)
-            self.set_buffer_language( lm.get_id() )
+            try:
+                self.set_buffer_language( lm.get_id() )
+            except Exception as e:
+                ...
 
             # self.current_file = myfile
             # self.current_filename = myfile.rpartition("/")[2]
@@ -176,3 +185,40 @@ class SourceView(GtkSource.View):
             # self.headerbar.set_title("TextEdit")
             self.grab_focus()
             # self.is_changed = False
+
+
+
+    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
+        if mark != buf.get_insert():
+            return
+
+        self.update_cursor_position()
+
+
+    def update_cursor_position(self):
+        iter  = self._buffer.get_iter_at_mark(self._buffer.get_insert())
+        chars = iter.get_offset()
+        row   = iter.get_line() + 1
+        col   = self.get_visual_column(iter) + 1
+
+        classes = self._buffer.get_context_classes_at_iter(iter)
+        classes_str = ""
+
+        i = 0
+        for c in classes:
+            if len(classes) != i + 1:
+                classes_str += c + ", "
+            else:
+                classes_str += c
+
+        cursor_data = f"char: {chars}, line: {row}, column: {col}, classes: {classes_str}"
+        logger.debug(cursor_data)
+        event_system.emit("set_line_char_label", (f"{row}:{col}",))
+
+
+    # https://github.com/ptomato/inform7-ide/blob/main/src/actions.c
+    def action_uncomment_selection(self):
+        ...
+
+    def action_comment_out_selection(self):
+        pass

@@ -9,8 +9,8 @@ from gi.repository import Gtk
 
 
 
-class TabHeaderWidget(Gtk.ButtonBox):
-    """docstring for TabHeaderWidget"""
+class TabHeaderWidget(Gtk.Box):
+    """ docstring for TabHeaderWidget """
 
     ccount = 0
     def __new__(cls, *args, **kwargs):
@@ -30,13 +30,21 @@ class TabHeaderWidget(Gtk.ButtonBox):
 
         self._setup_styling()
         self._setup_signals()
+        self._subscribe_to_events()
         self._load_widgets()
+
+        self.set_tab_label()
+        self.show_all()
 
 
     def _setup_styling(self):
         self.set_orientation(0)
+        self.set_hexpand(False)
 
     def _setup_signals(self):
+        ...
+
+    def _subscribe_to_events(self):
         ...
 
     def _load_widgets(self):
@@ -44,17 +52,19 @@ class TabHeaderWidget(Gtk.ButtonBox):
         close = Gtk.Button()
         icon  = Gtk.Image(stock=Gtk.STOCK_CLOSE)
 
-        label.set_label("untitled")
-        label.set_width_chars(len(self.NAME))
+        # NOTE: Setup with settings and from file
         label.set_xalign(0.0)
+        label.set_margin_left(25)
+        label.set_margin_right(25)
+        label.set_hexpand(True)
 
         close.set_always_show_image(True)
         close.set_hexpand(False)
-        close.set_size_request(32, 32)
         close.set_image( Gtk.Image.new_from_icon_name("gtk-close", 4) )
         close.connect("released", self._close_tab, *(self._scroll_view, self._source_view,))
 
         self.add(label)
         self.add(close)
 
-        self.show_all()
+    def set_tab_label(self, label = "untitled"):
+        self.get_children()[0].set_label(label)

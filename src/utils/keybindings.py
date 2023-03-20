@@ -11,7 +11,7 @@ from gi.repository import Gdk
 
 
 
-def err(log = ""):
+def logger(log = ""):
     print(log)
 
 
@@ -68,7 +68,7 @@ class Keybindings:
                     # Does much the same, but with worse error handling.
                     # keyval, mask = Gtk.accelerator_parse(binding)
                 except KeymapError as e:
-                  err(f"Keybinding reload failed to parse binding '{binding}': {e}")
+                  logger(f"Keybinding reload failed to parse binding '{binding}': {e}")
                 else:
                     if mask & Gdk.ModifierType.SHIFT_MASK:
                         if keyval == Gdk.KEY_Tab:
@@ -120,7 +120,7 @@ class Keybindings:
                                               Gdk.ModifierType(event.get_state() & ~Gdk.ModifierType.LOCK_MASK),
                                               event.group)
         except TypeError:
-            err(f"Keybinding lookup failed to translate keyboard event: {dir(event)}")
+            logger(f"Keybinding lookup failed to translate keyboard event: {dir(event)}")
             return None
 
         mask = (event.get_state() & ~consumed) & self._masks
