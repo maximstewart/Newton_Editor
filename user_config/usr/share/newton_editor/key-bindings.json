@@ -8,6 +8,8 @@
         "open_files"             : "<Control>o",
         "keyboard_create_tab"    : "<Control>t",
         "keyboard_close_tab"     : "<Control>w",
+        "keyboard_save_file"     : "<Control>s",
+        "keyboard_save_file_as"  : "<Shift><Control>s",
         "keyboard_up"            : "Up",
         "keyboard_down"          : "Down",
         "keyboard_left"          : "Left",

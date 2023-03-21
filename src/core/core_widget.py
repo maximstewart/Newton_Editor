@@ -7,7 +7,7 @@ from gi.repository import Gtk
 
 # Application imports
 from .widgets.base.banner_controls import BannerControls
-from .widgets.base.editer_notebook import EditorNotebook
+from .widgets.base.notebook.editor_notebook import EditorNotebook
 from .widgets.base.bottom_status_info_widget import BottomStatusInfoWidget
 
 

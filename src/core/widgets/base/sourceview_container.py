@@ -7,11 +7,9 @@ from gi.repository import Gtk
 
 # Application imports
 from ..tab_header_widget import TabHeaderWidget
-from .source_view import SourceView
+from .sourceview.source_view import SourceView
 
 
-
-# NOTE: https://github.com/Axel-Erfurt/TextEdit/tree/b65f09be945196eb05bef83d81a6abcd129b4eb0
 
 class SourceViewContainer(Gtk.ScrolledWindow):
     def __init__(self, close_tab):

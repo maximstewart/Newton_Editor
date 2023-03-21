@@ -9,11 +9,15 @@ from gi.repository import Gdk
 from gi.repository import Gio
 
 # Application imports
-from .sourceview_container import SourceViewContainer
+from ..sourceview_container import SourceViewContainer
+from .editor_controller import EditorControllerMixin
+from .editor_events import EditorEventsMixin
 
 
 
-class EditorNotebook(Gtk.Notebook):
+# NOTE: https://github.com/Axel-Erfurt/TextEdit/tree/b65f09be945196eb05bef83d81a6abcd129b4eb0
+
+class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def __init__(self):
         super(EditorNotebook, self).__init__()
 
@@ -48,6 +52,8 @@ class EditorNotebook(Gtk.Notebook):
         event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
         event_system.subscribe("keyboard_scale_down_text", self._keyboard_scale_down_text)
+        event_system.subscribe("keyboard_save_file", self._keyboard_save_file)
+        event_system.subscribe("keyboard_save_file_as", self._keyboard_save_file_as)
 
     def _add_action_widgets(self):
         start_box = Gtk.Box()
@@ -74,9 +80,6 @@ class EditorNotebook(Gtk.Notebook):
 
     def _load_widgets(self):
         self.create_view()
-
-    def _keyboard_create_tab(self, _gfile):
-        self.create_view(gfile=_gfile)
 
     def create_view(self, widget = None, eve = None, gfile = None):
         container =  SourceViewContainer(self.close_tab)
@@ -109,75 +112,3 @@ class EditorNotebook(Gtk.Notebook):
     def _dbl_click_create_view(self, notebook, eve):
         if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
             ...
-
-    def _toggle_highlight_line(self):
-        self.action_controller("toggle_highlight_line")
-
-    def _keyboard_close_tab(self):
-        self.action_controller("close_tab")
-
-    def _keyboard_next_tab(self):
-        self.action_controller("keyboard_next_tab")
-
-    def _keyboard_prev_tab(self):
-        self.action_controller("keyboard_prev_tab")
-
-    def _keyboard_scale_up_text(self):
-        self.action_controller("scale_up_text")
-
-    def _keyboard_scale_down_text(self):
-        self.action_controller("scale_down_text")
-
-    def _text_search(self, widget = None, eve = None):
-        self.action_controller("do_text_search", widget.get_text())
-
-    def action_controller(self, action = "", query = ""):
-        page_num    = self.get_current_page()
-        container   = self.get_nth_page( page_num )
-        source_view = container.get_source_view()
-
-        if action == "do_text_search":
-            self.do_text_search(source_view, query)
-        if action == "set_buffer_language":
-            self.set_buffer_language(source_view, query)
-        if action == "set_buffer_style":
-            self.set_buffer_style(source_view, query)
-        if action == "toggle_highlight_line":
-            self.toggle_highlight_line(source_view)
-        if action == "scale_up_text":
-            self.scale_up_text(source_view)
-        if action == "scale_down_text":
-            self.scale_down_text(source_view)
-        if action == "close_tab":
-            self.close_tab(None, container, source_view)
-        if action == "keyboard_prev_tab":
-            self.keyboard_prev_tab(page_num)
-        if action == "keyboard_next_tab":
-            self.keyboard_next_tab(page_num)
-
-
-    def do_text_search(self, query = ""):
-        source_view.scale_down_text()
-
-    def set_buffer_language(self, source_view, language = "python3"):
-        source_view.set_buffer_language(language)
-
-    def set_buffer_style(self, source_view, style = "tango"):
-        source_view.set_buffer_style(style)
-
-    def keyboard_prev_tab(self, page_num):
-        page_num = self.get_n_pages() - 1 if page_num == 0 else page_num - 1
-        self.set_current_page(page_num)
-
-    def keyboard_next_tab(self, page_num):
-        page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
-        self.set_current_page(page_num)
-
-    def scale_up_text(self, source_view):
-        source_view.scale_up_text()
-
-    def scale_down_text(self, source_view):
-        source_view.scale_down_text()
-
-    def toggle_highlight_line(self, source_view):
-        source_view.toggle_highlight_line()
