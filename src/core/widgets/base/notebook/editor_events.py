@@ -13,7 +13,10 @@ class EditorEventsMixin:
     def _keyboard_close_tab(self):
         self.action_controller("close_tab")
 
-    def _keyboard_create_tab(self, _gfile):
+    def _keyboard_open_file(self, gfile):
+        self.open_file(gfile)
+
+    def _keyboard_create_tab(self, _gfile=None):
         self.create_view(gfile=_gfile)
 
     def _keyboard_next_tab(self):
@@ -29,10 +32,10 @@ class EditorEventsMixin:
         self.action_controller("scale_down_text")
 
     def _keyboard_save_file(self):
-        ...
+        self.action_controller("save_file")
 
     def _keyboard_save_file_as(self):
-        ...
+        self.action_controller("save_file_as")
 
     def _text_search(self, widget = None, eve = None):
         self.action_controller("do_text_search", widget.get_text())

@@ -30,3 +30,7 @@ class EditorControllerMixin:
             self.keyboard_prev_tab(page_num)
         if action == "keyboard_next_tab":
             self.keyboard_next_tab(page_num)
+        if action == "save_file":
+            source_view.save_file()
+        if action == "save_file_as":
+            source_view.save_file_as()

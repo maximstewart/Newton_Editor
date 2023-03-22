@@ -55,6 +55,6 @@ class OpenFileButton(Gtk.Button):
             if filename:
                 path   = filename if os.path.isabs(filename) else os.path.abspath(filename)
                 _gfile = Gio.File.new_for_path(path)
-                event_system.emit("keyboard_create_tab", (_gfile,))
+                event_system.emit("keyboard_open_file", (_gfile,))
 
         chooser.destroy()

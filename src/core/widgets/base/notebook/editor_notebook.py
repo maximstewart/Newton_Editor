@@ -47,6 +47,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("toggle_highlight_line", self._toggle_highlight_line)
         event_system.subscribe("keyboard_create_tab", self._keyboard_create_tab)
+        event_system.subscribe("keyboard_open_file", self._keyboard_open_file)
         event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
         event_system.subscribe("keyboard_prev_tab", self._keyboard_prev_tab)
         event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
@@ -81,6 +82,10 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def _load_widgets(self):
         self.create_view()
 
+    def _dbl_click_create_view(self, notebook, eve):
+        if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
+            ...
+
     def create_view(self, widget = None, eve = None, gfile = None):
         container =  SourceViewContainer(self.close_tab)
 
@@ -98,17 +103,20 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.show_all()
         self.set_current_page(index)
 
+    def open_file(self, gfile):
+        page_num    = self.get_current_page()
+        container   = self.get_nth_page( page_num )
+        source_view = container.get_source_view()
+
+        if source_view._current_filename == "":
+            source_view.open_file(gfile)
+        else:
+            self.create_view(None, None, gfile)
+
     def close_tab(self, button, container, source_view, eve = None):
         if self.get_n_pages() == 1:
             return
 
         page_num = self.page_num(container)
-        watcher  = source_view.get_file_watcher()
-        if watcher:
-            watcher.cancel()
-
+        source_view._cancel_current_file_watchers()
         self.remove_page(page_num)
-
-    def _dbl_click_create_view(self, notebook, eve):
-        if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
-            ...

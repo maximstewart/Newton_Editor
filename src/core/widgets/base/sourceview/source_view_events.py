@@ -1,17 +1,17 @@
 # Python imports
 
 # Lib imports
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkSource', '4')
+from gi.repository import Gtk
+from gi.repository import GtkSource
 
 # Application imports
 
 
 
 class SourceViewEventsMixin:
-    def _create_default_tag(self):
-        self._general_style_tag = self._buffer.create_tag('general_style')
-        self._general_style_tag.set_property('size', 100)
-        self._general_style_tag.set_property('scale', 100)
-
     def set_buffer_language(self, language = "python3"):
         self._buffer.set_language( self._language_manager.get_language(language) )
 
@@ -37,12 +37,6 @@ class SourceViewEventsMixin:
 
         tag.set_property('scale', tag.get_property('scale') - scale_step)
         self._buffer.apply_tag(tag, start_itr, end_itr)
-
-    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
-        if mark != buf.get_insert():
-            return
-
-        self.update_cursor_position()
 
     def update_cursor_position(self):
         iter  = self._buffer.get_iter_at_mark(self._buffer.get_insert())
@@ -71,3 +65,44 @@ class SourceViewEventsMixin:
 
     def action_comment_out_selection(self):
         pass
+
+    def open_file(self, gfile, *args):
+        self._current_file = gfile
+
+        self.load_file_info(gfile)
+        self.load_file_async(gfile)
+        self._create_file_watcher(gfile)
+        self.grab_focus()
+
+    def load_file_info(self, gfile):
+        info         = gfile.query_info("standard::*", 0, cancellable=None)
+        content_type = info.get_content_type()
+        display_name = info.get_display_name()
+        tab_widget   = self.get_parent().get_tab_widget()
+        self._current_filename = display_name
+
+        try:
+            lm = self._language_manager.guess_language(None, content_type)
+            self.set_buffer_language( lm.get_id() )
+        except Exception as e:
+            ...
+
+        logger.debug(f"Detected Content Type: {content_type}")
+        tab_widget.set_tab_label(display_name)
+        event_system.emit("set_bottom_labels", (gfile, info))
+
+    def load_file_async(self, gfile):
+        file = GtkSource.File()
+        file.set_location(gfile)
+        self._file_loader = GtkSource.FileLoader.new(self._buffer, file)
+
+        def finish_load_callback(obj, res, user_data=None):
+            self._file_loader.load_finish(res)
+            self._is_changed = False
+
+        self._file_loader.load_async(io_priority = 98,
+                            cancellable = None,
+                            progress_callback = None,
+                            progress_callback_data = None,
+                            callback = finish_load_callback,
+                            user_data = (None))

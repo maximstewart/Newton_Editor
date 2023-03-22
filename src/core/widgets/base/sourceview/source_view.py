@@ -23,12 +23,30 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._style_scheme_manager = GtkSource.StyleSchemeManager()
 
         self._general_style_tag    = None
-        self._file_watcher         = None
-        self._is_changed           = False
+        self._file_change_watcher  = None
+        self._file_cdr_watcher     = None
 
+        self._is_changed             = False
+        self._ignore_internal_change = False
+        self._last_eve_in_queue      = None
         self._current_file: Gio.File = None
-        self._file_loader = None
-        self._buffer      = self.get_buffer()
+        self._current_filename: str  = ""
+        self._file_loader            = None
+        self._buffer                 = self.get_buffer()
+
+
+
+        self._file_filter_text = Gtk.FileFilter()
+        self._file_filter_text.set_name("Text Files")
+        # TODO: Need to externalize to settings file...
+        pattern = ["*.txt", "*.py", "*.c", "*.h", "*.cpp", "*.csv", "*.m3*", "*.lua", "*.js", "*.toml", "*.xml", "*.pom", "*.htm", "*.md" "*.vala", "*.tsv", "*.css", "*.html", ".json", "*.java", "*.go", "*.php", "*.ts", "*.rs"]
+        for p in pattern:
+            self._file_filter_text.add_pattern(p)
+
+        self._file_filter_all = Gtk.FileFilter()
+        self._file_filter_all.set_name("All Files")
+        self._file_filter_all.add_pattern("*.*")
+
 
         self._setup_styling()
         self._setup_signals()
@@ -69,40 +87,10 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
     def _load_widgets(self):
         ...
 
-    def _is_modified(self, *args):
-        self._is_changed = True
-        self.update_cursor_position()
-
-    def get_file_watcher(self):
-        return self._file_watcher
-
-    def create_file_watcher(self, file_path = None):
-        if not file_path:
-            return
-
-        if self._file_watcher:
-            self._file_watcher.cancel()
-            self._file_watcher = None
-
-        self._file_watcher = Gio.File.new_for_path(file_path) \
-                                        .monitor_file([
-                                                        Gio.FileMonitorFlags.WATCH_MOVES,
-                                                        Gio.FileMonitorFlags.WATCH_HARD_LINKS
-                                                    ], Gio.Cancellable())
-
-        self._file_watcher.connect("changed", self.file_watch_updates)
-
-    def file_watch_updates(self, file_monitor, file, other_file=None, eve_type=None, data=None):
-        if settings.is_debug():
-            logger.debug(eve_type)
-
-        if eve_type in [Gio.FileMonitorEvent.CREATED,
-                        Gio.FileMonitorEvent.DELETED,
-                        Gio.FileMonitorEvent.RENAMED]:
-            ...
-
-        if eve_type in [ Gio.FileMonitorEvent.CHANGED ]:
-            ...
+    def _create_default_tag(self):
+        self._general_style_tag = self._buffer.create_tag('general_style')
+        self._general_style_tag.set_property('size', 100)
+        self._general_style_tag.set_property('scale', 100)
 
     def _set_up_dnd(self):
         URI_TARGET_TYPE  = 80
@@ -137,42 +125,96 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
                 event_system.emit('create_view', (None, None, gfile,))
 
+    def _is_modified(self, *args):
+        self._is_changed = True
+        self.update_cursor_position()
 
-    def open_file(self, gfile, *args):
-        self._current_file = gfile
+    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
+        if mark != buf.get_insert(): return
 
-        self.load_file_info(gfile)
-        self.load_file_async(gfile)
-        self.grab_focus()
+        self.update_cursor_position()
 
-    def load_file_info(self, gfile):
-        info         = gfile.query_info("standard::*", 0, cancellable=None)
-        content_type = info.get_content_type()
-        display_name = info.get_display_name()
-        tab_widget   = self.get_parent().get_tab_widget()
+    def _create_file_watcher(self, gfile = None):
+        if not gfile: return
 
-        try:
-            lm = self._language_manager.guess_language(None, content_type)
-            self.set_buffer_language( lm.get_id() )
-        except Exception as e:
-            ...
+        self._cancel_current_file_watchers()
+        self._file_change_watcher = gfile.monitor(Gio.FileMonitorFlags.NONE, Gio.Cancellable())
+        self._file_change_watcher.connect("changed", self._file_monitor)
 
-        logger.debug(f"Detected Content Type: {content_type}")
-        tab_widget.set_tab_label(display_name)
-        event_system.emit("set_bottom_labels", (gfile, info))
+    def _file_monitor(self, file_monitor, file, other_file = None, eve_type = None, data = None):
+        if not file.get_path() == self._current_file.get_path():
+            return
 
-    def load_file_async(self, gfile):
-        file = GtkSource.File()
-        file.set_location(gfile)
-        self._file_loader = GtkSource.FileLoader.new(self._buffer, file)
+        if eve_type in [Gio.FileMonitorEvent.CREATED,
+                        Gio.FileMonitorEvent.DELETED,
+                        Gio.FileMonitorEvent.RENAMED,
+                        Gio.FileMonitorEvent.MOVED_IN,
+                        Gio.FileMonitorEvent.MOVED_OUT]:
+            self._is_changed = True
 
-        def finish_load_callback(obj, res, user_data=None):
-            self._file_loader.load_finish(res)
-            self._is_changed = False
+        if eve_type in [ Gio.FileMonitorEvent.CHANGES_DONE_HINT ]:
+            if self._ignore_internal_change:
+                self._ignore_internal_change = False
+                return
 
-        self._file_loader.load_async(io_priority=98,
-                            cancellable=None,
-                            progress_callback=None,
-                            progress_callback_data=None,
-                            callback=finish_load_callback,
-                            user_data=(None))
+            # TODO: Any better way to load the difference??
+            if self._current_file.query_exists():
+                self.load_file_async(self._current_file)
+
+    def _cancel_current_file_watchers(self):
+        if self._file_change_watcher:
+            self._file_change_watcher.cancel()
+            self._file_change_watcher = None
+
+        if self._file_cdr_watcher:
+            self._file_cdr_watcher.cancel()
+            self._file_cdr_watcher = None
+
+    def save_file(self):
+        if not self._current_file:
+            self.save_file_as()
+            return
+
+        self._write_file(self._current_file)
+
+
+    def save_file_as(self):
+        # TODO: Move Chooser logic to own widget
+        dlg = Gtk.FileChooserDialog(title="Please choose a file...", parent = None, action = 1)
+
+        dlg.add_buttons("Cancel", Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK)
+        dlg.set_do_overwrite_confirmation(True)
+        dlg.add_filter(self._file_filter_text)
+        dlg.add_filter(self._file_filter_all)
+
+        if self._current_filename == "":
+            dlg.set_current_name("new.txt")
+        else:
+            dlg.set_current_folder(self._current_file.get_parent())
+            dlg.set_current_name(self._current_filename)
+
+        response = dlg.run()
+        file     = dlg.get_filename() if response == Gtk.ResponseType.OK else ""
+        dlg.destroy()
+
+        if not file == "":
+            gfile = Gio.File.new_for_path(file)
+            self._write_file(gfile, True)
+
+    def _write_file(self, gfile, save_as = False):
+        with open(gfile.get_path(), 'w') as f:
+            if not save_as:
+                self._ignore_internal_change = True
+                self._is_changed = False
+
+            start_itr = self._buffer.get_start_iter()
+            end_itr   = self._buffer.get_end_iter()
+            text      = self._buffer.get_text(start_itr, end_itr, True)
+
+            f.write(text)
+            f.close()
+
+            if self._current_filename == "" and save_as:
+                self.open_file(gfile)
+            else:
+                event_system.emit("create_view", (None, None, gfile,))
