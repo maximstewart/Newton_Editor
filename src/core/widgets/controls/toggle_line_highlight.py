@@ -21,11 +21,9 @@ class ToggleLineHighlight(Gtk.Button):
 
     def _setup_styling(self):
         self.set_label("Line Highlight")
-        # self.set_image( Gtk.Image.new_from_icon_name("gtk-add", 4) )
+        self.set_image( Gtk.Image.new_from_icon_name("gtk-select-font", 4) )
         self.set_always_show_image(True)
         self.set_image_position(1) # Left - 0, Right = 1
-        # self.set_margin_left(5)
-        # self.set_margin_right(5)
         self.set_hexpand(False)
 
     def _setup_signals(self):

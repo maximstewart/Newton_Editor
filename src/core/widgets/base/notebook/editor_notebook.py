@@ -36,6 +36,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.set_scrollable(True)
 
     def _setup_signals(self):
+        self.connect("switch-page", self._switch_page_update)
         # self.connect("button-press-event", self._dbl_click_create_view)
         ...
 
@@ -85,6 +86,13 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def _dbl_click_create_view(self, notebook, eve):
         if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
             ...
+
+    def _switch_page_update(self, notebook, page, page_num):
+        source_view = page.get_source_view()
+        gfile       = source_view.get_current_file()
+        if gfile:
+            source_view.load_file_info( gfile )
+            source_view.update_cursor_position()
 
     def create_view(self, widget = None, eve = None, gfile = None):
         container =  SourceViewContainer(self.close_tab)

@@ -36,7 +36,6 @@ class BottomStatusInfoWidget:
 
     def _subscribe_to_events(self):
         event_system.subscribe("set_bottom_labels", self.set_bottom_labels)
-
         event_system.subscribe("set_path_label", self._set_path_label)
         event_system.subscribe("set_encoding_label", self._set_encoding_label)
         event_system.subscribe("set_line_char_label", self._set_line_char_label)
@@ -69,7 +68,7 @@ class BottomStatusInfoWidget:
         self.bottom_path_label.set_tooltip_text( gfile.get_path() )
 
         self.bottom_encoding_label.set_text("utf-8")
-        self.bottom_line_char_label.set_text("0:0")
+        self.bottom_line_char_label.set_text("1:1")
         self.bottom_file_type_label.set_text( info.get_content_type() )
 
     def _set_path_label(self):

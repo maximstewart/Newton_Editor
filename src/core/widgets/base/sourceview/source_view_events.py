@@ -12,6 +12,9 @@ from gi.repository import GtkSource
 
 
 class SourceViewEventsMixin:
+    def get_current_file(self):
+        return self._current_file
+
     def set_buffer_language(self, language = "python3"):
         self._buffer.set_language( self._language_manager.get_language(language) )
 
@@ -39,7 +42,7 @@ class SourceViewEventsMixin:
         self._buffer.apply_tag(tag, start_itr, end_itr)
 
     def update_cursor_position(self):
-        iter  = self._buffer.get_iter_at_mark(self._buffer.get_insert())
+        iter  = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
         chars = iter.get_offset()
         row   = iter.get_line() + 1
         col   = self.get_visual_column(iter) + 1

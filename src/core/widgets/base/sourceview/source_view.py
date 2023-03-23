@@ -34,8 +34,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._file_loader            = None
         self._buffer                 = self.get_buffer()
 
-
-
         self._file_filter_text = Gtk.FileFilter()
         self._file_filter_text.set_name("Text Files")
         # TODO: Need to externalize to settings file...
