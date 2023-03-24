@@ -12,6 +12,7 @@ from gi.repository import GtkSource
 
 # Application imports
 from .source_view_events import SourceViewEventsMixin
+from .custom_completion_providers.py_provider import PythonProvider
 
 
 
@@ -33,6 +34,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._current_filename: str  = ""
         self._file_loader            = None
         self._buffer                 = self.get_buffer()
+        self._completion             = self.get_completion()
 
         self._file_filter_text = Gtk.FileFilter()
         self._file_filter_text.set_name("Text Files")
@@ -76,8 +78,13 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.connect("drag-data-received", self._on_drag_data_received)
         self._buffer.connect("mark-set", self._on_cursor_move)
         self._buffer.connect('changed', self._is_modified)
-        # self.completion.add_provider(srcCompleteonSnippets)
-        # self.completion.add_provider(srcCompleteonWords)
+
+        word_completion = GtkSource.CompletionWords.new("word_completion")
+        word_completion.register(self._buffer)
+        self._completion.add_provider(word_completion)
+
+        py_provider = PythonProvider()
+        self._completion.add_provider(py_provider)
 
     def _subscribe_to_events(self):
         ...
@@ -188,7 +195,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         if self._current_filename == "":
             dlg.set_current_name("new.txt")
         else:
-            dlg.set_current_folder(self._current_file.get_parent())
+            dlg.set_current_folder(self._current_file.get_parent().get_path())
             dlg.set_current_name(self._current_filename)
 
         response = dlg.run()
@@ -212,7 +219,8 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
             f.write(text)
             f.close()
 
-            if self._current_filename == "" and save_as:
-                self.open_file(gfile)
+            if (self._current_filename == "" and save_as) or \
+                (self._current_filename != "" and not save_as):
+                    self.open_file(gfile)
             else:
                 event_system.emit("create_view", (None, None, gfile,))

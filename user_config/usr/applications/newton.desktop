@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=Newton Editor
-GenericName=Code IDE
-Comment=General purpose IDE
-Exec=/bin/newton_editor %F
-Icon=/usr/share/newton_editor/icons/newton_editor.png
+Name=Newton
+GenericName=Text editor and mini IDE
+Comment=General purpose text editor and IDE
+Exec=/bin/newton %F
+Icon=/usr/share/newton/icons/newton.png
 Type=Application
 StartupNotify=true
 Categories=GNOME;GTK;Utility;TextEditor;Development;
