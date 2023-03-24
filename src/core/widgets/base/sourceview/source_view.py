@@ -12,7 +12,8 @@ from gi.repository import GtkSource
 
 # Application imports
 from .source_view_events import SourceViewEventsMixin
-from .custom_completion_providers.py_provider import PythonProvider
+from .custom_completion_providers.example_completion_provider import ExampleCompletionProvider
+from .custom_completion_providers.gedi_completion_provider import GediCompletionProvider
 
 
 
@@ -78,13 +79,24 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.connect("drag-data-received", self._on_drag_data_received)
         self._buffer.connect("mark-set", self._on_cursor_move)
         self._buffer.connect('changed', self._is_modified)
+        # self._buffer.connect("loaded", self.on_document_load)
 
+    def _document_loaded(self):
+        for provider in self._completion.get_providers():
+            self._completion.remove_provider(provider)
+
+        # TODO: actually load a meaningful provider based on file type...
+        file = self._current_file.get_path()
         word_completion = GtkSource.CompletionWords.new("word_completion")
         word_completion.register(self._buffer)
         self._completion.add_provider(word_completion)
 
-        py_provider = PythonProvider()
-        self._completion.add_provider(py_provider)
+        # example_completion_provider = ExampleCompletionProvider()
+        # self._completion.add_provider(example_completion_provider)
+
+        gedi_completion_provider = GediCompletionProvider(file)
+        self._completion.add_provider(gedi_completion_provider)
+
 
     def _subscribe_to_events(self):
         ...

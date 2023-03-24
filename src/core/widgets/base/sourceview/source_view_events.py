@@ -102,6 +102,7 @@ class SourceViewEventsMixin:
         def finish_load_callback(obj, res, user_data=None):
             self._file_loader.load_finish(res)
             self._is_changed = False
+            self._document_loaded()
 
         self._file_loader.load_async(io_priority = 98,
                             cancellable = None,

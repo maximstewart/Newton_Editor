@@ -14,15 +14,19 @@ from gi.repository import GObject
 
 
 
-class PythonProvider(GObject.GObject, GtkSource.CompletionProvider):
+class ExampleCompletionProvider(GObject.GObject, GtkSource.CompletionProvider):
     """
-        This is a custom Completion Provider for Python.
+        This is a custom Completion Example Provider.
         # NOTE: used information from here --> https://warroom.rsmus.com/do-that-auto-complete/
     """
+    __gtype_name__ = 'CustomProvider'
+
+    def __init__(self):
+        GObject.Object.__init__(self)
 
     def do_get_name(self):
         """ Returns: a new string containing the name of the provider. """
-        return 'PythonProvider'
+        return _('ExampleProvider')
 
     def do_match(self, context):
         """ Get whether the provider match the context of completion detailed in context. """
@@ -45,7 +49,7 @@ class PythonProvider(GObject.GObject, GtkSource.CompletionProvider):
             # GtkSource.CompletionItem(label='Hello World!', text = 'Hello World!', icon = None, info = None) # NOTE: Always proposed...
         ]
 
-        # Gtk Versions differ on get_iter responses... 
+        # Gtk Versions differ on get_iter responses...
         end_iter = context.get_iter()
         if not isinstance(end_iter, Gtk.TextIter):
             _, end_iter = context.get_iter()
