@@ -9,6 +9,7 @@ from gi.repository import Gtk
 from gi.repository import GtkSource
 from gi.repository import GObject
 
+import jedi
 from jedi.api import Script
 
 # Application imports
@@ -27,20 +28,16 @@ icon_names = {
 
 
 class Jedi:
-    def get_script(file, buffer):
-        doc_text    = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), False)
-        iter_cursor = buffer.get_iter_at_mark(buffer.get_insert())
-        linenum     = iter_cursor.get_line() + 1
-        charnum     = iter_cursor.get_line_index()
+    def get_script(file, doc_text):
         return Script(code = doc_text, path = file)
 
 
-class GediCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
+class PythonCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
     """
-        This code is A python code completion plugin for Gedit that's been modified accordingly to work for Newton.
-        # NOTE: Code pulled from here --> https://github.com/isamert/gedi
+        This code is A python code completion plugin for Newton.
+        # NOTE: Some code pulled/referenced from here --> https://github.com/isamert/gedi
     """
-    __gtype_name__ = 'GediProvider'
+    __gtype_name__ = 'PythonProvider'
 
     def __init__(self, file):
         GObject.Object.__init__(self)
@@ -48,20 +45,19 @@ class GediCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         self._file  = file
 
     def do_get_name(self):
-        return _("Gedi Python Code Completion")
+        return "Python Code Completion"
 
     def get_iter_correctly(self, context):
-        if isinstance(context.get_iter(), tuple):
-            return context.get_iter()[1];
-        else:
-            return context.get_iter()
+        return context.get_iter()[1] if isinstance(context.get_iter(), tuple) else context.get_iter()
 
     def do_match(self, context):
         iter = self.get_iter_correctly(context)
         iter.backward_char()
+
         buffer = iter.get_buffer()
         if buffer.get_context_classes_at_iter(iter) != ['no-spell-check']:
             return False
+
         ch = iter.get_char()
         if not (ch in ('_', '.') or ch.isalnum()):
             return False
@@ -75,20 +71,27 @@ class GediCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         return GtkSource.CompletionActivation.INTERACTIVE
 
     def do_populate(self, context):
-        # TODO: Convert async maybe?
-        it = self.get_iter_correctly(context)
-        document  = it.get_buffer()
+        # TODO: Maybe convert async?
+        it        = self.get_iter_correctly(context)
+        buffer    = it.get_buffer()
         proposals = []
 
-        # for completion in Jedi.get_script(document).completions():
-        for completion in Jedi.get_script(self._file, document).complete():
-            complete = completion.name
-            doc      = completion.doc if jedi.__version__ <= (0,7,0) else completion.docstring()
+        doc_text    = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), False)
+        iter_cursor = buffer.get_iter_at_mark(buffer.get_insert())
+        linenum     = iter_cursor.get_line() + 1
+        charnum     = iter_cursor.get_line_index()
 
-            proposals.append(GtkSource.CompletionItem.new(completion.name,
-                                                            completion.name,
-                                                            self.get_icon_for_type(completion.type),
-                                                            doc))
+        def create_generator():
+            for completion in Jedi.get_script(self._file, doc_text).complete(line = linenum, column = None, fuzzy = False):
+                comp_item = GtkSource.CompletionItem.new()
+                comp_item.set_label(completion.name)
+                comp_item.set_text(completion.name)
+                comp_item.set_icon(self.get_icon_for_type(completion.type))
+                comp_item.set_info(completion.docstring())
+                yield comp_item
+
+        for item in create_generator():
+            proposals.append(item)
 
         context.add_proposals(self, proposals, True)
 
