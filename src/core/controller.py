@@ -1,4 +1,5 @@
 # Python imports
+import os
 
 # Lib imports
 import gi
@@ -22,6 +23,14 @@ class Controller(SignalsMixins, ControllerData):
         self._setup_styling()
         self._setup_signals()
         self._subscribe_to_events()
+
+        if args.no_plugins == "false":
+            self.plugins.launch_plugins()
+
+        for arg in unknownargs + [args.new_tab,]:
+            if os.path.isfile(arg):
+                message = f"FILE|{arg}"
+                event_system.emit("post_file_to_ipc", message)
 
 
     def _setup_styling(self):

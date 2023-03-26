@@ -7,8 +7,8 @@ from gi.repository import Gtk
 
 # Application imports
 from .widgets.base.banner_controls import BannerControls
-from .widgets.base.notebook.editor_notebook import EditorNotebook
-from .widgets.base.bottom_status_info_widget import BottomStatusInfoWidget
+from .editors_container import EditorsContainer
+from .widgets.base.general_info_widget import GeneralInfoWidget
 
 
 
@@ -34,6 +34,5 @@ class CoreWidget(Gtk.Box):
 
     def _load_widgets(self):
         self.add(BannerControls())
-        self.add(EditorNotebook())
-
-        BottomStatusInfoWidget()
+        GeneralInfoWidget()
+        self.add(EditorsContainer())

@@ -18,8 +18,8 @@ function main() {
     fi
 
     # NOTE: Remove if you want to pass file(s) besides directories...
-    if [ ! -d "${path}" ]; then
-        echo "Newton: Path given not a directory..."
+    if [ ! -f "${path}" ]; then
+        echo "Newton: Path given not a file..."
         exit 1
     fi
 

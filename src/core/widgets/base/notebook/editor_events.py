@@ -3,42 +3,49 @@
 # Lib imports
 
 # Application imports
+from ..sourceview_container import SourceViewContainer
 
 
 
 class EditorEventsMixin:
-    def _toggle_highlight_line(self):
-        self.action_controller("toggle_highlight_line")
+    def create_view(self, widget = None, eve = None, gfile = None):
+        container =  SourceViewContainer(self.close_tab)
 
-    def _keyboard_close_tab(self):
-        self.action_controller("close_tab")
+        page_num = self.append_page(container, container.get_tab_widget())
+        self.set_tab_detachable(container, True)
 
-    def _keyboard_open_file(self, gfile):
-        self.open_file(gfile)
+        ctx = self.get_style_context()
+        ctx.add_class("notebook-unselected-focus")
+        self.set_tab_reorderable(container, True)
 
-    def _keyboard_create_tab(self, _gfile=None):
-        self.create_view(gfile=_gfile)
+        if gfile:
+            source_view = container.get_source_view()
+            source_view.open_file(gfile)
 
-    def _keyboard_next_tab(self):
-        self.action_controller("keyboard_next_tab")
+        self.show_all()
+        self.set_current_page(page_num)
 
-    def _keyboard_prev_tab(self):
-        self.action_controller("keyboard_prev_tab")
+    def open_file(self, gfile):
+        page_num    = self.get_current_page()
+        container   = self.get_nth_page( page_num )
+        source_view = container.get_source_view()
 
-    def _keyboard_scale_up_text(self):
-        self.action_controller("scale_up_text")
+        if source_view._current_filename == "":
+            source_view.open_file(gfile)
+        else:
+            self.create_view(None, None, gfile)
 
-    def _keyboard_scale_down_text(self):
-        self.action_controller("scale_down_text")
+    def close_tab(self, button, container, source_view, eve = None):
+        if self.NAME == "notebook_1" and self.get_n_pages() == 1:
+            return
 
-    def _keyboard_save_file(self):
-        self.action_controller("save_file")
+        page_num = self.page_num(container)
+        source_view._cancel_current_file_watchers()
+        self.remove_page(page_num)
 
-    def _keyboard_save_file_as(self):
-        self.action_controller("save_file_as")
+        if self.NAME == "notebook_2" and self.get_n_pages() == 0:
+            self.hide()
 
-    def _text_search(self, widget = None, eve = None):
-        self.action_controller("do_text_search", widget.get_text())
 
     def do_text_search(self, query = ""):
         source_view.scale_down_text()
@@ -56,6 +63,48 @@ class EditorEventsMixin:
     def keyboard_next_tab(self, page_num):
         page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
         self.set_current_page(page_num)
+
+    def keyboard_move_tab_to_1(self, page_num):
+        notebook = self.builder.get_object("notebook_1")
+        if self.NAME == "notebook_1":
+            if self.get_n_pages() == 1:
+                return
+
+            notebook = self.builder.get_object("notebook_2")
+
+        page = self.get_nth_page(page_num)
+        tab  = page.get_tab_widget()
+        self.detach_tab(page)
+
+        notebook.insert_page(page, tab, -1)
+        notebook.show()
+
+    def keyboard_move_tab_to_2(self, page_num):
+        if self.NAME == "notebook_1" and self.get_n_pages() == 1:
+            return
+
+        notebook = self.builder.get_object("notebook_2")
+        if self.NAME == "notebook_2":
+            notebook = self.builder.get_object("notebook_1")
+
+        page = self.get_nth_page(page_num)
+        tab  = page.get_tab_widget()
+        self.detach_tab(page)
+
+        notebook.insert_page(page, tab, -1)
+        notebook.show()
+        if self.NAME == "notebook_2" and self.get_n_pages() == 0:
+            self.hide()
+
+    def keyboard_move_tab_left(self, page_num):
+        page     = self.get_nth_page(page_num)
+        page_num = self.get_n_pages() - 1 if page_num == 0 else page_num - 1
+        self.reorder_child(page, page_num)
+
+    def keyboard_move_tab_right(self, page_num):
+        page     = self.get_nth_page(page_num)
+        page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
+        self.reorder_child(page, page_num)
 
     def scale_up_text(self, source_view):
         source_view.scale_up_text()

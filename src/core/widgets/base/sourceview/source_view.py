@@ -21,19 +21,22 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
     def __init__(self):
         super(SourceView, self).__init__()
 
-        self._language_manager     = GtkSource.LanguageManager()
-        self._style_scheme_manager = GtkSource.StyleSchemeManager()
+        self._language_manager       = GtkSource.LanguageManager()
+        self._style_scheme_manager   = GtkSource.StyleSchemeManager()
 
-        self._general_style_tag    = None
-        self._file_change_watcher  = None
-        self._file_cdr_watcher     = None
+        self._general_style_tag      = None
+        self._file_loader            = None
+        self._file_change_watcher    = None
+        self._file_cdr_watcher       = None
+        self._last_eve_in_queue      = None
+        self._current_file: Gio.File = None
+
+        self._current_filename: str  = ""
+        self._current_filepath: str  = None
+        self._current_filetype: str  = "buffer"
 
         self._is_changed             = False
         self._ignore_internal_change = False
-        self._last_eve_in_queue      = None
-        self._current_file: Gio.File = None
-        self._current_filename: str  = ""
-        self._file_loader            = None
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
 
@@ -47,7 +50,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._file_filter_all = Gtk.FileFilter()
         self._file_filter_all.set_name("All Files")
         self._file_filter_all.add_pattern("*.*")
-
 
         self._setup_styling()
         self._setup_signals()
@@ -108,13 +110,38 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._general_style_tag.set_property('size', 100)
         self._general_style_tag.set_property('scale', 100)
 
+    def _is_modified(self, *args):
+        self._is_changed = True
+        self.update_cursor_position()
+
+    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
+        if mark != buf.get_insert(): return
+
+        target = self.get_parent().get_parent().NAME
+        path   = self._current_file if self._current_file else ""
+
+        event_system.emit('focused_target_changed', (target,))
+        event_system.emit("set_path_label", (path,))
+        event_system.emit("set_encoding_label")
+        event_system.emit("set_file_type_label", (self._current_filetype,))
+        self.update_cursor_position()
+
     def _set_up_dnd(self):
-        URI_TARGET_TYPE  = 80
-        uri_target       = Gtk.TargetEntry.new('text/uri-list', Gtk.TargetFlags(0), URI_TARGET_TYPE)
-        targets          = [ uri_target ]
+        WIDGET_TARGET_TYPE = 70
+        URI_TARGET_TYPE    = 80
+        widget_target      = Gtk.TargetEntry.new('dummy', Gtk.TargetFlags(0), WIDGET_TARGET_TYPE)
+        uri_target         = Gtk.TargetEntry.new('text/uri-list', Gtk.TargetFlags(0), URI_TARGET_TYPE)
+        targets            = [ widget_target, uri_target ]
         self.drag_dest_set_target_list(targets)
 
     def _on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
+        if info == 70:
+            print(drag_context)
+            print(data)
+            print(info)
+            # detach_tab(child)
+            return
+
         if info == 80:
             uris  = data.get_uris()
 
@@ -141,14 +168,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
                 event_system.emit('create_view', (None, None, gfile,))
 
-    def _is_modified(self, *args):
-        self._is_changed = True
-        self.update_cursor_position()
-
-    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
-        if mark != buf.get_insert(): return
-
-        self.update_cursor_position()
 
     def _create_file_watcher(self, gfile = None):
         if not gfile: return
@@ -185,37 +204,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         if self._file_cdr_watcher:
             self._file_cdr_watcher.cancel()
             self._file_cdr_watcher = None
-
-    def save_file(self):
-        if not self._current_file:
-            self.save_file_as()
-            return
-
-        self._write_file(self._current_file)
-
-
-    def save_file_as(self):
-        # TODO: Move Chooser logic to own widget
-        dlg = Gtk.FileChooserDialog(title="Please choose a file...", parent = None, action = 1)
-
-        dlg.add_buttons("Cancel", Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK)
-        dlg.set_do_overwrite_confirmation(True)
-        dlg.add_filter(self._file_filter_text)
-        dlg.add_filter(self._file_filter_all)
-
-        if self._current_filename == "":
-            dlg.set_current_name("new.txt")
-        else:
-            dlg.set_current_folder(self._current_file.get_parent().get_path())
-            dlg.set_current_name(self._current_filename)
-
-        response = dlg.run()
-        file     = dlg.get_filename() if response == Gtk.ResponseType.OK else ""
-        dlg.destroy()
-
-        if not file == "":
-            gfile = Gio.File.new_for_path(file)
-            self._write_file(gfile, True)
 
     def _write_file(self, gfile, save_as = False):
         with open(gfile.get_path(), 'w') as f:

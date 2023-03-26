@@ -2,7 +2,7 @@
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.22"/>
-  <object class="GtkStatusbar" id="bottom_status_info">
+  <object class="GtkStatusbar" id="general_info">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="margin-left">10</property>
@@ -14,7 +14,7 @@
     <property name="spacing">15</property>
     <property name="baseline-position">top</property>
     <child type="center">
-      <object class="GtkLabel" id="bottom_line_char_label">
+      <object class="GtkLabel" id="line_char_label">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="single-line-mode">True</property>
@@ -27,7 +27,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkLabel" id="bottom_path_label">
+      <object class="GtkLabel" id="path_label">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="ellipsize">start</property>
@@ -41,7 +41,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkLabel" id="bottom_file_type_label">
+      <object class="GtkLabel" id="file_type_label">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
       </object>
@@ -53,7 +53,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkLabel" id="bottom_encoding_label">
+      <object class="GtkLabel" id="encoding_label">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
       </object>

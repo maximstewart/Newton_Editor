@@ -5,6 +5,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '4')
 from gi.repository import Gtk
+from gi.repository import Gio
 from gi.repository import GtkSource
 
 # Application imports
@@ -77,22 +78,52 @@ class SourceViewEventsMixin:
         self._create_file_watcher(gfile)
         self.grab_focus()
 
+    def save_file(self):
+        if not self._current_file:
+            self.save_file_as()
+            return
+
+        self._write_file(self._current_file)
+
+    def save_file_as(self):
+        # TODO: Move Chooser logic to own widget
+        dlg = Gtk.FileChooserDialog(title="Please choose a file...", parent = None, action = 1)
+
+        dlg.add_buttons("Cancel", Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK)
+        dlg.set_do_overwrite_confirmation(True)
+        dlg.add_filter(self._file_filter_text)
+        dlg.add_filter(self._file_filter_all)
+
+        if self._current_filename == "":
+            dlg.set_current_name("new.txt")
+        else:
+            dlg.set_current_folder(self._current_file.get_parent().get_path())
+            dlg.set_current_name(self._current_filename)
+
+        response = dlg.run()
+        file     = dlg.get_filename() if response == Gtk.ResponseType.OK else ""
+        dlg.destroy()
+
+        if not file == "":
+            gfile = Gio.File.new_for_path(file)
+            self._write_file(gfile, True)
+
     def load_file_info(self, gfile):
         info         = gfile.query_info("standard::*", 0, cancellable=None)
         content_type = info.get_content_type()
         display_name = info.get_display_name()
-        tab_widget   = self.get_parent().get_tab_widget()
         self._current_filename = display_name
 
         try:
             lm = self._language_manager.guess_language(None, content_type)
-            self.set_buffer_language( lm.get_id() )
+            self._current_filetype = lm.get_id()
+            self.set_buffer_language(self._current_filetype)
         except Exception as e:
             ...
 
         logger.debug(f"Detected Content Type: {content_type}")
-        tab_widget.set_tab_label(display_name)
-        event_system.emit("set_bottom_labels", (gfile, info))
+        if self._current_filetype == "buffer":
+            self._current_filetype = info.get_content_type()
 
     def load_file_async(self, gfile):
         file = GtkSource.File()
@@ -103,6 +134,10 @@ class SourceViewEventsMixin:
             self._file_loader.load_finish(res)
             self._is_changed = False
             self._document_loaded()
+
+            tab_widget = self.get_parent().get_tab_widget()
+            tab_widget.set_tab_label(self._current_filename)
+            event_system.emit("set_bottom_labels", (gfile, None, self._current_filetype, None))
 
         self._file_loader.load_async(io_priority = 98,
                             cancellable = None,

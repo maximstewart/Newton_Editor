@@ -9,7 +9,6 @@ from gi.repository import Gdk
 from gi.repository import Gio
 
 # Application imports
-from ..sourceview_container import SourceViewContainer
 from .editor_controller import EditorControllerMixin
 from .editor_events import EditorEventsMixin
 
@@ -18,10 +17,23 @@ from .editor_events import EditorEventsMixin
 # NOTE: https://github.com/Axel-Erfurt/TextEdit/tree/b65f09be945196eb05bef83d81a6abcd129b4eb0
 
 class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
+    ccount = 0
+
+    def __new__(cls, *args, **kwargs):
+        obj        = super(EditorNotebook, cls).__new__(cls)
+        cls.ccount += 1
+
+        return obj
+
     def __init__(self):
         super(EditorNotebook, self).__init__()
 
+        self.NAME = f"notebook_{self.ccount}"
+        self.is_editor_focused = False
         self.set_group_name("editor_widget")
+        self.builder = settings.get_builder()
+
+        self.builder.expose_object(self.NAME, self)
 
         self._add_action_widgets()
         self._setup_styling()
@@ -30,6 +42,10 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self._load_widgets()
 
         self.show_all()
+
+        print(self.NAME)
+        if self.NAME == "notebook_2":
+            self.hide()
 
 
     def _setup_styling(self):
@@ -42,7 +58,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _subscribe_to_events(self):
         # event_system.subscribe("set_buffer_language", self.action_controller, *("set_buffer_language",))
-        event_system.subscribe("create_view", self.create_view)
+        event_system.subscribe("create_view", self._create_view)
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
         event_system.subscribe("set_buffer_style", self.action_controller)
@@ -52,10 +68,19 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
         event_system.subscribe("keyboard_prev_tab", self._keyboard_prev_tab)
         event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
+        event_system.subscribe("keyboard_move_tab_left", self._keyboard_move_tab_left)
+        event_system.subscribe("keyboard_move_tab_right", self._keyboard_move_tab_right)
+        event_system.subscribe("keyboard_move_tab_to_1", self._keyboard_move_tab_to_1)
+        event_system.subscribe("keyboard_move_tab_to_2", self._keyboard_move_tab_to_2)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
         event_system.subscribe("keyboard_scale_down_text", self._keyboard_scale_down_text)
         event_system.subscribe("keyboard_save_file", self._keyboard_save_file)
         event_system.subscribe("keyboard_save_file_as", self._keyboard_save_file_as)
+        event_system.subscribe("focused_target_changed", self._focused_target_changed)
+
+
+    def _focused_target_changed(self, target):
+        self.is_editor_focused = True if target == self.NAME else False
 
     def _add_action_widgets(self):
         start_box = Gtk.Box()
@@ -81,7 +106,8 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.set_action_widget(end_box, 1)
 
     def _load_widgets(self):
-        self.create_view()
+        if self.NAME == "notebook_1":
+            self.create_view()
 
     def _dbl_click_create_view(self, notebook, eve):
         if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
@@ -93,38 +119,67 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         if gfile:
             source_view.load_file_info( gfile )
             source_view.update_cursor_position()
-
-    def create_view(self, widget = None, eve = None, gfile = None):
-        container =  SourceViewContainer(self.close_tab)
-
-        index = self.append_page(container, container.get_tab_widget())
-        self.set_tab_detachable(container, True)
-
-        ctx = self.get_style_context()
-        ctx.add_class("notebook-unselected-focus")
-        self.set_tab_reorderable(container, True)
-
-        if gfile:
-            source_view = container.get_source_view()
-            source_view.open_file(gfile)
-
-        self.show_all()
-        self.set_current_page(index)
-
-    def open_file(self, gfile):
-        page_num    = self.get_current_page()
-        container   = self.get_nth_page( page_num )
-        source_view = container.get_source_view()
-
-        if source_view._current_filename == "":
-            source_view.open_file(gfile)
         else:
-            self.create_view(None, None, gfile)
+            event_system.emit("set_path_label", ("",))
+            event_system.emit("set_file_type_label", (source_view._current_filetype,))
 
-    def close_tab(self, button, container, source_view, eve = None):
-        if self.get_n_pages() == 1:
+    def _create_view(self, gfile = None):
+        if not self.is_editor_focused: # TODO: Find way to converge this
             return
 
-        page_num = self.page_num(container)
-        source_view._cancel_current_file_watchers()
-        self.remove_page(page_num)
+        if isinstance(gfile, str):
+            gfile = Gio.File.new_for_path(gfile)
+
+        self.create_view(None, None, gfile,)
+
+    def _keyboard_open_file(self, gfile):
+        if not self.is_editor_focused: # TODO: Find way to converge this
+            return
+
+        self.open_file(gfile)
+
+    def _keyboard_create_tab(self, _gfile=None):
+        if not self.is_editor_focused: # TODO: Find way to converge this
+            return
+
+        self.create_view(gfile=_gfile)
+
+
+    def _keyboard_close_tab(self):
+        self.action_controller("close_tab")
+
+    def _toggle_highlight_line(self):
+        self.action_controller("toggle_highlight_line")
+
+    def _keyboard_next_tab(self):
+        self.action_controller("keyboard_next_tab")
+
+    def _keyboard_move_tab_left(self):
+        self.action_controller("keyboard_move_tab_left")
+
+    def _keyboard_move_tab_right(self):
+        self.action_controller("keyboard_move_tab_right")
+
+    def _keyboard_move_tab_to_1(self):
+        self.action_controller("keyboard_move_tab_to_1")
+
+    def _keyboard_move_tab_to_2(self):
+        self.action_controller("keyboard_move_tab_to_2")
+
+    def _keyboard_prev_tab(self):
+        self.action_controller("keyboard_prev_tab")
+
+    def _keyboard_scale_up_text(self):
+        self.action_controller("scale_up_text")
+
+    def _keyboard_scale_down_text(self):
+        self.action_controller("scale_down_text")
+
+    def _keyboard_save_file(self):
+        self.action_controller("save_file")
+
+    def _keyboard_save_file_as(self):
+        self.action_controller("save_file_as")
+
+    def _text_search(self, widget = None, eve = None):
+        self.action_controller("do_text_search", widget.get_text())
