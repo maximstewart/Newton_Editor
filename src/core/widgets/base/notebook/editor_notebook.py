@@ -43,7 +43,9 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
         self.show_all()
 
-        print(self.NAME)
+        if self.NAME == "notebook_1":
+            self.is_editor_focused = True
+
         if self.NAME == "notebook_2":
             self.hide()
 
