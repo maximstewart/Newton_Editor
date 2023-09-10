@@ -166,7 +166,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
                 except Exception as e:
                     gfile = Gio.File.new_for_path(uri)
 
-                event_system.emit('create_view', (None, None, gfile,))
+                event_system.emit('create_view', (gfile,))
 
 
     def _create_file_watcher(self, gfile = None):
@@ -222,4 +222,4 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
                 (self._current_filename != "" and not save_as):
                     self.open_file(gfile)
             else:
-                event_system.emit("create_view", (None, None, gfile,))
+                event_system.emit("create_view", (gfile,))

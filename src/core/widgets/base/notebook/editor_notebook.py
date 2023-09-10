@@ -108,7 +108,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.set_action_widget(end_box, 1)
 
     def _load_widgets(self):
-        if self.NAME == "notebook_1":
+        if self.NAME == "notebook_1" and not settings.is_starting_with_file():
             self.create_view()
 
     def _dbl_click_create_view(self, notebook, eve):
@@ -140,11 +140,11 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
         self.open_file(gfile)
 
-    def _keyboard_create_tab(self, _gfile=None):
+    def _keyboard_create_tab(self, _gfile = None):
         if not self.is_editor_focused: # TODO: Find way to converge this
             return
 
-        self.create_view(gfile=_gfile)
+        self.create_view(gfile = _gfile)
 
 
     def _keyboard_close_tab(self):

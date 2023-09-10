@@ -18,6 +18,14 @@ from .mixins.signals_mixins import SignalsMixins
 
 class Controller(SignalsMixins, ControllerData):
     def __init__(self, args, unknownargs):
+        messages = []
+        for arg in unknownargs + [args.new_tab,]:
+            if os.path.isfile(arg):
+                messages.append(f"FILE|{arg}")
+
+        if len(messages) > 0:
+            settings.set_is_starting_with_file(True)
+
         self.setup_controller_data()
 
         self._setup_styling()
@@ -27,10 +35,8 @@ class Controller(SignalsMixins, ControllerData):
         if args.no_plugins == "false":
             self.plugins.launch_plugins()
 
-        for arg in unknownargs + [args.new_tab,]:
-            if os.path.isfile(arg):
-                message = f"FILE|{arg}"
-                event_system.emit("post_file_to_ipc", message)
+        for message in messages:
+            event_system.emit("post_file_to_ipc", message)
 
 
     def _setup_styling(self):

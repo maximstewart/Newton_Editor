@@ -9,9 +9,9 @@ from ..sourceview_container import SourceViewContainer
 
 class EditorEventsMixin:
     def create_view(self, widget = None, eve = None, gfile = None):
-        container =  SourceViewContainer(self.close_tab)
+        container = SourceViewContainer(self.close_tab)
+        page_num  = self.append_page(container, container.get_tab_widget())
 
-        page_num = self.append_page(container, container.get_tab_widget())
         self.set_tab_detachable(container, True)
 
         ctx = self.get_style_context()

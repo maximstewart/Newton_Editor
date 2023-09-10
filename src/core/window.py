@@ -59,7 +59,6 @@ class Window(Gtk.ApplicationWindow):
         if settings.is_debug():
             self.set_interactive_debugging(True)
 
-
         self._controller = Controller(args, unknownargs)
         if not self._controller:
             raise ControllerStartException("Controller exited and doesn't exist...")

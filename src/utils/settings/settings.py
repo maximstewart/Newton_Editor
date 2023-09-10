@@ -85,15 +85,16 @@ class Settings(StartCheckMixin):
             print( f"Settings: {self._CONTEXT_MENU}\n\t\t{repr(e)}" )
 
 
-        self._main_window   = None
-        self._main_window_w = 800
-        self._main_window_h = 600
-        self._builder       = None
-        self.PAINT_BG_COLOR = (0, 0, 0, 0.54)
+        self._main_window    = None
+        self._main_window_w  = 800
+        self._main_window_h  = 600
+        self._builder        = None
+        self.PAINT_BG_COLOR  = (0, 0, 0, 0.54)
 
-        self._trace_debug   = False
-        self._debug         = False
-        self._dirty_start   = False
+        self._trace_debug    = False
+        self._debug          = False
+        self._dirty_start    = False
+        self._passed_in_file = False
 
         self.load_settings()
 
@@ -154,6 +155,7 @@ class Settings(StartCheckMixin):
 
     def is_trace_debug(self)       -> str:   return self._trace_debug
     def is_debug(self)             -> str:   return self._debug
+    def is_starting_with_file(self) -> bool: return self._passed_in_file
 
     def get_ch_log_lvl(self)       -> str:   return self._settings["debugging"]["ch_log_lvl"]
     def get_fh_log_lvl(self)       -> str:   return self._settings["debugging"]["fh_log_lvl"]
@@ -163,6 +165,9 @@ class Settings(StartCheckMixin):
 
     def set_debug(self, debug):
         self._debug = debug
+
+    def set_is_starting_with_file(self, is_passed_in_file: False):
+        self._passed_in_file = is_passed_in_file
 
 
     def load_settings(self):
