@@ -28,11 +28,11 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def __init__(self):
         super(EditorNotebook, self).__init__()
 
-        self.NAME = f"notebook_{self.ccount}"
+        self.NAME              = f"notebook_{self.ccount}"
+        self.builder           = settings.get_builder()
         self.is_editor_focused = False
-        self.set_group_name("editor_widget")
-        self.builder = settings.get_builder()
 
+        self.set_group_name("editor_widget")
         self.builder.expose_object(self.NAME, self)
 
         self._add_action_widgets()
@@ -118,12 +118,13 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def _switch_page_update(self, notebook, page, page_num):
         source_view = page.get_source_view()
         gfile       = source_view.get_current_file()
-        if gfile:
-            source_view.load_file_info( gfile )
-            source_view.update_cursor_position()
-        else:
+        if not gfile:
             event_system.emit("set_path_label", ("",))
             event_system.emit("set_file_type_label", (source_view._current_filetype,))
+        else:
+            source_view.load_file_info(gfile)
+            source_view.update_cursor_position()
+            source_view.set_bottom_labels(gfile)
 
     def _create_view(self, gfile = None):
         if not self.is_editor_focused: # TODO: Find way to converge this

@@ -35,6 +35,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._current_filepath: str  = None
         self._current_filetype: str  = "buffer"
 
+        self.skip_file_load          = False
         self._is_changed             = False
         self._ignore_internal_change = False
         self._buffer                 = self.get_buffer()
@@ -218,8 +219,4 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
             f.write(text)
             f.close()
 
-            if (self._current_filename == "" and save_as) or \
-                (self._current_filename != "" and not save_as):
-                    self.open_file(gfile)
-            else:
-                event_system.emit("create_view", (gfile,))
+        return gfile

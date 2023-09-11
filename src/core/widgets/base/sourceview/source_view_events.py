@@ -79,34 +79,22 @@ class SourceViewEventsMixin:
         self.grab_focus()
 
     def save_file(self):
-        if not self._current_file:
-            self.save_file_as()
-            return
+        self.skip_file_load = True
+        gfile = self._current_file
 
-        self._write_file(self._current_file)
+        if not gfile:
+            gfile = self.save_file_dialog()
+            self.skip_file_load = False
+            if not gfile: return
+
+        self.open_file( self._write_file(gfile) )
+        self.skip_file_load = False
 
     def save_file_as(self):
-        # TODO: Move Chooser logic to own widget
-        dlg = Gtk.FileChooserDialog(title="Please choose a file...", parent = None, action = 1)
-
-        dlg.add_buttons("Cancel", Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK)
-        dlg.set_do_overwrite_confirmation(True)
-        dlg.add_filter(self._file_filter_text)
-        dlg.add_filter(self._file_filter_all)
-
-        if self._current_filename == "":
-            dlg.set_current_name("new.txt")
-        else:
-            dlg.set_current_folder(self._current_file.get_parent().get_path())
-            dlg.set_current_name(self._current_filename)
-
-        response = dlg.run()
-        file     = dlg.get_filename() if response == Gtk.ResponseType.OK else ""
-        dlg.destroy()
-
-        if not file == "":
-            gfile = Gio.File.new_for_path(file)
+        gfile = self.save_file_dialog()
+        if gfile:
             self._write_file(gfile, True)
+            event_system.emit("create_view", (gfile,))
 
     def load_file_info(self, gfile):
         info         = gfile.query_info("standard::*", 0, cancellable=None)
@@ -126,6 +114,8 @@ class SourceViewEventsMixin:
             self._current_filetype = info.get_content_type()
 
     def load_file_async(self, gfile):
+        if self.skip_file_load: return
+
         file = GtkSource.File()
         file.set_location(gfile)
         self._file_loader = GtkSource.FileLoader.new(self._buffer, file)
@@ -134,10 +124,7 @@ class SourceViewEventsMixin:
             self._file_loader.load_finish(res)
             self._is_changed = False
             self._document_loaded()
-
-            tab_widget = self.get_parent().get_tab_widget()
-            tab_widget.set_tab_label(self._current_filename)
-            event_system.emit("set_bottom_labels", (gfile, None, self._current_filetype, None))
+            self.update_labels(gfile)
 
         self._file_loader.load_async(io_priority = 98,
                             cancellable = None,
@@ -145,3 +132,37 @@ class SourceViewEventsMixin:
                             progress_callback_data = None,
                             callback = finish_load_callback,
                             user_data = (None))
+
+
+    def update_labels(self, gfile = None):
+        if not gfile: return
+
+        tab_widget = self.get_parent().get_tab_widget()
+        tab_widget.set_tab_label(self._current_filename)
+        self.set_bottom_labels(gfile)
+
+    def set_bottom_labels(self, gfile = None):
+        if not gfile: return
+        event_system.emit("set_bottom_labels", (gfile, None, self._current_filetype, None))
+
+
+    def save_file_dialog(self) -> str:
+        # TODO: Move Chooser logic to own widget
+        dlg = Gtk.FileChooserDialog(title = "Please choose a file...", parent = None, action = 1)
+
+        dlg.add_buttons("Cancel", Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK)
+        dlg.set_do_overwrite_confirmation(True)
+        dlg.add_filter(self._file_filter_text)
+        dlg.add_filter(self._file_filter_all)
+
+        if self._current_filename == "":
+            dlg.set_current_name("new.txt")
+        else:
+            dlg.set_current_folder(self._current_file.get_parent().get_path())
+            dlg.set_current_name(self._current_filename)
+
+        response = dlg.run()
+        file     = dlg.get_filename() if response == Gtk.ResponseType.OK else ""
+        dlg.destroy()
+
+        return Gio.File.new_for_path(file) if not file == "" else None
