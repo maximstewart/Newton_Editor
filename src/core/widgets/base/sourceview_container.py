@@ -15,9 +15,9 @@ class SourceViewContainer(Gtk.ScrolledWindow):
     def __init__(self, close_tab):
         super(SourceViewContainer, self).__init__()
 
-        self._close_tab   = close_tab
-        self._source_view = None
-        self._tab_widget  = None
+        self._close_tab: function         = close_tab
+        self._source_view: SourceView     = None
+        self._tab_widget: TabHeaderWidget = None
 
         self._setup_styling()
         self._setup_signals()

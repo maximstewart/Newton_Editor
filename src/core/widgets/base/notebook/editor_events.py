@@ -8,7 +8,7 @@ from ..sourceview_container import SourceViewContainer
 
 
 class EditorEventsMixin:
-    def create_view(self, widget = None, eve = None, gfile = None):
+    def create_view(self, widget = None, eve = None, gfile = None, line: int = 0):
         container = SourceViewContainer(self.close_tab)
         page_num  = self.append_page(container, container.get_tab_widget())
 
@@ -18,12 +18,13 @@ class EditorEventsMixin:
         ctx.add_class("notebook-unselected-focus")
         self.set_tab_reorderable(container, True)
 
-        if gfile:
-            source_view = container.get_source_view()
-            source_view.open_file(gfile)
-
         self.show_all()
         self.set_current_page(page_num)
+
+        if gfile:
+            source_view = container.get_source_view()
+            source_view.open_file(gfile, line)
+            source_view.grab_focus()
 
     def open_file(self, gfile):
         page_num    = self.get_current_page()

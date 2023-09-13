@@ -207,6 +207,8 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
             self._file_cdr_watcher = None
 
     def _write_file(self, gfile, save_as = False):
+        if not gfile: return
+
         with open(gfile.get_path(), 'w') as f:
             if not save_as:
                 self._ignore_internal_change = True

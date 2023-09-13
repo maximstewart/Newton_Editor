@@ -62,39 +62,46 @@ class SourceViewEventsMixin:
         logger.debug(cursor_data)
         event_system.emit("set_line_char_label", (f"{row}:{col}",))
 
+    def got_to_line(self, line: int = 0):
+        index     = line - 1
+        buffer    = self.get_buffer()
+        line_itr  = buffer.get_iter_at_line(index)
+        char_iter = buffer.get_iter_at_line_offset(index, line_itr.get_bytes_in_line())
+
+        buffer.place_cursor(char_iter)
+        if not buffer.get_mark("starting_cursor"):
+             buffer.create_mark("starting_cursor", char_iter, True)
+        self.scroll_to_mark( buffer.get_mark("starting_cursor"), 0.0, True, 0.0, 0.0 )
 
     # https://github.com/ptomato/inform7-ide/blob/main/src/actions.c
     def action_uncomment_selection(self):
         ...
 
     def action_comment_out_selection(self):
-        pass
+        ...
 
-    def open_file(self, gfile, *args):
+    def open_file(self, gfile, line: int = 0, *args):
         self._current_file = gfile
 
         self.load_file_info(gfile)
-        self.load_file_async(gfile)
+        self.load_file_async(gfile, line)
         self._create_file_watcher(gfile)
-        self.grab_focus()
 
     def save_file(self):
         self.skip_file_load = True
-        gfile = self._current_file
+        gfile = self.save_file_dialog() if not self._current_file else self._current_file
 
         if not gfile:
-            gfile = self.save_file_dialog()
             self.skip_file_load = False
-            if not gfile: return
+            return
 
         self.open_file( self._write_file(gfile) )
         self.skip_file_load = False
 
     def save_file_as(self):
         gfile = self.save_file_dialog()
-        if gfile:
-            self._write_file(gfile, True)
-            event_system.emit("create_view", (gfile,))
+        self._write_file(gfile, True)
+        event_system.emit("create_view", (gfile,))
 
     def load_file_info(self, gfile):
         info         = gfile.query_info("standard::*", 0, cancellable=None)
@@ -113,8 +120,10 @@ class SourceViewEventsMixin:
         if self._current_filetype == "buffer":
             self._current_filetype = info.get_content_type()
 
-    def load_file_async(self, gfile):
-        if self.skip_file_load: return
+    def load_file_async(self, gfile, line: int = 0):
+        if self.skip_file_load:
+            self.update_labels(gfile)
+            return
 
         file = GtkSource.File()
         file.set_location(gfile)
@@ -124,6 +133,7 @@ class SourceViewEventsMixin:
             self._file_loader.load_finish(res)
             self._is_changed = False
             self._document_loaded()
+            self.got_to_line(line)
             self.update_labels(gfile)
 
         self._file_loader.load_async(io_priority = 98,
@@ -143,7 +153,9 @@ class SourceViewEventsMixin:
 
     def set_bottom_labels(self, gfile = None):
         if not gfile: return
+
         event_system.emit("set_bottom_labels", (gfile, None, self._current_filetype, None))
+        self.update_cursor_position()
 
 
     def save_file_dialog(self) -> str:

@@ -126,14 +126,19 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
             source_view.update_cursor_position()
             source_view.set_bottom_labels(gfile)
 
-    def _create_view(self, gfile = None):
+    def _create_view(self, gfile = None, line: int = 0):
         if not self.is_editor_focused: # TODO: Find way to converge this
             return
 
         if isinstance(gfile, str):
-            gfile = Gio.File.new_for_path(gfile)
+            parts = gfile.split(":")
+            gfile = Gio.File.new_for_path(parts[0])
+            try:
+                line = int(parts[1]) if len(parts) > 1 else 0
+            except Exception as e:
+                ...
 
-        self.create_view(None, None, gfile,)
+        self.create_view(None, None, gfile, line)
 
     def _keyboard_open_file(self, gfile):
         if not self.is_editor_focused: # TODO: Find way to converge this
