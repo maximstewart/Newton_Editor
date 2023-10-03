@@ -44,8 +44,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._file_filter_text = Gtk.FileFilter()
         self._file_filter_text.set_name("Text Files")
         # TODO: Need to externalize to settings file...
-        pattern = ["*.txt", "*.py", "*.c", "*.h", "*.cpp", "*.csv", "*.m3*", "*.lua", "*.js", "*.toml", "*.xml", "*.pom", "*.htm", "*.md" "*.vala", "*.tsv", "*.css", "*.html", ".json", "*.java", "*.go", "*.php", "*.ts", "*.rs"]
-        for p in pattern:
+        for p in settings.filters.code:
             self._file_filter_text.add_pattern(p)
 
         self._file_filter_all = Gtk.FileFilter()

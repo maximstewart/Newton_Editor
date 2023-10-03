@@ -16,7 +16,7 @@ class CoreWidget(Gtk.Box):
     def __init__(self):
         super(CoreWidget, self).__init__()
 
-        builder = settings.get_builder()
+        builder = settings_manager.get_builder()
         builder.expose_object("core_widget", self)
 
         self._setup_styling()

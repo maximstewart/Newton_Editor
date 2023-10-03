@@ -1,12 +1,20 @@
 # Python imports
-import os
+import signal
+import io
 import json
 import inspect
+import zipfile
+
+from os import path
+from os import mkdir
 
 # Lib imports
 
 # Application imports
+from ..singleton import Singleton
 from .start_check_mixin import StartCheckMixin
+from .options.settings import Settings
+
 
 
 class MissingConfigError(Exception):
@@ -14,14 +22,14 @@ class MissingConfigError(Exception):
 
 
 
-class Settings(StartCheckMixin):
+class SettingsManager(StartCheckMixin, Singleton):
     def __init__(self):
-        self._SCRIPT_PTH        = os.path.dirname(os.path.realpath(__file__))
-        self._USER_HOME         = os.path.expanduser('~')
-        self._USR_PATH          = f"/usr/share/{app_name.lower()}"
-
-        self._USR_CONFIG_FILE   = f"{self._USR_PATH}/settings.json"
+        self._SCRIPT_PTH        = path.dirname(path.realpath(__file__))
+        self._USER_HOME         = path.expanduser('~')
         self._HOME_CONFIG_PATH  = f"{self._USER_HOME}/.config/{app_name.lower()}"
+        self._USR_PATH          = f"/usr/share/{app_name.lower()}"
+        self._USR_CONFIG_FILE   = f"{self._USR_PATH}/settings.json"
+
         self._PLUGINS_PATH      = f"{self._HOME_CONFIG_PATH}/plugins"
         self._DEFAULT_ICONS     = f"{self._HOME_CONFIG_PATH}/icons"
         self._CONFIG_FILE       = f"{self._HOME_CONFIG_PATH}/settings.json"
@@ -33,42 +41,35 @@ class Settings(StartCheckMixin):
         self._CONTEXT_MENU      = f"{self._HOME_CONFIG_PATH}/contexct_menu.json"
         self._WINDOW_ICON       = f"{self._DEFAULT_ICONS}/{app_name.lower()}.png"
 
-        if not os.path.exists(self._HOME_CONFIG_PATH):
-            os.mkdir(self._HOME_CONFIG_PATH)
-        if not os.path.exists(self._PLUGINS_PATH):
-            os.mkdir(self._PLUGINS_PATH)
+        if not path.exists(self._HOME_CONFIG_PATH):
+            mkdir(self._HOME_CONFIG_PATH)
+        if not path.exists(self._PLUGINS_PATH):
+            mkdir(self._PLUGINS_PATH)
 
-        if not os.path.exists(self._CONFIG_FILE):
-            import shutil
-            try:
-                shutil.copyfile(self._USR_CONFIG_FILE, self._CONFIG_FILE)
-            except Exception as e:
-                raise
-
-        if not os.path.exists(self._DEFAULT_ICONS):
+        if not path.exists(self._DEFAULT_ICONS):
             self._DEFAULT_ICONS = f"{self._USR_PATH}/icons"
-            if not os.path.exists(self._DEFAULT_ICONS):
+            if not path.exists(self._DEFAULT_ICONS):
                 raise MissingConfigError("Unable to find the application icons directory.")
-        if not os.path.exists(self._GLADE_FILE):
+        if not path.exists(self._GLADE_FILE):
             self._GLADE_FILE   = f"{self._USR_PATH}/Main_Window.glade"
-            if not os.path.exists(self._GLADE_FILE):
+            if not path.exists(self._GLADE_FILE):
                 raise MissingConfigError("Unable to find the application Glade file.")
-        if not os.path.exists(self._KEY_BINDINGS_FILE):
+        if not path.exists(self._KEY_BINDINGS_FILE):
             self._KEY_BINDINGS_FILE = f"{self._USR_PATH}/key-bindings.json"
-            if not os.path.exists(self._KEY_BINDINGS_FILE):
+            if not path.exists(self._KEY_BINDINGS_FILE):
                 raise MissingConfigError("Unable to find the application Keybindings file.")
-        if not os.path.exists(self._CSS_FILE):
+        if not path.exists(self._CSS_FILE):
             self._CSS_FILE     = f"{self._USR_PATH}/stylesheet.css"
-            if not os.path.exists(self._CSS_FILE):
+            if not path.exists(self._CSS_FILE):
                 raise MissingConfigError("Unable to find the application Stylesheet file.")
-        if not os.path.exists(self._WINDOW_ICON):
+        if not path.exists(self._WINDOW_ICON):
             self._WINDOW_ICON  = f"{self._USR_PATH}/icons/{app_name.lower()}.png"
-            if not os.path.exists(self._WINDOW_ICON):
+            if not path.exists(self._WINDOW_ICON):
                 raise MissingConfigError("Unable to find the application icon.")
-        if not os.path.exists(self._UI_WIDEGTS_PATH):
-            self._UI_WIDEGTS_PATH = f"{self._USR_PATH}/ui_widgets"
-        if not os.path.exists(self._CONTEXT_MENU):
-            self._CONTEXT_MENU    = f"{self._USR_PATH}/contexct_menu.json"
+        if not path.exists(self._UI_WIDEGTS_PATH):
+            self._UI_WIDEGTS_PATH  = f"{self._USR_PATH}/ui_widgets"
+        if not path.exists(self._CONTEXT_MENU):
+            self._CONTEXT_MENU  = f"{self._USR_PATH}/contexct_menu.json"
 
 
         try:
@@ -85,18 +86,15 @@ class Settings(StartCheckMixin):
             print( f"Settings: {self._CONTEXT_MENU}\n\t\t{repr(e)}" )
 
 
-        self._main_window    = None
-        self._main_window_w  = 800
-        self._main_window_h  = 600
-        self._builder        = None
-        self.PAINT_BG_COLOR  = (0, 0, 0, 0.54)
+        self.settings: Settings = None
+        self._main_window       = None
+        self._builder           = None
+        self.PAINT_BG_COLOR     = (0, 0, 0, 0.0)
 
-        self._trace_debug    = False
-        self._debug          = False
-        self._dirty_start    = False
-        self._passed_in_file = False
-
-        self.load_settings()
+        self._trace_debug       = False
+        self._debug             = False
+        self._dirty_start       = False
+        self._passed_in_file    = False
 
 
     def register_signals_to_builder(self, classes=None):
@@ -126,13 +124,11 @@ class Settings(StartCheckMixin):
         return monitors
 
     def get_main_window(self)        -> any: return self._main_window
-    def get_main_window_width(self)  -> any: return self._main_window_w
-    def get_main_window_height(self) -> any: return self._main_window_h
-    def get_builder(self)          -> any:   return self._builder
-    def get_paint_bg_color(self)   -> any:   return self.PAINT_BG_COLOR
-    def get_glade_file(self)       -> str:   return self._GLADE_FILE
-    def get_ui_widgets_path(self)  -> str:   return self._UI_WIDEGTS_PATH
-
+    def get_builder(self)            -> any: return self._builder
+    def get_paint_bg_color(self)     -> any: return self.PAINT_BG_COLOR
+    def get_glade_file(self)         -> str: return self._GLADE_FILE
+    def get_ui_widgets_path(self)    -> str: return self._UI_WIDEGTS_PATH
+    def get_context_menu_data(self)  -> str: return self._context_menu_data
 
     def get_plugins_path(self)     -> str:   return self._PLUGINS_PATH
     def get_icon_theme(self)       -> str:   return self._ICON_THEME
@@ -141,24 +137,21 @@ class Settings(StartCheckMixin):
     def get_window_icon(self)      -> str:   return self._WINDOW_ICON
     def get_home_path(self)        -> str:   return self._USER_HOME
 
-    # Filter returns
-    def get_office_filter(self)    -> tuple: return tuple(self._settings["filters"]["office"])
-    def get_vids_filter(self)      -> tuple: return tuple(self._settings["filters"]["videos"])
-    def get_text_filter(self)      -> tuple: return tuple(self._settings["filters"]["text"])
-    def get_music_filter(self)     -> tuple: return tuple(self._settings["filters"]["music"])
-    def get_images_filter(self)    -> tuple: return tuple(self._settings["filters"]["images"])
-    def get_pdf_filter(self)       -> tuple: return tuple(self._settings["filters"]["pdf"])
-
-    def get_success_color(self)    -> str:   return self._theming["success_color"]
-    def get_warning_color(self)    -> str:   return self._theming["warning_color"]
-    def get_error_color(self)      -> str:   return self._theming["error_color"]
-
     def is_trace_debug(self)       -> str:   return self._trace_debug
     def is_debug(self)             -> str:   return self._debug
     def is_starting_with_file(self) -> bool: return self._passed_in_file
 
-    def get_ch_log_lvl(self)       -> str:   return self._settings["debugging"]["ch_log_lvl"]
-    def get_fh_log_lvl(self)       -> str:   return self._settings["debugging"]["fh_log_lvl"]
+    def call_method(self, target_class = None, _method_name = None, data = None):
+        method_name = str(_method_name)
+        method      = getattr(target_class, method_name, lambda data: f"No valid key passed...\nkey={method_name}\nargs={data}")
+        return method(data) if data else method()
+
+    def set_main_window_x(self, x = 0):  self.settings.config.window_x  = x
+    def set_main_window_y(self, y = 0):  self.settings.config.window_y  = y
+    def set_main_window_width(self, width = 800):   self.settings.config.window_width  = width
+    def set_main_window_height(self, height = 600): self.settings.config.window_height = height
+    def set_main_window_min_width(self, width = 720):   self.settings.config.window_min_width  = width
+    def set_main_window_min_height(self, height = 480): self.settings.config.window_min_height = height
 
     def set_trace_debug(self, trace_debug):
         self._trace_debug = trace_debug
@@ -171,11 +164,15 @@ class Settings(StartCheckMixin):
 
 
     def load_settings(self):
-        with open(self._CONFIG_FILE) as f:
-            self._settings = json.load(f)
-            self._config   = self._settings["config"]
-            self._theming  = self._settings["theming"]
+        if not path.exists(self._CONFIG_FILE):
+            self.settings = Settings()
+            return
+
+        with open(self._CONFIG_FILE) as file:
+            data          = json.load(file)
+            data["load_defaults"] = False
+            self.settings = Settings(**data)
 
     def save_settings(self):
         with open(self._CONFIG_FILE, 'w') as outfile:
-            json.dump(self._settings, outfile, separators=(',', ':'), indent=4)
+            json.dump(self.settings.as_dict(), outfile, separators=(',', ':'), indent=4)

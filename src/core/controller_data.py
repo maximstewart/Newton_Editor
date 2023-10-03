@@ -14,7 +14,7 @@ class ControllerData:
     ''' ControllerData contains most of the state of the app at ay given time. It also has some support methods. '''
 
     def setup_controller_data(self) -> None:
-        self.window      = settings.get_main_window()
+        self.window      = settings_manager.get_main_window()
         self.builder     = None
         self.core_widget = None
         self.was_midified_key = False

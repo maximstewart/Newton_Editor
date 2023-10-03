@@ -25,7 +25,7 @@ class Controller(SignalsMixins, ControllerData):
                 messages.append(f"FILE|{arg.replace('file://', '')}")
 
         if len(messages) > 0:
-            settings.set_is_starting_with_file(True)
+            settings_manager.set_is_starting_with_file(True)
 
         self.setup_controller_data()
 
@@ -53,13 +53,13 @@ class Controller(SignalsMixins, ControllerData):
 
     def load_glade_file(self):
         self.builder     = Gtk.Builder()
-        self.builder.add_from_file(settings.get_glade_file())
+        self.builder.add_from_file(settings_manager.get_glade_file())
         self.builder.expose_object("main_window", self.window)
 
-        settings.set_builder(self.builder)
+        settings_manager.set_builder(self.builder)
         self.core_widget = CoreWidget()
 
-        settings.register_signals_to_builder([self, self.core_widget])
+        settings_manager.register_signals_to_builder([self, self.core_widget])
 
     def get_core_widget(self):
         return self.core_widget

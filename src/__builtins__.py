@@ -9,7 +9,11 @@ from utils.event_system import EventSystem
 from utils.endpoint_registry import EndpointRegistry
 from utils.keybindings import Keybindings
 from utils.logger import Logger
-from utils.settings import Settings
+from utils.settings_manager.manager import SettingsManager
+
+
+class BuiltinsException(Exception):
+    ...
 
 
 
@@ -33,10 +37,14 @@ builtins.app_name          = "Newton"
 builtins.keybindings       = Keybindings()
 builtins.event_system      = EventSystem()
 builtins.endpoint_registry = EndpointRegistry()
-builtins.settings          = Settings()
-builtins.logger            = Logger(settings.get_home_config_path(), \
-                                    _ch_log_lvl=settings.get_ch_log_lvl(), \
-                                    _fh_log_lvl=settings.get_fh_log_lvl()).get_logger()
+builtins.settings_manager  = SettingsManager()
+
+settings_manager.load_settings()
+
+builtins.settings          = settings_manager.settings
+builtins.logger            = Logger(settings_manager.get_home_config_path(), \
+                                    _ch_log_lvl=settings.debugging.ch_log_lvl, \
+                                    _fh_log_lvl=settings.debugging.fh_log_lvl).get_logger()
 
 builtins.threaded          = threaded_wrapper
 builtins.daemon_threaded   = daemon_threaded_wrapper

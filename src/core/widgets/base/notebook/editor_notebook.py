@@ -29,7 +29,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         super(EditorNotebook, self).__init__()
 
         self.NAME              = f"notebook_{self.ccount}"
-        self.builder           = settings.get_builder()
+        self.builder           = settings_manager.get_builder()
         self.is_editor_focused = False
 
         self.set_group_name("editor_widget")
@@ -108,7 +108,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.set_action_widget(end_box, 1)
 
     def _load_widgets(self):
-        if self.NAME == "notebook_1" and not settings.is_starting_with_file():
+        if self.NAME == "notebook_1" and not settings_manager.is_starting_with_file():
             self.create_view()
 
     def _dbl_click_create_view(self, notebook, eve):

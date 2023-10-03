@@ -18,7 +18,7 @@ class GeneralInfoWidget:
     def __init__(self):
         super(GeneralInfoWidget, self).__init__()
 
-        _GLADE_FILE   = f"{settings.get_ui_widgets_path()}/general_info_ui.glade"
+        _GLADE_FILE   = f"{settings_manager.get_ui_widgets_path()}/general_info_ui.glade"
         self._builder = Gtk.Builder()
         self._builder.add_from_file(_GLADE_FILE)
 
@@ -43,7 +43,7 @@ class GeneralInfoWidget:
 
 
     def _load_widgets(self):
-        builder = settings.get_builder()
+        builder = settings_manager.get_builder()
 
         self.bottom_status_info      = self._builder.get_object("general_info")
         self.bottom_path_label       = self._builder.get_object("path_label")

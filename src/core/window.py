@@ -34,17 +34,17 @@ class Window(Gtk.ApplicationWindow):
         self._setup_signals()
         self._subscribe_to_events()
 
-        settings.set_main_window(self)
+        settings_manager.set_main_window(self)
         self._load_widgets(args, unknownargs)
 
         self.show()
 
 
     def _setup_styling(self):
-        self.set_default_size(settings.get_main_window_width(),
-                                settings.get_main_window_height())
+        self.set_default_size(settings.config.main_window_width,
+                                settings.config.main_window_height)
         self.set_title(f"{app_name}")
-        self.set_icon_from_file( settings.get_window_icon() )
+        self.set_icon_from_file( settings_manager.get_window_icon() )
         self.set_gravity(5)  # 5 = CENTER
         self.set_position(1) # 1 = CENTER, 4 = CENTER_ALWAYS
 
@@ -56,7 +56,7 @@ class Window(Gtk.ApplicationWindow):
         event_system.subscribe("tear_down", self._tear_down)
 
     def _load_widgets(self, args, unknownargs):
-        if settings.is_debug():
+        if settings_manager.is_debug():
             self.set_interactive_debugging(True)
 
         self._controller = Controller(args, unknownargs)
@@ -76,19 +76,19 @@ class Window(Gtk.ApplicationWindow):
 
         # bind css file
         cssProvider  = Gtk.CssProvider()
-        cssProvider.load_from_path( settings.get_css_file() )
+        cssProvider.load_from_path( settings_manager.get_css_file() )
         screen       = Gdk.Screen.get_default()
         styleContext = Gtk.StyleContext()
         styleContext.add_provider_for_screen(screen, cssProvider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
     def _area_draw(self, widget: Gtk.ApplicationWindow, cr: cairo.Context) -> None:
-        cr.set_source_rgba( *settings.get_paint_bg_color() )
+        cr.set_source_rgba( *settings_manager.get_paint_bg_color() )
         cr.set_operator(cairo.OPERATOR_SOURCE)
         cr.paint()
         cr.set_operator(cairo.OPERATOR_OVER)
 
 
     def _tear_down(self, widget=None, eve=None):
-        settings.clear_pid()
+        settings_manager.clear_pid()
         time.sleep(event_sleep_time)
         Gtk.main_quit()
