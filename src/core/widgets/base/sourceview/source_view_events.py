@@ -48,18 +48,6 @@ class SourceViewEventsMixin:
         row   = iter.get_line() + 1
         col   = self.get_visual_column(iter) + 1
 
-        classes = self._buffer.get_context_classes_at_iter(iter)
-        classes_str = ""
-
-        i = 0
-        for c in classes:
-            if len(classes) != i + 1:
-                classes_str += c + ", "
-            else:
-                classes_str += c
-
-        cursor_data = f"char: {chars}, line: {row}, column: {col}, classes: {classes_str}"
-        logger.debug(cursor_data)
         event_system.emit("set_line_char_label", (f"{row}:{col}",))
 
     def got_to_line(self, line: int = 0):
@@ -89,7 +77,7 @@ class SourceViewEventsMixin:
 
     def save_file(self):
         self.skip_file_load = True
-        gfile = self.save_file_dialog() if not self._current_file else self._current_file
+        gfile = event_system.emit_and_await("save_file_dialog", (self._current_filename, self._current_file)) if not self._current_file else self._current_file
 
         if not gfile:
             self.skip_file_load = False
@@ -99,9 +87,9 @@ class SourceViewEventsMixin:
         self.skip_file_load = False
 
     def save_file_as(self):
-        gfile = self.save_file_dialog()
+        gfile = event_system.emit_and_await("save_file_dialog", (self._current_filename, self._current_file))
         self._write_file(gfile, True)
-        event_system.emit("create_view", (gfile,))
+        if gfile: event_system.emit("create_view", (gfile,))
 
     def load_file_info(self, gfile):
         info         = gfile.query_info("standard::*", 0, cancellable=None)
@@ -156,25 +144,3 @@ class SourceViewEventsMixin:
 
         event_system.emit("set_bottom_labels", (gfile, None, self._current_filetype, None))
         self.update_cursor_position()
-
-
-    def save_file_dialog(self) -> str:
-        # TODO: Move Chooser logic to own widget
-        dlg = Gtk.FileChooserDialog(title = "Please choose a file...", parent = None, action = 1)
-
-        dlg.add_buttons("Cancel", Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK)
-        dlg.set_do_overwrite_confirmation(True)
-        dlg.add_filter(self._file_filter_text)
-        dlg.add_filter(self._file_filter_all)
-
-        if self._current_filename == "":
-            dlg.set_current_name("new.txt")
-        else:
-            dlg.set_current_folder(self._current_file.get_parent().get_path())
-            dlg.set_current_name(self._current_filename)
-
-        response = dlg.run()
-        file     = dlg.get_filename() if response == Gtk.ResponseType.OK else ""
-        dlg.destroy()
-
-        return Gio.File.new_for_path(file) if not file == "" else None

@@ -41,16 +41,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
 
-        self._file_filter_text = Gtk.FileFilter()
-        self._file_filter_text.set_name("Text Files")
-        # TODO: Need to externalize to settings file...
-        for p in settings.filters.code:
-            self._file_filter_text.add_pattern(p)
-
-        self._file_filter_all = Gtk.FileFilter()
-        self._file_filter_all.set_name("All Files")
-        self._file_filter_all.add_pattern("*.*")
-
         self._setup_styling()
         self._setup_signals()
         self._set_up_dnd()
@@ -79,8 +69,16 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
     def _setup_signals(self):
         self.connect("drag-data-received", self._on_drag_data_received)
+        self.connect("focus", self._on_widget_focus)
         self._buffer.connect("mark-set", self._on_cursor_move)
         self._buffer.connect('changed', self._is_modified)
+
+    def _subscribe_to_events(self):
+        ...
+
+    def _load_widgets(self):
+        ...
+
 
     def _document_loaded(self):
         for provider in self._completion.get_providers():
@@ -99,12 +97,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._completion.add_provider(py_completion_provider)
 
 
-    def _subscribe_to_events(self):
-        ...
-
-    def _load_widgets(self):
-        ...
-
     def _create_default_tag(self):
         self._general_style_tag = self._buffer.create_tag('general_style')
         self._general_style_tag.set_property('size', 100)
@@ -114,9 +106,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._is_changed = True
         self.update_cursor_position()
 
-    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
-        if mark != buf.get_insert(): return
-
+    def _on_widget_focus(self, widget, eve = None):
         target = self.get_parent().get_parent().NAME
         path   = self._current_file if self._current_file else ""
 
@@ -124,6 +114,11 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         event_system.emit("set_path_label", (path,))
         event_system.emit("set_encoding_label")
         event_system.emit("set_file_type_label", (self._current_filetype,))
+
+        return False
+
+    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
+        if mark != buf.get_insert(): return
         self.update_cursor_position()
 
     def _set_up_dnd(self):
