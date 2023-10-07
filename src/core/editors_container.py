@@ -20,13 +20,11 @@ class EditorsPaned(Gtk.Paned):
         self._subscribe_to_events()
         self._load_widgets()
 
-        self.show_all()
+        self.show()
 
 
     def _setup_styling(self):
         self.set_wide_handle(True)
-        self.set_vexpand(True)
-        self.set_hexpand(True)
 
     def _setup_signals(self):
         ...
@@ -50,12 +48,11 @@ class EditorsContainer(Gtk.Box):
         self._subscribe_to_events()
         self._load_widgets()
 
-        self.show_all()
+        self.show()
 
 
     def _setup_styling(self):
-        self.set_vexpand(True)
-        self.set_hexpand(True)
+        ...
 
     def _setup_signals(self):
         ...

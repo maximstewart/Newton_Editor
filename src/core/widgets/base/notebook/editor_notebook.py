@@ -52,6 +52,8 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _setup_styling(self):
         self.set_scrollable(True)
+        self.set_vexpand(True)
+        self.set_hexpand(True)
 
     def _setup_signals(self):
         self.connect("switch-page", self._switch_page_update)
