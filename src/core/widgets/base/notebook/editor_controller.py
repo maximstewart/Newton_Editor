@@ -41,6 +41,8 @@ class EditorControllerMixin:
             self.keyboard_move_tab_left(page_num)
         if action == "keyboard_move_tab_right":
             self.keyboard_move_tab_right(page_num)
+        if action == "keyboard_insert_mark":
+            self.keyboard_insert_mark(source_view)
         if action == "keyboard_move_tab_to_1":
             self.keyboard_move_tab_to_1(page_num)
         if action == "keyboard_move_tab_to_2":

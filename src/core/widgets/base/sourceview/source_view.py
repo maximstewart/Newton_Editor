@@ -7,6 +7,7 @@ gi.require_version('GtkSource', '4')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import GLib
 from gi.repository import Gio
 from gi.repository import GtkSource
 
@@ -40,6 +41,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._ignore_internal_change = False
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
+        self._insert_marks           = []
 
         self._setup_styling()
         self._setup_signals()
@@ -72,6 +74,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.connect("focus", self._on_widget_focus)
         self._buffer.connect("mark-set", self._on_cursor_move)
         self._buffer.connect('changed', self._is_modified)
+        self._buffer.connect('insert-text', self._insert_text)
 
     def _subscribe_to_events(self):
         ...
@@ -106,6 +109,15 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._is_changed = True
         self.update_cursor_position()
 
+    def _insert_text(self, text_buffer, location_itr, text_str, len_int):
+        with text_buffer.freeze_notify():
+            for mark in self._insert_marks:
+                itr = text_buffer.get_iter_at_mark(mark)
+                print(itr)
+
+                # GLib.idle_add(text_buffer.insert, *(itr, text_str, -1))
+                text_buffer.insert(itr, text_str, -1)
+
     def _on_widget_focus(self, widget, eve = None):
         target = self.get_parent().get_parent().NAME
         path   = self._current_file if self._current_file else ""
@@ -121,20 +133,19 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         if mark != buf.get_insert(): return
         self.update_cursor_position()
 
+        # NOTE: Not sure but this might not be efficient if the map reloads the same view.
+        event_system.emit(f"set_source_view", (self,))
+
     def _set_up_dnd(self):
-        WIDGET_TARGET_TYPE = 70
-        URI_TARGET_TYPE    = 80
-        widget_target      = Gtk.TargetEntry.new('dummy', Gtk.TargetFlags(0), WIDGET_TARGET_TYPE)
+        PLAIN_TEXT_TARGET_TYPE = 70
+        URI_TARGET_TYPE        = 80
+        text_target        = Gtk.TargetEntry.new('text/plain', Gtk.TargetFlags(0), PLAIN_TEXT_TARGET_TYPE)
         uri_target         = Gtk.TargetEntry.new('text/uri-list', Gtk.TargetFlags(0), URI_TARGET_TYPE)
-        targets            = [ widget_target, uri_target ]
+        targets            = [ text_target, uri_target ]
         self.drag_dest_set_target_list(targets)
 
     def _on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
         if info == 70:
-            print(drag_context)
-            print(data)
-            print(info)
-            # detach_tab(child)
             return
 
         if info == 80:

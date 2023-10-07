@@ -8,6 +8,7 @@ from utils.ipc_server import IPCServer
 from core.window import Window
 
 
+
 class AppLaunchException(Exception):
     ...
 

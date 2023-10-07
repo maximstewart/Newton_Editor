@@ -1,5 +1,16 @@
-/* Set fm to have transparent window */
 * {
     background: rgba(39, 43, 52, 0.24);
     color: rgba(255, 255, 255, 1);
 }
+
+* selection {
+    background-color: rgba(0, 115, 115, 0.34);
+    /* Bergundy */
+    /* background-color: rgba(116, 0, 0, 0.64); */
+    color: rgba(255, 255, 255, 0.5);
+}
+
+
+.error_txt   { color: rgb(170, 18, 18); }
+.warning_txt { color: rgb(255, 168, 0); }
+.success_txt { color: rgb(136, 204, 39); }

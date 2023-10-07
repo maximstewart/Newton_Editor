@@ -59,7 +59,7 @@ class PythonCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
             return False
 
         ch = iter.get_char()
-        if not (ch in ('_', '.') or ch.isalnum()):
+        if not (ch in ('_', '.', ' ') or ch.isalnum()):
             return False
 
         return True

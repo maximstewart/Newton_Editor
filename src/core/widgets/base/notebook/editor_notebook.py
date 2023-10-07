@@ -55,11 +55,8 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _setup_signals(self):
         self.connect("switch-page", self._switch_page_update)
-        # self.connect("button-press-event", self._dbl_click_create_view)
-        ...
 
     def _subscribe_to_events(self):
-        # event_system.subscribe("set_buffer_language", self.action_controller, *("set_buffer_language",))
         event_system.subscribe("create_view", self._create_view)
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
@@ -72,6 +69,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
         event_system.subscribe("keyboard_move_tab_left", self._keyboard_move_tab_left)
         event_system.subscribe("keyboard_move_tab_right", self._keyboard_move_tab_right)
+        event_system.subscribe("keyboard_insert_mark", self._keyboard_insert_mark)
         event_system.subscribe("keyboard_move_tab_to_1", self._keyboard_move_tab_to_1)
         event_system.subscribe("keyboard_move_tab_to_2", self._keyboard_move_tab_to_2)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
@@ -118,6 +116,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def _switch_page_update(self, notebook, page, page_num):
         source_view = page.get_source_view()
         gfile       = source_view.get_current_file()
+
         if not gfile:
             event_system.emit("set_path_label", ("",))
             event_system.emit("set_file_type_label", (source_view._current_filetype,))
@@ -125,6 +124,8 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
             source_view.load_file_info(gfile)
             source_view.update_cursor_position()
             source_view.set_bottom_labels(gfile)
+
+        event_system.emit(f"set_source_view", (source_view,))
 
     def _create_view(self, gfile = None, line: int = 0):
         if not self.is_editor_focused: # TODO: Find way to converge this
@@ -167,6 +168,9 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _keyboard_move_tab_right(self):
         self.action_controller("keyboard_move_tab_right")
+
+    def _keyboard_insert_mark(self):
+        self.action_controller("keyboard_insert_mark")
 
     def _keyboard_move_tab_to_1(self):
         self.action_controller("keyboard_move_tab_to_1")

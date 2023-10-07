@@ -6,10 +6,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
+from .widgets.save_file_dialog import SaveFileDialog
 from .widgets.base.banner_controls import BannerControls
 from .editors_container import EditorsContainer
 from .widgets.base.general_info_widget import GeneralInfoWidget
-from .widgets.save_file_dialog import SaveFileDialog
 
 
 

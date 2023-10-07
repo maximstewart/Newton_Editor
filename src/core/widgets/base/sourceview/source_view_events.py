@@ -50,6 +50,14 @@ class SourceViewEventsMixin:
 
         event_system.emit("set_line_char_label", (f"{row}:{col}",))
 
+    def keyboard_insert_mark(self):
+        iter  = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
+        mark  = Gtk.TextMark.new(name = None, left_gravity = False)
+
+        self._buffer.add_mark(mark, iter)
+        self._insert_marks.append(mark)
+        mark.set_visible(True)
+
     def got_to_line(self, line: int = 0):
         index     = line - 1
         buffer    = self.get_buffer()

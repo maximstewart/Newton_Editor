@@ -6,25 +6,27 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
+from .widgets.miniview_widget import MiniViewWidget
 from .widgets.base.notebook.editor_notebook import EditorNotebook
 
 
 
-class EditorsContainer(Gtk.Paned):
+class EditorsPaned(Gtk.Paned):
     def __init__(self):
-        super(EditorsContainer, self).__init__()
+        super(EditorsPaned, self).__init__()
 
         self._setup_styling()
         self._setup_signals()
         self._subscribe_to_events()
         self._load_widgets()
 
-        self.show()
+        self.show_all()
 
 
     def _setup_styling(self):
         self.set_wide_handle(True)
         self.set_vexpand(True)
+        self.set_hexpand(True)
 
     def _setup_signals(self):
         ...
@@ -35,3 +37,32 @@ class EditorsContainer(Gtk.Paned):
     def _load_widgets(self):
         self.add1(EditorNotebook())
         self.add2(EditorNotebook())
+
+
+
+
+class EditorsContainer(Gtk.Box):
+    def __init__(self):
+        super(EditorsContainer, self).__init__()
+
+        self._setup_styling()
+        self._setup_signals()
+        self._subscribe_to_events()
+        self._load_widgets()
+
+        self.show_all()
+
+
+    def _setup_styling(self):
+        self.set_vexpand(True)
+        self.set_hexpand(True)
+
+    def _setup_signals(self):
+        ...
+
+    def _subscribe_to_events(self):
+        ...
+
+    def _load_widgets(self):
+        self.add(EditorsPaned())
+        self.add(MiniViewWidget())

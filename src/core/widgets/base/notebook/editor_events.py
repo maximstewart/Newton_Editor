@@ -65,6 +65,10 @@ class EditorEventsMixin:
         page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
         self.set_current_page(page_num)
 
+    # NOTE: This feels bad man...
+    def keyboard_insert_mark(self, source_view):
+        source_view.keyboard_insert_mark()
+
     def keyboard_move_tab_to_1(self, page_num):
         notebook = self.builder.get_object("notebook_1")
         if self.NAME == "notebook_1":
