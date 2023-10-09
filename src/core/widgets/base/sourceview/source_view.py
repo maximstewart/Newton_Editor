@@ -41,7 +41,9 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._ignore_internal_change = False
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
-        self._insert_marks           = []
+
+        self._multi_insert_marks      = []
+        self.freeze_multi_line_insert = False
 
         self._setup_styling()
         self._setup_signals()
@@ -70,6 +72,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.set_vexpand(True)
 
     def _setup_signals(self):
+        self.connect("button-release-event", self._keyboard_handle_marks)
         self.connect("drag-data-received", self._on_drag_data_received)
         self.connect("focus", self._on_widget_focus)
         self._buffer.connect("mark-set", self._on_cursor_move)
@@ -110,13 +113,19 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.update_cursor_position()
 
     def _insert_text(self, text_buffer, location_itr, text_str, len_int):
-        with text_buffer.freeze_notify():
-            for mark in self._insert_marks:
-                itr = text_buffer.get_iter_at_mark(mark)
-                print(itr)
+        if self.freeze_multi_line_insert: return
 
-                # GLib.idle_add(text_buffer.insert, *(itr, text_str, -1))
-                text_buffer.insert(itr, text_str, -1)
+        with self._buffer.freeze_notify():
+            GLib.idle_add(self._update_multi_line_markers, *(text_str,))
+
+    def _update_multi_line_markers(self, text_str):
+        self.freeze_multi_line_insert = True
+
+        for mark in self._multi_insert_marks:
+            itr = self._buffer.get_iter_at_mark(mark)
+            self._buffer.insert(itr, text_str, -1)
+
+        self.freeze_multi_line_insert = False
 
     def _on_widget_focus(self, widget, eve = None):
         target = self.get_parent().get_parent().NAME
@@ -135,6 +144,15 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         # NOTE: Not sure but this might not be efficient if the map reloads the same view.
         event_system.emit(f"set_source_view", (self,))
+
+    def _keyboard_handle_marks(self, widget = None, eve = None, user_data = None):
+        if eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 1 :   # l-click
+            if eve.state & Gdk.ModifierType.CONTROL_MASK:
+                self.keyboard_insert_mark()
+            else:
+                self.keyboard_clear_marks()
+        elif eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 3: # r-click
+            ...
 
     def _set_up_dnd(self):
         PLAIN_TEXT_TARGET_TYPE = 70

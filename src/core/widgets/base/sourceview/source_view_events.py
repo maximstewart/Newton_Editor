@@ -52,11 +52,21 @@ class SourceViewEventsMixin:
 
     def keyboard_insert_mark(self):
         iter  = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
-        mark  = Gtk.TextMark.new(name = None, left_gravity = False)
+        mark  = Gtk.TextMark.new(name = f"multi_insert_{len(self._multi_insert_marks)}", left_gravity = False)
 
         self._buffer.add_mark(mark, iter)
-        self._insert_marks.append(mark)
+        self._multi_insert_marks.append(mark)
         mark.set_visible(True)
+
+    def keyboard_clear_marks(self):
+        self._buffer.begin_user_action()
+
+        for mark in self._multi_insert_marks:
+            mark.set_visible(False)
+            self._buffer.delete_mark(mark)
+
+        self._multi_insert_marks.clear()
+        self._buffer.end_user_action()
 
     def got_to_line(self, line: int = 0):
         index     = line - 1

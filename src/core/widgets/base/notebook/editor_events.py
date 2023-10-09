@@ -47,16 +47,6 @@ class EditorEventsMixin:
         if self.NAME == "notebook_2" and self.get_n_pages() == 0:
             self.hide()
 
-
-    def do_text_search(self, query = ""):
-        source_view.scale_down_text()
-
-    def set_buffer_language(self, source_view, language = "python3"):
-        source_view.set_buffer_language(language)
-
-    def set_buffer_style(self, source_view, style = "tango"):
-        source_view.set_buffer_style(style)
-
     def keyboard_prev_tab(self, page_num):
         page_num = self.get_n_pages() - 1 if page_num == 0 else page_num - 1
         self.set_current_page(page_num)
@@ -64,10 +54,6 @@ class EditorEventsMixin:
     def keyboard_next_tab(self, page_num):
         page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
         self.set_current_page(page_num)
-
-    # NOTE: This feels bad man...
-    def keyboard_insert_mark(self, source_view):
-        source_view.keyboard_insert_mark()
 
     def keyboard_move_tab_to_1(self, page_num):
         notebook = self.builder.get_object("notebook_1")
@@ -111,6 +97,10 @@ class EditorEventsMixin:
         page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
         self.reorder_child(page, page_num)
 
+
+
+
+    # NOTE: These feel bad being here man...
     def scale_up_text(self, source_view):
         source_view.scale_up_text()
 
@@ -119,3 +109,19 @@ class EditorEventsMixin:
 
     def toggle_highlight_line(self, source_view):
         source_view.toggle_highlight_line()
+
+    def keyboard_insert_mark(self, source_view):
+        source_view.keyboard_insert_mark()
+
+    def keyboard_clear_marks(self, source_view):
+        source_view.keyboard_clear_marks()
+
+    def do_text_search(self, query = ""):
+        # source_view.scale_down_text()
+        ...
+
+    def set_buffer_language(self, source_view, language = "python3"):
+        source_view.set_buffer_language(language)
+
+    def set_buffer_style(self, source_view, style = "tango"):
+        source_view.set_buffer_style(style)

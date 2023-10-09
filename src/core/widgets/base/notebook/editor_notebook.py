@@ -72,6 +72,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("keyboard_move_tab_left", self._keyboard_move_tab_left)
         event_system.subscribe("keyboard_move_tab_right", self._keyboard_move_tab_right)
         event_system.subscribe("keyboard_insert_mark", self._keyboard_insert_mark)
+        event_system.subscribe("keyboard_clear_marks", self._keyboard_clear_marks)
         event_system.subscribe("keyboard_move_tab_to_1", self._keyboard_move_tab_to_1)
         event_system.subscribe("keyboard_move_tab_to_2", self._keyboard_move_tab_to_2)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
@@ -173,6 +174,9 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _keyboard_insert_mark(self):
         self.action_controller("keyboard_insert_mark")
+
+    def _keyboard_clear_marks(self):
+        self.action_controller("keyboard_clear_marks")
 
     def _keyboard_move_tab_to_1(self):
         self.action_controller("keyboard_move_tab_to_1")
