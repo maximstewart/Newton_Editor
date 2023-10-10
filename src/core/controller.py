@@ -50,6 +50,8 @@ class Controller(SignalsMixins, ControllerData):
 
     def _subscribe_to_events(self):
         event_system.subscribe("handle_file_from_ipc", self.handle_file_from_ipc)
+        event_system.subscribe("set_active_src_view", self.set_active_src_view)
+        event_system.subscribe("get_active_src_view", self.get_active_src_view)
 
     def load_glade_file(self):
         self.builder     = Gtk.Builder()

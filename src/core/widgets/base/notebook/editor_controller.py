@@ -46,6 +46,12 @@ class EditorControllerMixin:
             self.keyboard_insert_mark(source_view)
         if action == "keyboard_clear_marks":
             self.keyboard_clear_marks(source_view)
+        if action == "move_lines_up":
+            self.move_lines_up(source_view)
+        if action == "move_lines_down":
+            self.move_lines_down(source_view)
+        if action == "keyboard_tggl_comment":
+            self.keyboard_tggl_comment(source_view)
         if action == "do_text_search":
             self.do_text_search(source_view, query)
         if action == "set_buffer_language":

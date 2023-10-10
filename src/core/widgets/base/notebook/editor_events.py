@@ -116,6 +116,15 @@ class EditorEventsMixin:
     def keyboard_clear_marks(self, source_view):
         source_view.keyboard_clear_marks()
 
+    def move_lines_up(self, source_view):
+        source_view.move_lines_up()
+
+    def move_lines_down(self, source_view):
+        source_view.move_lines_down()
+
+    def keyboard_tggl_comment(self, source_view):
+        source_view.keyboard_tggl_comment()
+
     def do_text_search(self, query = ""):
         # source_view.scale_down_text()
         ...

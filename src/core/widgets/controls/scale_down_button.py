@@ -21,7 +21,7 @@ class ScaleDownButton(Gtk.Button):
 
     def _setup_styling(self):
         self.set_label("Zoom")
-        self.set_image( Gtk.Image.new_from_icon_name("gtk-remove", 4) )
+        self.set_image( Gtk.Image.new_from_icon_name("gtk-zoom-out", 4) )
         self.set_always_show_image(True)
         self.set_image_position(1) # Left - 0, Right = 1
         self.set_hexpand(False)
@@ -36,4 +36,4 @@ class ScaleDownButton(Gtk.Button):
         ...
 
     def _emit_scale_eve(self, widget, eve = None):
-        event_system.emit('scale_down_text', ("scale_down_text",))
+        event_system.emit('keyboard_scale_down_text')

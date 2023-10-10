@@ -36,4 +36,4 @@ class ToggleLineHighlight(Gtk.Button):
         ...
 
     def _emit_toggle_eve(self, widget, eve = None):
-        event_system.emit('toggle_highlight_line', ("toggle_highlight_line",))
+        event_system.emit('toggle_highlight_line')

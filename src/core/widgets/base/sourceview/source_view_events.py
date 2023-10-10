@@ -50,6 +50,9 @@ class SourceViewEventsMixin:
 
         event_system.emit("set_line_char_label", (f"{row}:{col}",))
 
+    def keyboard_tggl_comment(self):
+        logger.info("SourceViewEventsMixin > keyboard_tggl_comment > stub...")
+
     def keyboard_insert_mark(self):
         iter  = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
         mark  = Gtk.TextMark.new(name = f"multi_insert_{len(self._multi_insert_marks)}", left_gravity = False)
@@ -85,6 +88,12 @@ class SourceViewEventsMixin:
 
     def action_comment_out_selection(self):
         ...
+
+    def move_lines_up(self):
+        self.emit("move-lines", *(False,))
+
+    def move_lines_down(self):
+        self.emit("move-lines", *(True,))
 
     def open_file(self, gfile, line: int = 0, *args):
         self._current_file = gfile

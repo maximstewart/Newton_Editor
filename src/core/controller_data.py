@@ -21,9 +21,19 @@ class ControllerData:
         self.ctrl_down   = False
         self.shift_down  = False
         self.alt_down    = False
+        self.active_src_view = None
 
         self.load_glade_file()
         self.plugins     = PluginsController()
+
+    def set_active_src_view(self, source_view):
+        if self.active_src_view:
+            self.active_src_view.get_parent().get_parent().is_editor_focused = False
+
+        self.active_src_view = source_view
+
+    def get_active_src_view(self):
+        return self.active_src_view
 
 
     def clear_console(self) -> None:

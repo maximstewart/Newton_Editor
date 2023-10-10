@@ -72,12 +72,16 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.set_vexpand(True)
 
     def _setup_signals(self):
-        self.connect("button-release-event", self._keyboard_handle_marks)
-        self.connect("drag-data-received", self._on_drag_data_received)
         self.connect("focus", self._on_widget_focus)
-        self._buffer.connect("mark-set", self._on_cursor_move)
+        self.connect("focus-in-event", self._focus_in_event)
+
+        self.connect("drag-data-received", self._on_drag_data_received)
+        self.connect("button-release-event", self._button_release_event)
+
         self._buffer.connect('changed', self._is_modified)
+        self._buffer.connect("mark-set", self._on_cursor_move)
         self._buffer.connect('insert-text', self._insert_text)
+
 
     def _subscribe_to_events(self):
         ...
@@ -127,6 +131,10 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         self.freeze_multi_line_insert = False
 
+    def _focus_in_event(self, widget, eve = None):
+        event_system.emit("set_active_src_view", (self,))
+        self.get_parent().get_parent().is_editor_focused = True
+
     def _on_widget_focus(self, widget, eve = None):
         target = self.get_parent().get_parent().NAME
         path   = self._current_file if self._current_file else ""
@@ -145,7 +153,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         # NOTE: Not sure but this might not be efficient if the map reloads the same view.
         event_system.emit(f"set_source_view", (self,))
 
-    def _keyboard_handle_marks(self, widget = None, eve = None, user_data = None):
+    def _button_release_event(self, widget = None, eve = None, user_data = None):
         if eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 1 :   # l-click
             if eve.state & Gdk.ModifierType.CONTROL_MASK:
                 self.keyboard_insert_mark()
