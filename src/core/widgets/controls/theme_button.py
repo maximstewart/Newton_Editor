@@ -44,8 +44,10 @@ class ThemePopover(Gtk.Popover):
         self.popup()
 
     def _set_theme(self, widget = None, eve = None):
-        style_scheme = widget.get_style_scheme()
-        id   = style_scheme.get_id()
+        style_scheme                  = widget.get_style_scheme()
+        id                            = style_scheme.get_id()
+        settings.theming.syntax_theme = id.lower()
+
         event_system.emit('set_buffer_style', ("set_buffer_style", id.lower(),))
 
 

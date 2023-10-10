@@ -39,7 +39,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._ignore_internal_change = False
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
-        self.px_value                = 16
+        self._px_value               = settings.theming.default_zoom
 
         self._multi_insert_marks      = []
         self.freeze_multi_line_insert = False
@@ -54,6 +54,8 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
     def _setup_styling(self):
         ctx = self.get_style_context()
         ctx.add_class("source-view")
+        ctx.add_class(f"px{self._px_value}")
+
 
         self.set_show_line_marks(True)
         self.set_show_line_numbers(True)

@@ -19,7 +19,7 @@ class SourceViewEventsMixin:
     def set_buffer_language(self, language = "python3"):
         self._buffer.set_language( self._language_manager.get_language(language) )
 
-    def set_buffer_style(self, style = "tango"):
+    def set_buffer_style(self, style = settings.theming.syntax_theme):
         self._buffer.set_style_scheme( self._style_scheme_manager.get_scheme(style) )
 
     def toggle_highlight_line(self, widget = None, eve = None):
@@ -28,10 +28,9 @@ class SourceViewEventsMixin:
     def scale_up_text(self, scale_step = 10):
         ctx = self.get_style_context()
 
-        if self.px_value < 99:
-            self.px_value += 1
-
-        ctx.add_class(f"px{self.px_value}")
+        if self._px_value < 99:
+            self._px_value += 1
+            ctx.add_class(f"px{self._px_value}")
 
         # NOTE: Hope to bring this or similar back after we decouple scaling issues coupled with the miniview.
         # tag_table = self._buffer.get_tag_table()
@@ -45,11 +44,10 @@ class SourceViewEventsMixin:
     def scale_down_text(self, scale_step = 10):
         ctx = self.get_style_context()
 
-        ctx.remove_class(f"px{self.px_value}")
-        if self.px_value > 1:
-            self.px_value -= 1
-
-        ctx.add_class(f"px{self.px_value}")
+        if self._px_value > 1:
+            ctx.remove_class(f"px{self._px_value}")
+            self._px_value -= 1
+            ctx.add_class(f"px{self._px_value}")
 
         # NOTE: Hope to bring this or similar back after we decouple scaling issues coupled with the miniview.
         # tag_table = self._buffer.get_tag_table()

@@ -1,45 +1,83 @@
-/* Make most desired things base transparent */
+/* ----  make most desired things base transparent  ---- */
 window > box,
 window > box > box,
 window > box > box > paned,
 window > box > box > paned > notebook,
 window > box > box > paned > notebook > stack,
-window > box > box > paned > notebook > stack scrolledwindow > textview > * {
+window > box > box > paned > notebook > stack > scrolledwindow > textview > * {
     background: rgba(0, 0, 0, 0.0);
     color: rgba(255, 255, 255, 1);
 }
 
-/* Top controls */
-window > box > box > button
+
+/* ----  top controls  ---- */
+window > box > box > button,
 window > box > box > buttonbox > button {
     background: rgba(39, 43, 52, 0.64);
     margin-left: 12px;
     margin-right: 12px;
 }
 
-/* status bar */
+
+/*  status bar */
 window > box > statusbar {
     background: rgba(39, 43, 52, 0.64);
     padding-left: 96px;
     padding-right: 96px;
 }
 
-/* source code notebooks */
-window > box > box > paned > notebook > stack scrolledwindow > textview {
+
+/* ----  notebook headers  ---- */
+notebook > header {
+    background: rgba(39, 43, 52, 0.72);
+}
+
+notebook > header > tabs > tab {
+    color: rgba(255, 255, 255, 1);
+}
+
+notebook > header > tabs > tab:active {
+    background: rgba(39, 43, 52, 0.0);
+}
+
+
+/* ----  notebook tab buttons  ---- */
+tab > box > button {
+    background: rgba(116, 0, 0, 0.64);
+}
+
+tab > box > button:hover {
+    background: rgba(256, 0, 0, 0.64);
+}
+
+
+/* ----  source code notebooks  ---- */
+notebook > stack > scrolledwindow > textview {
     background: rgba(39, 43, 52, 0.64);
     color: rgba(255, 255, 255, 1);
 }
 
-/* make text selection slightly transparent */
+/* ----  miniview properties  ---- */
+/* the mini view container of text */
+.mini-view > text {
+    background: rgba(39, 43, 52, 0.64);
+}
+
+/* draggable overlay of the miniview */
+.mini-view > * {
+    background: rgba(64, 64, 64, 0.32);
+    color: rgba(255, 255, 255, 1);
+}
+
+
+
+/* ----  make text selection slightly transparent  ---- */
 * selection {
     background-color: rgba(0, 115, 115, 0.34);
     /* Bergundy */
     /* background-color: rgba(116, 0, 0, 0.64); */
     color: rgba(255, 255, 255, 0.5);
 }
-
-
-
 
 
 .source-view,
@@ -85,7 +123,6 @@ window > box > box > paned > notebook > stack scrolledwindow > textview {
 .px9 { font-size: 9px;  }
 .px10 { font-size: 10px;  }
 .px11 { font-size: 11px;  }
-.source-view,
 .px12 { font-size: 12px;  }
 .px13 { font-size: 13px;  }
 .px14 { font-size: 14px;  }
