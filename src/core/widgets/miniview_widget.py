@@ -24,12 +24,14 @@ class MiniViewWidget(Map):
 
     def _setup_styling(self):
         self.set_hexpand(False)
+        ctx = self.get_style_context()
+        ctx.add_class("mini-view")
 
     def _setup_signals(self):
-        event_system.subscribe(f"set_source_view", self.set_source_view)
+        ...
 
     def _subscribe_to_events(self):
-        ...
+        event_system.subscribe(f"set_source_view", self.set_source_view)
 
     def _load_widgets(self):
         ...

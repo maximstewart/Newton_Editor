@@ -25,22 +25,21 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._language_manager       = GtkSource.LanguageManager()
         self._style_scheme_manager   = GtkSource.StyleSchemeManager()
 
-        self._general_style_tag      = None
         self._file_loader            = None
         self._file_change_watcher    = None
         self._file_cdr_watcher       = None
-        self._last_eve_in_queue      = None
         self._current_file: Gio.File = None
 
         self._current_filename: str  = ""
         self._current_filepath: str  = None
         self._current_filetype: str  = "buffer"
 
-        self.skip_file_load          = False
+        self._skip_file_load         = False
         self._is_changed             = False
         self._ignore_internal_change = False
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
+        self.px_value                = 16
 
         self._multi_insert_marks      = []
         self.freeze_multi_line_insert = False
@@ -53,6 +52,9 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
 
     def _setup_styling(self):
+        ctx = self.get_style_context()
+        ctx.add_class("source-view")
+
         self.set_show_line_marks(True)
         self.set_show_line_numbers(True)
         self.set_smart_backspace(True)
@@ -70,6 +72,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.set_buffer_style()
 
         self.set_vexpand(True)
+
 
     def _setup_signals(self):
         self.connect("focus", self._on_widget_focus)
@@ -108,9 +111,9 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
 
     def _create_default_tag(self):
-        self._general_style_tag = self._buffer.create_tag('general_style')
-        self._general_style_tag.set_property('size', 100)
-        self._general_style_tag.set_property('scale', 100)
+        general_style_tag = self._buffer.create_tag('general_style')
+        general_style_tag.set_property('size', 100)
+        general_style_tag.set_property('scale', 100)
 
     def _is_modified(self, *args):
         self._is_changed = True
@@ -148,9 +151,10 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
     def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
         if mark != buf.get_insert(): return
+
         self.update_cursor_position()
 
-        # NOTE: Not sure but this might not be efficient if the map reloads the same view.
+        # NOTE: Not sure but this might not be efficient if the map reloads the same view...
         event_system.emit(f"set_source_view", (self,))
 
     def _button_release_event(self, widget = None, eve = None, user_data = None):
@@ -171,8 +175,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.drag_dest_set_target_list(targets)
 
     def _on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
-        if info == 70:
-            return
+        if info == 70: return
 
         if info == 80:
             uris  = data.get_uris()
@@ -209,8 +212,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._file_change_watcher.connect("changed", self._file_monitor)
 
     def _file_monitor(self, file_monitor, file, other_file = None, eve_type = None, data = None):
-        if not file.get_path() == self._current_file.get_path():
-            return
+        if not file.get_path() == self._current_file.get_path(): return
 
         if eve_type in [Gio.FileMonitorEvent.CREATED,
                         Gio.FileMonitorEvent.DELETED,

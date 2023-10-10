@@ -26,21 +26,39 @@ class SourceViewEventsMixin:
         self.set_highlight_current_line( not self.get_highlight_current_line() )
 
     def scale_up_text(self, scale_step = 10):
-        current_scale = self._general_style_tag.get_property('scale')
-        start_itr     = self._buffer.get_start_iter()
-        end_itr       = self._buffer.get_end_iter()
+        ctx = self.get_style_context()
 
-        self._general_style_tag.set_property('scale',  current_scale + scale_step)
-        self._buffer.apply_tag(self._general_style_tag, start_itr, end_itr)
+        if self.px_value < 99:
+            self.px_value += 1
+
+        ctx.add_class(f"px{self.px_value}")
+
+        # NOTE: Hope to bring this or similar back after we decouple scaling issues coupled with the miniview.
+        # tag_table = self._buffer.get_tag_table()
+        # start_itr = self._buffer.get_start_iter()
+        # end_itr   = self._buffer.get_end_iter()
+        # tag       = tag_table.lookup('general_style')
+        #
+        # tag.set_property('scale', tag.get_property('scale') + scale_step)
+        # self._buffer.apply_tag(tag, start_itr, end_itr)
 
     def scale_down_text(self, scale_step = 10):
-        tag_table = self._buffer.get_tag_table()
-        start_itr = self._buffer.get_start_iter()
-        end_itr   = self._buffer.get_end_iter()
-        tag       = tag_table.lookup('general_style')
+        ctx = self.get_style_context()
 
-        tag.set_property('scale', tag.get_property('scale') - scale_step)
-        self._buffer.apply_tag(tag, start_itr, end_itr)
+        ctx.remove_class(f"px{self.px_value}")
+        if self.px_value > 1:
+            self.px_value -= 1
+
+        ctx.add_class(f"px{self.px_value}")
+
+        # NOTE: Hope to bring this or similar back after we decouple scaling issues coupled with the miniview.
+        # tag_table = self._buffer.get_tag_table()
+        # start_itr = self._buffer.get_start_iter()
+        # end_itr   = self._buffer.get_end_iter()
+        # tag       = tag_table.lookup('general_style')
+        #
+        # tag.set_property('scale', tag.get_property('scale') - scale_step)
+        # self._buffer.apply_tag(tag, start_itr, end_itr)
 
     def update_cursor_position(self):
         iter  = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
@@ -103,15 +121,15 @@ class SourceViewEventsMixin:
         self._create_file_watcher(gfile)
 
     def save_file(self):
-        self.skip_file_load = True
+        self._skip_file_load = True
         gfile = event_system.emit_and_await("save_file_dialog", (self._current_filename, self._current_file)) if not self._current_file else self._current_file
 
         if not gfile:
-            self.skip_file_load = False
+            self._skip_file_load = False
             return
 
         self.open_file( self._write_file(gfile) )
-        self.skip_file_load = False
+        self._skip_file_load = False
 
     def save_file_as(self):
         gfile = event_system.emit_and_await("save_file_dialog", (self._current_filename, self._current_file))
@@ -136,7 +154,7 @@ class SourceViewEventsMixin:
             self._current_filetype = info.get_content_type()
 
     def load_file_async(self, gfile, line: int = 0):
-        if self.skip_file_load:
+        if self._skip_file_load:
             self.update_labels(gfile)
             return
 
