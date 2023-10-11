@@ -7,6 +7,16 @@
     <property name="can-focus">False</property>
     <property name="stock">gtk-close</property>
   </object>
+  <object class="GtkImage" id="only-in-selection">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">../../icons/only-in-selection.png</property>
+  </object>
+  <object class="GtkImage" id="whole-word">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">../../icons/whole-word.png</property>
+  </object>
   <object class="GtkPopover" id="search_replace_dialog">
     <property name="can-focus">False</property>
     <property name="modal">False</property>
@@ -92,12 +102,13 @@
                     </child>
                     <child>
                       <object class="GtkToggleButton">
-                        <property name="label" translatable="yes">togglebutton</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="focus-on-click">False</property>
                         <property name="receives-default">True</property>
                         <property name="tooltip-text" translatable="yes">Only In Selection</property>
+                        <property name="image">only-in-selection</property>
+                        <property name="always-show-image">True</property>
                         <signal name="toggled" handler="tggle_selection_only_scan" swapped="no"/>
                       </object>
                       <packing>
@@ -108,13 +119,14 @@
                     </child>
                     <child>
                       <object class="GtkToggleButton">
-                        <property name="label" translatable="yes">togglebutton</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="focus-on-click">False</property>
                         <property name="receives-default">True</property>
                         <property name="tooltip-text" translatable="yes">Whole Word</property>
-                        <signal name="toggled" handler="tggle_fuzzy_search" swapped="no"/>
+                        <property name="image">whole-word</property>
+                        <property name="always-show-image">True</property>
+                        <signal name="toggled" handler="tggle_whole_word_search" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -176,6 +188,7 @@
                 <property name="margin-bottom">5</property>
                 <property name="placeholder-text" translatable="yes">Find in current buffer</property>
                 <signal name="changed" handler="search_for_string" swapped="no"/>
+                <signal name="key-release-event" handler="find_next_entry" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -211,6 +224,7 @@
                 <property name="margin-end">5</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">5</property>
+                <signal name="clicked" handler="replace_all" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">9</property>
@@ -229,6 +243,7 @@
                 <property name="margin-end">10</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">5</property>
+                <signal name="clicked" handler="replace" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">8</property>
@@ -245,6 +260,7 @@
                 <property name="margin-end">5</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">5</property>
+                <signal name="clicked" handler="find_all" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">9</property>
@@ -261,6 +277,7 @@
                 <property name="margin-end">5</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">5</property>
+                <signal name="clicked" handler="find_next" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">8</property>

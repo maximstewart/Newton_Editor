@@ -28,8 +28,8 @@ class Plugin(PluginBase):
 
         self.use_regex               = False
         self.use_case_sensitive      = False
-        self.use_selection_only_scan = False
-        self.use_fuzzy_search        = False
+        self.use_only_in_selection   = False
+        self.use_whole_word_search   = False
         self.highlight_color         = "#FBF719"
         self.text_color              = "#000000"
 
@@ -81,11 +81,11 @@ class Plugin(PluginBase):
         self._set_find_options_lbl()
 
     def tggle_selection_only_scan(self, widget):
-        self.use_selection_only_scan = not widget.get_active()
+        self.use_only_in_selection = not widget.get_active()
         self._set_find_options_lbl()
 
-    def tggle_fuzzy_search(self, widget):
-        self.use_fuzzy_search =  not widget.get_active()
+    def tggle_whole_word_search(self, widget):
+        self.use_whole_word_search =  not widget.get_active()
         self._set_find_options_lbl()
 
     def _set_find_options_lbl(self):
@@ -110,6 +110,9 @@ class Plugin(PluginBase):
 
         buffer.remove_tag_by_name("search_tag", buffer.get_start_iter(), buffer.get_end_iter())
         return search_tag
+
+    def find_next_entry(self, widget, eve, use_data = None):
+        ...
 
     def search_for_string(self, widget):
         query      = widget.get_text()
@@ -153,14 +156,14 @@ class Plugin(PluginBase):
 
 
 
-    def find_next(self):
+    def find_next(self, widget):
         ...
 
-    def find_all(self):
+    def find_all(self, widget):
         ...
 
-    def replace_next(self):
+    def replace(self, widget):
         ...
 
-    def replace_all(self):
+    def replace_all(self, widget):
         ...
