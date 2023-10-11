@@ -6,10 +6,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
+from .widgets.separator_widget import Separator
 from .widgets.save_file_dialog import SaveFileDialog
+from .widgets.base.general_info_widget import GeneralInfoWidget
 from .widgets.base.banner_controls import BannerControls
 from .editors_container import EditorsContainer
-from .widgets.base.general_info_widget import GeneralInfoWidget
 
 
 
@@ -28,13 +29,17 @@ class CoreWidget(Gtk.Box):
 
 
     def _setup_styling(self):
-        self.set_orientation(1)
+        self.set_orientation(1) # VERTICAL = 1
+
 
     def _setup_signals(self):
         ...
 
     def _load_widgets(self):
         SaveFileDialog()
-        self.add(BannerControls())
         GeneralInfoWidget()
+
+        self.add(BannerControls())
+        self.add(Separator("separator_top"))
         self.add(EditorsContainer())
+        self.add(Separator("separator_botton"))

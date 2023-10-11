@@ -125,12 +125,8 @@ class EditorEventsMixin:
     def keyboard_tggl_comment(self, source_view):
         source_view.keyboard_tggl_comment()
 
-    def do_text_search(self, query = ""):
-        # source_view.scale_down_text()
-        ...
-
     def set_buffer_language(self, source_view, language = "python3"):
         source_view.set_buffer_language(language)
 
-    def set_buffer_style(self, source_view, style = "tango"):
+    def set_buffer_style(self, source_view, style = settings.theming.syntax_theme):
         source_view.set_buffer_style(style)

@@ -1,4 +1,7 @@
 /* ----  make most desired things base transparent  ---- */
+popover,
+/* popover *, */
+popover > box
 window > box,
 window > box > box,
 window > box > box > paned,
@@ -56,6 +59,13 @@ notebook > stack > scrolledwindow > textview {
     background: rgba(39, 43, 52, 0.64);
     color: rgba(255, 255, 255, 1);
 }
+
+/* any popover */
+popover {
+    background: rgba(39, 43, 52, 0.86);
+    color: rgba(255, 255, 255, 1);
+}
+
 
 /* ----  miniview properties  ---- */
 /* the mini view container of text */

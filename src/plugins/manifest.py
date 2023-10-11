@@ -61,4 +61,8 @@ class ManifestProcessor:
             if isinstance(requests["bind_keys"], list):
                 loading_data["bind_keys"] = requests["bind_keys"]
 
+        if "pass_ui_objects" in keys:
+            if isinstance(requests["pass_ui_objects"], list):
+                loading_data["pass_ui_objects"] = [ self._builder.get_object(obj) for obj in requests["pass_ui_objects"] ]
+
         return self._plugin, loading_data

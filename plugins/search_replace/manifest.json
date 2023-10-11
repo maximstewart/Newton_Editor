@@ -1,0 +1,14 @@
+{
+    "manifest": {
+        "name": "Search/Replace",
+        "author": "ITDominator",
+        "version": "0.0.1",
+        "support": "",
+        "requests": {
+            "pass_events": "true",
+            "pass_ui_objects": ["separator_botton"],
+            "bind_keys": ["Search/Replace||tggl_search_replace:<Control>f"]
+
+        }
+    }
+}

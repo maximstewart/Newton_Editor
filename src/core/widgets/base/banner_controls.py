@@ -30,6 +30,8 @@ class BannerControls(Gtk.Box):
 
     def _setup_styling(self):
         self.set_orientation(0)
+        self.set_margin_top(5)
+        self.set_margin_bottom(5)
 
     def _setup_signals(self):
         ...

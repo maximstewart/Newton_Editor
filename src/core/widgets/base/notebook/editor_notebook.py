@@ -92,17 +92,12 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         start_box = Gtk.Box()
         end_box   = Gtk.Box()
 
-        search = Gtk.SearchEntry()
-        search.set_placeholder_text("Search...")
-        search.connect("changed", self._text_search)
-
         add_btn = Gtk.Button()
         add_btn.set_image( Gtk.Image.new_from_icon_name("add", 4) )
         add_btn.set_always_show_image(True)
         add_btn.connect("released", self.create_view)
 
         end_box.add(add_btn)
-        end_box.add(search)
 
         start_box.show_all()
         end_box.show_all()
@@ -210,6 +205,3 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _keyboard_save_file_as(self):
         self.action_controller("save_file_as")
-
-    def _text_search(self, widget = None, eve = None):
-        self.action_controller("do_text_search", widget.get_text())
