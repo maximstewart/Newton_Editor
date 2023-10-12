@@ -81,7 +81,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.connect("focus-in-event", self._focus_in_event)
 
         self.connect("drag-data-received", self._on_drag_data_received)
-        self.connect("button-release-event", self._button_release_event)
+        self.connect("button-press-event", self._button_press_event)
 
         self._buffer.connect('changed', self._is_modified)
         self._buffer.connect("mark-set", self._on_cursor_move)
@@ -124,17 +124,22 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
     def _insert_text(self, text_buffer, location_itr, text_str, len_int):
         if self.freeze_multi_line_insert: return
 
+        if len(self._multi_insert_marks) > 0:
+            self._buffer.begin_user_action()
+            self.freeze_multi_line_insert = True
+
         with self._buffer.freeze_notify():
             GLib.idle_add(self._update_multi_line_markers, *(text_str,))
 
-    def _update_multi_line_markers(self, text_str):
-        self.freeze_multi_line_insert = True
-
-        for mark in self._multi_insert_marks:
-            itr = self._buffer.get_iter_at_mark(mark)
-            self._buffer.insert(itr, text_str, -1)
-
-        self.freeze_multi_line_insert = False
+    def _button_press_event(self, widget = None, eve = None, user_data = None):
+        if eve.type == Gdk.EventType.BUTTON_PRESS and eve.button == 1 :   # l-click
+            if eve.state & Gdk.ModifierType.CONTROL_MASK:
+                self.button_press_insert_mark(eve)
+                return True
+            else:
+                self.keyboard_clear_marks()
+        elif eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 3: # r-click
+            ...
 
     def _focus_in_event(self, widget, eve = None):
         event_system.emit("set_active_src_view", (self,))
@@ -158,15 +163,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         # NOTE: Not sure but this might not be efficient if the map reloads the same view...
         event_system.emit(f"set_source_view", (self,))
-
-    def _button_release_event(self, widget = None, eve = None, user_data = None):
-        if eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 1 :   # l-click
-            if eve.state & Gdk.ModifierType.CONTROL_MASK:
-                self.keyboard_insert_mark()
-            else:
-                self.keyboard_clear_marks()
-        elif eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 3: # r-click
-            ...
 
     def _set_up_dnd(self):
         PLAIN_TEXT_TARGET_TYPE = 70
@@ -204,56 +200,3 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
                     gfile = Gio.File.new_for_path(uri)
 
                 event_system.emit('create_view', (gfile,))
-
-
-    def _create_file_watcher(self, gfile = None):
-        if not gfile: return
-
-        self._cancel_current_file_watchers()
-        self._file_change_watcher = gfile.monitor(Gio.FileMonitorFlags.NONE, Gio.Cancellable())
-        self._file_change_watcher.connect("changed", self._file_monitor)
-
-    def _file_monitor(self, file_monitor, file, other_file = None, eve_type = None, data = None):
-        if not file.get_path() == self._current_file.get_path(): return
-
-        if eve_type in [Gio.FileMonitorEvent.CREATED,
-                        Gio.FileMonitorEvent.DELETED,
-                        Gio.FileMonitorEvent.RENAMED,
-                        Gio.FileMonitorEvent.MOVED_IN,
-                        Gio.FileMonitorEvent.MOVED_OUT]:
-            self._is_changed = True
-
-        if eve_type in [ Gio.FileMonitorEvent.CHANGES_DONE_HINT ]:
-            if self._ignore_internal_change:
-                self._ignore_internal_change = False
-                return
-
-            # TODO: Any better way to load the difference??
-            if self._current_file.query_exists():
-                self.load_file_async(self._current_file)
-
-    def _cancel_current_file_watchers(self):
-        if self._file_change_watcher:
-            self._file_change_watcher.cancel()
-            self._file_change_watcher = None
-
-        if self._file_cdr_watcher:
-            self._file_cdr_watcher.cancel()
-            self._file_cdr_watcher = None
-
-    def _write_file(self, gfile, save_as = False):
-        if not gfile: return
-
-        with open(gfile.get_path(), 'w') as f:
-            if not save_as:
-                self._ignore_internal_change = True
-                self._is_changed = False
-
-            start_itr = self._buffer.get_start_iter()
-            end_itr   = self._buffer.get_end_iter()
-            text      = self._buffer.get_text(start_itr, end_itr, True)
-
-            f.write(text)
-            f.close()
-
-        return gfile
