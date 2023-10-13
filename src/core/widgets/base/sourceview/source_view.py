@@ -27,7 +27,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         self._file_loader            = None
         self._file_change_watcher    = None
-        self._file_cdr_watcher       = None
         self._current_file: Gio.File = None
 
         self._current_filename: str  = ""
@@ -35,7 +34,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._current_filetype: str  = "buffer"
 
         self._skip_file_load         = False
-        self._is_changed             = False
         self._ignore_internal_change = False
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
@@ -87,7 +85,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._buffer.connect('changed', self._is_modified)
         self._buffer.connect("mark-set", self._on_cursor_move)
         self._buffer.connect('insert-text', self._insert_text)
-
+        self._buffer.connect('modified-changed', self._buffer_modified_changed)
 
     def _subscribe_to_events(self):
         ...
@@ -119,7 +117,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         general_style_tag.set_property('scale', 100)
 
     def _is_modified(self, *args):
-        self._is_changed = True
         self.update_cursor_position()
 
     def _insert_text(self, text_buffer, location_itr, text_str, len_int):
@@ -128,6 +125,11 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.begin_user_action()
         with self._buffer.freeze_notify():
             GLib.idle_add(self._update_multi_line_markers, *(text_str,))
+
+    def _buffer_modified_changed(self, buffer):
+        tab_widget = self.get_parent().get_tab_widget()
+        tab_widget.set_status(changed = True if buffer.get_modified() else False)
+
 
     # NOTE: Mostly sinking pre-bound keys here to let our keybinder control instead...
     def _key_press_event(self, widget, eve):
@@ -212,13 +214,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
             if len(uris) == 0:
                 uris = data.get_text().split("\n")
 
-            if self._is_changed:
-                # TODO: Impliment change detection and offer to save as new file
-                # Need to insure self._current_file gets set for further flow logic to work
-                # self.maybe_saved()
-                ...
-
-            if not self._current_file:
+            if not self._current_file and not self._buffer.get_modified():
                 gfile = Gio.File.new_for_uri(uris[0])
                 self.open_file(gfile)
                 uris.pop(0)

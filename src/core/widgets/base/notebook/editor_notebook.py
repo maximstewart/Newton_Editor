@@ -139,7 +139,7 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
             gfile = Gio.File.new_for_path(parts[0])
             try:
                 line = int(parts[1]) if len(parts) > 1 else 0
-            except Exception as e:
+            except Exception:
                 ...
 
         self.create_view(None, None, gfile, line)

@@ -1,6 +1,5 @@
 /* ----  make most desired things base transparent  ---- */
 popover,
-/* popover *, */
 popover > box
 window > box,
 window > box > box,
@@ -66,21 +65,6 @@ popover {
     color: rgba(255, 255, 255, 1);
 }
 
-
-/* ----  miniview properties  ---- */
-/* the mini view container of text */
-.mini-view > text {
-    background: rgba(39, 43, 52, 0.64);
-}
-
-/* draggable overlay of the miniview */
-.mini-view > * {
-    background: rgba(64, 64, 64, 0.32);
-    color: rgba(255, 255, 255, 1);
-}
-
-
-
 /* ----  make text selection slightly transparent  ---- */
 * selection {
     background-color: rgba(0, 115, 115, 0.34);
@@ -90,11 +74,31 @@ popover {
 }
 
 
+/* ----  miniview properties  ---- */
 .source-view,
 .mini-view {
     font-family: Monospace;
 }
 
+/* the mini view container of text */
+.mini-view > text {
+    background: rgba(39, 43, 52, 0.64);
+}
+
+/* draggable overlay of the miniview */
+.mini-view > * {
+    background: rgba(64, 64, 64, 0.32);
+    color: rgba(255, 255, 255, 1);
+    font-size: 1px;
+}
+
+
+
+
+/* other properties */
+.buffer_changed {
+    color: rgba(0, 232, 255, 0.64);
+}
 
 
 
@@ -105,8 +109,6 @@ popover {
 
 
 
-
-.mini-view { font-size: 1px; }
 
 /*
     Need these because updating buffer with get_tag_table and tags updates minimap to the same size due to its mapping structure...

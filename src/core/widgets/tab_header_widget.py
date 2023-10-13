@@ -48,9 +48,9 @@ class TabHeaderWidget(Gtk.Box):
         ...
 
     def _load_widgets(self):
-        label = Gtk.Label()
-        close = Gtk.Button()
-        icon  = Gtk.Image(stock=Gtk.STOCK_CLOSE)
+        label  = Gtk.Label()
+        close  = Gtk.Button()
+        icon   = Gtk.Image(stock = Gtk.STOCK_CLOSE)
 
         # NOTE: Setup with settings and from file
         label.set_xalign(0.0)
@@ -68,3 +68,9 @@ class TabHeaderWidget(Gtk.Box):
 
     def set_tab_label(self, label = "untitled"):
         self.get_children()[0].set_label(label)
+
+    def set_status(self, changed = False):
+        label = self.get_children()[0]
+        ctx   = label.get_style_context()
+
+        ctx.add_class("buffer_changed") if changed else ctx.remove_class("buffer_changed")

@@ -69,7 +69,6 @@ class FileEventsMixin:
 
         def finish_load_callback(obj, res, user_data=None):
             self._file_loader.load_finish(res)
-            self._is_changed = False
             self._document_loaded()
             self.got_to_line(line)
             self.update_labels(gfile)
@@ -96,7 +95,7 @@ class FileEventsMixin:
                         Gio.FileMonitorEvent.RENAMED,
                         Gio.FileMonitorEvent.MOVED_IN,
                         Gio.FileMonitorEvent.MOVED_OUT]:
-            self._is_changed = True
+            self._buffer.set_modified(True)
 
         if eve_type in [ Gio.FileMonitorEvent.CHANGES_DONE_HINT ]:
             if self._ignore_internal_change:
@@ -112,17 +111,12 @@ class FileEventsMixin:
             self._file_change_watcher.cancel()
             self._file_change_watcher = None
 
-        if self._file_cdr_watcher:
-            self._file_cdr_watcher.cancel()
-            self._file_cdr_watcher = None
-
     def _write_file(self, gfile, save_as = False):
         if not gfile: return
 
         with open(gfile.get_path(), 'w') as f:
             if not save_as:
                 self._ignore_internal_change = True
-                self._is_changed = False
 
             start_itr = self._buffer.get_start_iter()
             end_itr   = self._buffer.get_end_iter()
@@ -131,4 +125,5 @@ class FileEventsMixin:
             f.write(text)
             f.close()
 
+        self._buffer.set_modified(False)
         return gfile
