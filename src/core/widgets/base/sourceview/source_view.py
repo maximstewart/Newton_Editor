@@ -81,6 +81,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.connect("focus-in-event", self._focus_in_event)
 
         self.connect("drag-data-received", self._on_drag_data_received)
+        self.connect("key-press-event", self._key_press_event)
         self.connect("button-press-event", self._button_press_event)
 
         self._buffer.connect('changed', self._is_modified)
@@ -124,12 +125,42 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
     def _insert_text(self, text_buffer, location_itr, text_str, len_int):
         if self.freeze_multi_line_insert: return
 
-        if len(self._multi_insert_marks) > 0:
-            self._buffer.begin_user_action()
-            self.freeze_multi_line_insert = True
-
+        self.begin_user_action()
         with self._buffer.freeze_notify():
             GLib.idle_add(self._update_multi_line_markers, *(text_str,))
+
+    # NOTE: Mostly sinking pre-bound keys here to let our keybinder control instead...
+    def _key_press_event(self, widget, eve):
+        keyname    = Gdk.keyval_name(eve.keyval)
+        modifiers  = Gdk.ModifierType(eve.get_state() & ~Gdk.ModifierType.LOCK_MASK)
+        is_control = True if modifiers & Gdk.ModifierType.CONTROL_MASK else False
+        is_shift   = True if modifiers & Gdk.ModifierType.SHIFT_MASK else False
+
+        try:
+            is_alt = True if modifiers & Gdk.ModifierType.ALT_MASK else False
+        except Exception:
+            is_alt = True if modifiers & Gdk.ModifierType.MOD1_MASK else False
+
+        if is_control:
+            if keyname in [ "slash", "Up", "Down", "z" ]:
+                return True
+
+            if is_shift:
+                if keyname in [ "z", "Up", "Down", "Left", "Right" ]:
+                    return True
+
+        if is_alt:
+            if keyname in [ "Up", "Down", "Left", "Right" ]:
+                return True
+
+        if keyname == "BackSpace":
+            if len(self._multi_insert_marks) > 0:
+                self.begin_user_action()
+                with self._buffer.freeze_notify():
+                    GLib.idle_add(self._delete_on_multi_line_markers)
+
+                return True
+
 
     def _button_press_event(self, widget = None, eve = None, user_data = None):
         if eve.type == Gdk.EventType.BUTTON_PRESS and eve.button == 1 :   # l-click

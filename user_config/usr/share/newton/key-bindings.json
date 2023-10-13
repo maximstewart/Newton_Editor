@@ -8,6 +8,8 @@
         "open_files"               : "<Control>o",
         "move_lines_up"            : "<Control>Up",
         "move_lines_down"          : "<Control>Down",
+        "keyboard_undo"            : "<Control>z",
+        "keyboard_redo"            : "<Control>y",
         "keyboard_create_tab"      : "<Control>t",
         "keyboard_close_tab"       : "<Control>w",
         "keyboard_save_file"       : "<Control>s",

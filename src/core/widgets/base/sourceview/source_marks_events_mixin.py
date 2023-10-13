@@ -75,6 +75,24 @@ class MarkEventsMixin:
             iter = self._buffer.get_iter_at_mark(mark)
             self._buffer.insert(iter, text_str, -1)
 
+        self.end_user_action()
+
+    def _delete_on_multi_line_markers(self):
+        iter = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
+        self._buffer.backspace(iter, interactive = True, default_editable = True)
+
+        for mark in self._multi_insert_marks:
+            iter = self._buffer.get_iter_at_mark(mark)
+            self._buffer.backspace(iter, interactive = True, default_editable = True)
+
+        self.end_user_action()
+
+    def begin_user_action(self):
+        if len(self._multi_insert_marks) > 0:
+            self._buffer.begin_user_action()
+            self.freeze_multi_line_insert = True
+
+    def end_user_action(self):
         if len(self._multi_insert_marks) > 0:
             self._buffer.end_user_action()
             self.freeze_multi_line_insert = False

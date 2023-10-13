@@ -63,9 +63,6 @@ class SourceViewEventsMixin(MarkEventsMixin, FileEventsMixin):
 
         event_system.emit("set_line_char_label", (f"{row}:{col}",))
 
-    def keyboard_tggl_comment(self):
-        logger.info("SourceViewEventsMixin > keyboard_tggl_comment > stub...")
-
     def got_to_line(self, line: int = 0):
         index     = line - 1
         buffer    = self.get_buffer()
@@ -77,12 +74,22 @@ class SourceViewEventsMixin(MarkEventsMixin, FileEventsMixin):
              buffer.create_mark("starting_cursor", char_iter, True)
         self.scroll_to_mark( buffer.get_mark("starting_cursor"), 0.0, True, 0.0, 0.0 )
 
+
     # https://github.com/ptomato/inform7-ide/blob/main/src/actions.c
     def action_uncomment_selection(self):
         ...
 
     def action_comment_out_selection(self):
         ...
+
+    def keyboard_tggl_comment(self):
+        logger.info("SourceViewEventsMixin > keyboard_tggl_comment > stub...")
+
+    def keyboard_undo(self):
+        self._buffer.undo()
+
+    def keyboard_redo(self):
+        self._buffer.redo()
 
     def move_lines_up(self):
         self.emit("move-lines", *(False,))

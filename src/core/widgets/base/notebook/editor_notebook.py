@@ -69,6 +69,8 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("keyboard_create_tab", self._keyboard_create_tab)
         event_system.subscribe("keyboard_open_file", self._keyboard_open_file)
         event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
+        event_system.subscribe("keyboard_undo", self._keyboard_undo)
+        event_system.subscribe("keyboard_redo", self._keyboard_redo)
         event_system.subscribe("keyboard_prev_tab", self._keyboard_prev_tab)
         event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
         event_system.subscribe("keyboard_move_tab_left", self._keyboard_move_tab_left)
@@ -155,8 +157,18 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.create_view(gfile = _gfile)
 
 
+    # NOTE: These feel bad being here man...
     def _keyboard_close_tab(self):
         self.action_controller("close_tab")
+
+    def _keyboard_close_tab(self):
+        self.action_controller("close_tab")
+
+    def _keyboard_undo(self):
+        self.action_controller("keyboard_undo")
+
+    def _keyboard_redo(self):
+        self.action_controller("keyboard_redo")
 
     def _toggle_highlight_line(self):
         self.action_controller("toggle_highlight_line")

@@ -101,6 +101,12 @@ class EditorEventsMixin:
 
 
     # NOTE: These feel bad being here man...
+    def keyboard_undo(self, source_view):
+        source_view.keyboard_undo()
+
+    def keyboard_redo(self, source_view):
+        source_view.keyboard_redo()
+
     def scale_up_text(self, source_view):
         source_view.scale_up_text()
 

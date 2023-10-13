@@ -38,6 +38,10 @@ class EditorControllerMixin:
         # NOTE: These feel bad being here man...
         if action == "scale_up_text":
             self.scale_up_text(source_view)
+        if action == "keyboard_undo":
+            self.keyboard_undo(source_view)
+        if action == "keyboard_redo":
+            self.keyboard_redo(source_view)
         if action == "scale_down_text":
             self.scale_down_text(source_view)
         if action == "toggle_highlight_line":
