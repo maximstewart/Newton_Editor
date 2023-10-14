@@ -108,8 +108,8 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         # example_completion_provider = ExampleCompletionProvider()
         # self._completion.add_provider(example_completion_provider)
 
-        py_completion_provider = PythonCompletionProvider(file)
-        self._completion.add_provider(py_completion_provider)
+        # py_completion_provider = PythonCompletionProvider(file)
+        # self._completion.add_provider(py_completion_provider)
 
 
     def _create_default_tag(self):
@@ -119,7 +119,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
     def _is_modified(self, *args):
         if not self._loading_file:
-            event_system.emit("buffer_changed")
+            event_system.emit("buffer_changed", (self._buffer, ))
         else:
             event_system.emit("buffer_changed_first_load", (self._buffer, ))
 
