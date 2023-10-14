@@ -72,7 +72,7 @@ class Plugin(PluginBase):
         start = iter.copy()
 
         for tag in tags:
-            if self.tag_stub_name in tag.props.name:
+            if tag.props.name and self.tag_stub_name in tag.props.name:
                 buffer.remove_tag(tag, start, end)
                 tag_table.remove(tag)
 

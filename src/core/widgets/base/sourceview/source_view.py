@@ -82,6 +82,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.connect("drag-data-received", self._on_drag_data_received)
         self.connect("key-press-event", self._key_press_event)
         self.connect("button-press-event", self._button_press_event)
+        self.connect("scroll-event", self._scroll_event)
 
         self._buffer.connect('changed', self._is_modified)
         self._buffer.connect("mark-set", self._on_cursor_move)
@@ -179,6 +180,29 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
                 self.keyboard_clear_marks()
         elif eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 3: # r-click
             ...
+
+    def _scroll_event(self, widget, eve):
+        accel_mask = Gtk.accelerator_get_default_mod_mask()
+        x, y, z  = eve.get_scroll_deltas()
+        if eve.state & accel_mask == Gdk.ModifierType.CONTROL_MASK:
+            if z > 0:
+                self.scale_down_text()
+            else:
+                self.scale_up_text()
+
+            return True
+
+        if eve.state & accel_mask == Gdk.ModifierType.SHIFT_MASK:
+            adjustment  = self.get_hadjustment()
+            current_val = adjustment.get_value()
+            step_val    = adjustment.get_step_increment()
+
+            if z > 0: # NOTE: scroll left
+                adjustment.set_value(current_val - step_val * 2)
+            else:     # NOTE: scroll right
+                adjustment.set_value(current_val + step_val * 2)
+
+            return True
 
     def _focus_in_event(self, widget, eve = None):
         event_system.emit("set_active_src_view", (self,))

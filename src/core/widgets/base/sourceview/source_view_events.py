@@ -64,7 +64,7 @@ class SourceViewEventsMixin(MarkEventsMixin, FileEventsMixin):
         event_system.emit("set_line_char_label", (f"{row}:{col}",))
 
     def got_to_line(self, line: int = 0):
-        index     = line - 1
+        index     = line
         buffer    = self.get_buffer()
         line_itr  = buffer.get_iter_at_line(index)
         char_iter = buffer.get_iter_at_line_offset(index, line_itr.get_bytes_in_line())

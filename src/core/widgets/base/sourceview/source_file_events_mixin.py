@@ -75,7 +75,7 @@ class FileEventsMixin:
             self.update_labels(gfile)
             self._loading_file = False
 
-        self._file_loader.load_async(io_priority = 70,
+        self._file_loader.load_async(io_priority = 80,
                             cancellable = None,
                             progress_callback = None,
                             progress_callback_data = None,

@@ -39,7 +39,7 @@ notebook > header > tabs > tab {
 }
 
 notebook > header > tabs > tab:active {
-    background: rgba(39, 43, 52, 0.0);
+    background: rgba(0, 0, 0, 0.0);
 }
 
 
@@ -223,3 +223,8 @@ popover {
 .px97 { font-size: 97px;  }
 .px98 { font-size: 98px;  }
 .px99 { font-size: 99px;  }
+
+
+.mini-view > text {
+    background: rgba(39, 43, 52, 0.64);
+}
