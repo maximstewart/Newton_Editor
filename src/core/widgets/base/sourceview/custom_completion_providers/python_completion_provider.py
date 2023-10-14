@@ -59,7 +59,10 @@ class PythonCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
             return False
 
         ch = iter.get_char()
-        if not (ch in ('_', '.', ' ') or ch.isalnum()):
+        # NOTE: Look to re-add or apply supprting logic to use spaces
+         # As is it slows down the editor in certain contexts...
+        # if not (ch in ('_', '.', ' ') or ch.isalnum()):
+        if not (ch in ('_', '.') or ch.isalnum()):
             return False
 
         return True

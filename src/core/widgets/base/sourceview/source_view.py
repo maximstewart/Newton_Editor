@@ -35,6 +35,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         self._skip_file_load         = False
         self._ignore_internal_change = False
+        self._loading_file           = False
         self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
         self._px_value               = settings.theming.default_zoom
@@ -117,6 +118,11 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         general_style_tag.set_property('scale', 100)
 
     def _is_modified(self, *args):
+        if not self._loading_file:
+            event_system.emit("buffer_changed")
+        else:
+            event_system.emit("buffer_changed_first_load", (self._buffer, ))
+
         self.update_cursor_position()
 
     def _insert_text(self, text_buffer, location_itr, text_str, len_int):

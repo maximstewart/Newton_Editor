@@ -66,11 +66,22 @@ class Plugin(PluginBase):
 
     def _tggl_search_replace(self, widget = None, eve = None):
         is_visible = self._search_replace_dialog.is_visible()
+        buffer     = self._active_src_view.get_buffer()
+        data       = None
+
+        if buffer.get_has_selection():
+            start, end = buffer.get_selection_bounds()
+            data       = buffer.get_text(start, end, include_hidden_chars = False)
+
+        if data:
+            self._find_entry.set_text(data)
+
         if not is_visible:
             self._search_replace_dialog.popup();
             self._find_entry.grab_focus()
-        else:
+        elif not data and is_visible:
             self._search_replace_dialog.popdown()
+            self._find_entry.set_text("")
 
     def tggle_regex(self, widget):
         self.use_regex = not widget.get_active()

@@ -20,6 +20,7 @@ class FileEventsMixin:
 
     def open_file(self, gfile, line: int = 0, *args):
         self._current_file = gfile
+        self._loading_file = True
 
         self.load_file_info(gfile)
         self.load_file_async(gfile, line)
@@ -72,6 +73,7 @@ class FileEventsMixin:
             self._document_loaded()
             self.got_to_line(line)
             self.update_labels(gfile)
+            self._loading_file = False
 
         self._file_loader.load_async(io_priority = 70,
                             cancellable = None,
