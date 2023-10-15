@@ -72,6 +72,7 @@
                       <object class="GtkToggleButton">
                         <property name="label" translatable="yes">.*</property>
                         <property name="visible">True</property>
+                        <property name="sensitive">False</property>
                         <property name="can-focus">True</property>
                         <property name="focus-on-click">False</property>
                         <property name="receives-default">True</property>
@@ -187,8 +188,8 @@
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">5</property>
                 <property name="placeholder-text" translatable="yes">Find in current buffer</property>
+                <signal name="activate" handler="find_next" swapped="no"/>
                 <signal name="changed" handler="search_for_string" swapped="no"/>
-                <signal name="key-release-event" handler="find_next_entry" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -255,6 +256,7 @@
                 <property name="label" translatable="yes">Find All</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
+                <property name="focus-on-click">False</property>
                 <property name="receives-default">True</property>
                 <property name="margin-start">5</property>
                 <property name="margin-end">5</property>
@@ -272,6 +274,7 @@
                 <property name="label" translatable="yes">Find</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
+                <property name="focus-on-click">False</property>
                 <property name="receives-default">True</property>
                 <property name="margin-start">5</property>
                 <property name="margin-end">5</property>

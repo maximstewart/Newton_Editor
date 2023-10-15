@@ -115,7 +115,7 @@ class Plugin(PluginBase):
         if not start_itr or not query: return None, None
 
         results = []
-        flags   = Gtk.TextSearchFlags.VISIBLE_ONLY & Gtk.TextSearchFlags.TEXT_ONLY
+        flags   = Gtk.TextSearchFlags.VISIBLE_ONLY | Gtk.TextSearchFlags.TEXT_ONLY
         while True:
             result = start_itr.forward_search(query, flags, end_itr)
             if not result: break
