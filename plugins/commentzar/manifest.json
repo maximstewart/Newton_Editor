@@ -1,0 +1,13 @@
+{
+    "manifest": {
+        "name": "Commentzar",
+        "author": "ITDominator",
+        "credit": "Hamad Al Marri",
+        "version": "0.0.1",
+        "support": "",
+        "requests": {
+            "pass_events": "true",
+            "bind_keys": ["Commentzar||keyboard_tggl_comment:<Control>slash"]
+        }
+    }
+}

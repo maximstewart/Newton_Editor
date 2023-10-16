@@ -156,6 +156,10 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
             if is_shift:
                 if keyname in [ "z", "Up", "Down", "Left", "Right" ]:
+                    # NOTE: For now do like so for completion sake above. 
+                    if keyname in ["Left", "Right"]:
+                        return False
+
                     return True
 
         if is_alt:

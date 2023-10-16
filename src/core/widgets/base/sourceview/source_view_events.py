@@ -82,9 +82,6 @@ class SourceViewEventsMixin(MarkEventsMixin, FileEventsMixin):
     def action_comment_out_selection(self):
         ...
 
-    def keyboard_tggl_comment(self):
-        logger.info("SourceViewEventsMixin > keyboard_tggl_comment > stub...")
-
     def keyboard_undo(self):
         self._buffer.undo()
 

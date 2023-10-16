@@ -128,9 +128,6 @@ class EditorEventsMixin:
     def move_lines_down(self, source_view):
         source_view.move_lines_down()
 
-    def keyboard_tggl_comment(self, source_view):
-        source_view.keyboard_tggl_comment()
-
     def set_buffer_language(self, source_view, language = "python3"):
         source_view.set_buffer_language(language)
 

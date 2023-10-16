@@ -54,8 +54,6 @@ class EditorControllerMixin:
             self.move_lines_up(source_view)
         if action == "move_lines_down":
             self.move_lines_down(source_view)
-        if action == "keyboard_tggl_comment":
-            self.keyboard_tggl_comment(source_view)
         if action == "set_buffer_language":
             self.set_buffer_language(source_view, query)
         if action == "set_buffer_style":
