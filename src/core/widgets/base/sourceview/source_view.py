@@ -170,6 +170,9 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
                 return True
 
+        # NOTE: if a plugin recieves the call and handles, it will be the final decider for propigation
+        return event_system.emit_and_await("autopairs", (keyname, is_control, is_alt, is_shift))
+
 
     def _button_press_event(self, widget = None, eve = None, user_data = None):
         if eve.type == Gdk.EventType.BUTTON_PRESS and eve.button == 1 :   # l-click
