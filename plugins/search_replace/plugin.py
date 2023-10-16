@@ -1,19 +1,22 @@
 # Python imports
 import os
 import re
+import threading
 
 # Lib imports
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import GLib
 
 # Application imports
 from plugins.plugin_base import PluginBase
+from .styling_mixin import StylingMixin
+from .replace_mixin import ReplaceMixin
 
 
 
-
-class Plugin(PluginBase):
+class Plugin(StylingMixin, ReplaceMixin, PluginBase):
     def __init__(self):
         super().__init__()
 
@@ -34,6 +37,9 @@ class Plugin(PluginBase):
         self.search_only_in_selection = False
         self.use_whole_word_search    = False
 
+        self.timer                    = None
+        self.search_time              = 0.35
+        self.find_text                = ""
         self.search_tag               = "search_tag"
         self.highlight_color          = "#FBF719"
         self.text_color               = "#000000"
@@ -91,39 +97,6 @@ class Plugin(PluginBase):
             self._search_replace_dialog.popdown()
             self._find_entry.set_text("")
 
-    def tggle_regex(self, widget):
-        self.use_regex = not widget.get_active()
-        self._set_find_options_lbl()
-        self.search_for_string(self._find_entry)
-
-    def tggle_case_sensitive(self, widget):
-        self.use_case_sensitive = widget.get_active()
-        self._set_find_options_lbl()
-        self.search_for_string(self._find_entry)
-
-    def tggle_selection_only_scan(self, widget):
-        self.search_only_in_selection = widget.get_active()
-        self._set_find_options_lbl()
-        self.search_for_string(self._find_entry)
-
-    def tggle_whole_word_search(self, widget):
-        self.use_whole_word_search = widget.get_active()
-        self._set_find_options_lbl()
-        self.search_for_string(self._find_entry)
-
-    def _set_find_options_lbl(self):
-        # Finding with Options: Case Insensitive
-        # Finding with Options: Regex, Case Sensitive, Within Current Selection, Whole Word
-        # Finding with Options: Regex, Case Inensitive, Within Current Selection, Whole Word
-        # f"Finding with Options: {regex}, {case}, {selection}, {word}"
-        ...
-
-    def _update_status_lbl(self, total_count: int = 0, query: str = None):
-        if not query: return
-
-        count  = total_count if total_count > 0 else "No"
-        plural = "s" if total_count > 1 else ""
-        self._find_status_lbl.set_label(f"{count} results{plural} found for '{query}'")
 
     def get_search_tag(self, buffer):
         tag_table  = buffer.get_tag_table()
@@ -134,14 +107,44 @@ class Plugin(PluginBase):
         buffer.remove_tag_by_name(self.search_tag, buffer.get_start_iter(), buffer.get_end_iter())
         return search_tag
 
+
+    def cancel_timer(self):
+        if self.timer:
+            self.timer.cancel()
+            GLib.idle_remove_by_data(None)
+
+    def delay_search_glib(self):
+        GLib.idle_add(self._do_highlight)
+
+    def delay_search(self):
+        wait_time = self.search_time / len(self.find_text)
+        wait_time = max(wait_time, 0.05)
+
+        self.timer = threading.Timer(wait_time, self.delay_search_glib)
+        self.timer.daemon = True
+        self.timer.start()
+
+
     def search_for_string(self, widget):
-        query      = widget.get_text()
+        self.cancel_timer()
+
+        self.find_text = widget.get_text()
+        if len(self.find_text) > 0 and len(self.find_text) < 5:
+            self.delay_search()
+        else:
+            self._do_highlight(self.find_text)
+
+
+    def _do_highlight(self, query = None):
+        query      = self.find_text if not query else query
         buffer     = self._active_src_view.get_buffer()
         # Also clears tag from buffer so if no query we're clean in ui
         search_tag = self.get_search_tag(buffer)
 
+        self.update_style(1)
         if not query:
             self._find_status_lbl.set_label(f"Find in current buffer")
+            self.update_style(0)
             return
 
         start_itr  = buffer.get_start_iter()
@@ -178,19 +181,8 @@ class Plugin(PluginBase):
         for start, end in _results:
             text = self._buffer.get_slice(start, end, include_hidden_chars = False)
             if self.use_whole_word_search:
-                end.forward_char()
-                start.backward_char()
-
-                match = self.alpha_num_under.match( start.get_char() )
-                if not match is None:
+                if not self.is_whole_word(start, end):
                     continue
-
-                match = self.alpha_num_under.match( end.get_char() )
-                if not match is None:
-                    continue
-
-                end.backward_char()
-                start.forward_char()
 
             results.append([start, end])
 
@@ -214,10 +206,4 @@ class Plugin(PluginBase):
 
 
     def find_all(self, widget):
-        ...
-
-    def replace(self, widget):
-        ...
-
-    def replace_all(self, widget):
         ...

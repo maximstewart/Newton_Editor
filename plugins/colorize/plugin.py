@@ -1,9 +1,4 @@
 # Python imports
-import os
-import threading
-import subprocess
-import time
-import colorsys
 
 # Lib imports
 import gi
@@ -14,26 +9,11 @@ from gi.repository import Gdk
 
 # Application imports
 from plugins.plugin_base import PluginBase
+from .color_converter_mixin import ColorConverterMixin
 
 
 
-
-# NOTE: Threads WILL NOT die with parent's destruction.
-def threaded(fn):
-    def wrapper(*args, **kwargs):
-        threading.Thread(target=fn, args=args, kwargs=kwargs, daemon=False).start()
-    return wrapper
-
-# NOTE: Threads WILL die with parent's destruction.
-def daemon_threaded(fn):
-    def wrapper(*args, **kwargs):
-        threading.Thread(target=fn, args=args, kwargs=kwargs, daemon=True).start()
-    return wrapper
-
-
-
-
-class Plugin(PluginBase):
+class Plugin(ColorConverterMixin, PluginBase):
     def __init__(self):
         super().__init__()
 
@@ -57,7 +37,7 @@ class Plugin(PluginBase):
         self._active_src_view = source_view
 
     def _buffer_changed_first_load(self, buffer):
-        self._handle(buffer)
+        self._do_colorize(buffer)
 
 
     def _buffer_changed(self, buffer):
@@ -76,10 +56,10 @@ class Plugin(PluginBase):
                 buffer.remove_tag(tag, start, end)
                 tag_table.remove(tag)
 
-        self._handle(buffer, start, end)
+        self._do_colorize(buffer, start, end)
 
 
-    def _handle(self, buffer = None, start_itr = None, end_itr = None):
+    def _do_colorize(self, buffer = None, start_itr = None, end_itr = None):
         # rgb(a), hsl, hsv
         results = self.finalize_non_hex_matches( self.collect_preliminary_results(buffer, start_itr, end_itr) )
         self.process_results(buffer, results)
@@ -171,20 +151,6 @@ class Plugin(PluginBase):
                 tag = self.get_colorized_tag(buffer, text, color)
                 buffer.apply_tag(tag, start, end)
 
-    def get_color_text(self, buffer, start, end):
-        text  = buffer.get_text(start, end, include_hidden_chars = False)
-
-        try:
-            if "hsl" in text:
-                text = self.hsl_to_rgb(text)
-
-            if "hsv" in text:
-                text = self.hsv_to_rgb(text)
-        except Exception as e:
-            ...
-
-        return text
-
     def get_colorized_tag(self, buffer, tag, color: Gdk.RGBA):
         tag_table    = buffer.get_tag_table()
         colorize_tag = f"{self.tag_stub_name}_{tag}"
@@ -193,44 +159,3 @@ class Plugin(PluginBase):
             search_tag = buffer.create_tag(colorize_tag, background_rgba = color)
 
         return search_tag
-
-    def hsl_to_rgb(self, text):
-        _h, _s , _l = text.replace("hsl", "") \
-                        .replace("deg", "") \
-                        .replace("(", "") \
-                        .replace(")", "") \
-                        .replace("%", "") \
-                        .replace(" ", "") \
-                        .split(",")
-
-        h = None
-        s = None
-        l = None
-
-        h, s , l = int(_h) / 360, float(_s) / 100, float(_l) / 100
-
-        rgb  = tuple(round(i * 255) for i in colorsys.hls_to_rgb(h, l, s))
-        rgb_sub = ','.join(map(str, rgb))
-
-        return f"rgb({rgb_sub})"
-
-
-    def hsv_to_rgb(self, text):
-        _h, _s , _v = text.replace("hsv", "") \
-                        .replace("deg", "") \
-                        .replace("(", "") \
-                        .replace(")", "") \
-                        .replace("%", "") \
-                        .replace(" ", "") \
-                        .split(",")
-
-        h = None
-        s = None
-        v = None
-
-        h, s , v = int(_h) / 360, float(_s) / 100, float(_v) / 100
-
-        rgb  = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
-        rgb_sub = ','.join(map(str, rgb))
-
-        return f"rgb({rgb_sub})"

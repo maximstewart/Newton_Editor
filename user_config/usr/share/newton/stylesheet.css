@@ -103,6 +103,25 @@ popover {
 
 
 
+.searching,
+.search_success,
+.search_fail {
+    border-style: solid;
+}
+
+.searching      {
+    border-color: rgba(0, 225, 225, 0.64);
+}
+.search_success {
+    background: rgba(136, 204, 39, 0.12);
+    border-color: rgba(136, 204, 39, 1);
+}
+.search_fail    {
+    background: rgba(170, 18, 18, 0.12);
+    border-color: rgba(200, 18, 18, 1);
+}
+
+
 .error_txt   { color: rgb(170, 18, 18); }
 .warning_txt { color: rgb(255, 168, 0); }
 .success_txt { color: rgb(136, 204, 39); }

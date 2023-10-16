@@ -180,40 +180,6 @@
             <property name="can-focus">False</property>
             <property name="column-homogeneous">True</property>
             <child>
-              <object class="GtkEntry" id="find_entry">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="margin-start">5</property>
-                <property name="margin-end">10</property>
-                <property name="margin-top">5</property>
-                <property name="margin-bottom">5</property>
-                <property name="placeholder-text" translatable="yes">Find in current buffer</property>
-                <signal name="activate" handler="find_next" swapped="no"/>
-                <signal name="changed" handler="search_for_string" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
-                <property name="width">8</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="replace_entry">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="margin-start">5</property>
-                <property name="margin-end">10</property>
-                <property name="margin-top">5</property>
-                <property name="margin-bottom">5</property>
-                <property name="placeholder-text" translatable="yes">Replace in current buffer</property>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">1</property>
-                <property name="width">8</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton">
                 <property name="label" translatable="yes">Replace All</property>
                 <property name="visible">True</property>
@@ -285,6 +251,37 @@
               <packing>
                 <property name="left-attach">8</property>
                 <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSearchEntry" id="find_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="primary-icon-name">edit-find-symbolic</property>
+                <property name="primary-icon-activatable">False</property>
+                <property name="primary-icon-sensitive">False</property>
+                <property name="placeholder-text" translatable="yes">Find in current buffer</property>
+                <signal name="search-changed" handler="search_for_string" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+                <property name="width">8</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSearchEntry" id="replace_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="primary-icon-name">edit-find-symbolic</property>
+                <property name="primary-icon-activatable">False</property>
+                <property name="primary-icon-sensitive">False</property>
+                <property name="placeholder-text" translatable="yes">Replace in current buffer</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">1</property>
+                <property name="width">8</property>
               </packing>
             </child>
           </object>
