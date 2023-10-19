@@ -1,10 +1,6 @@
 # Python imports
-import signal
-import io
-import json
 import inspect
-import zipfile
-
+import json
 from os import path
 from os import mkdir
 
