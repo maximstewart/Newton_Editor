@@ -88,10 +88,10 @@ class SourceViewEventsMixin(MarkEventsMixin, FileEventsMixin):
     def keyboard_redo(self):
         self._buffer.redo()
 
-    def move_lines_up(self):
+    def keyboard_move_lines_up(self):
         self.emit("move-lines", *(False,))
 
-    def move_lines_down(self):
+    def keyboard_move_lines_down(self):
         self.emit("move-lines", *(True,))
 
     def update_labels(self, gfile = None):

@@ -63,27 +63,29 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
         event_system.subscribe("set_buffer_style", self.action_controller)
-        event_system.subscribe("toggle_highlight_line", self._toggle_highlight_line)
-        event_system.subscribe("move_lines_up", self._move_lines_up)
-        event_system.subscribe("move_lines_down", self._move_lines_down)
+
+        event_system.subscribe("focused_target_changed", self._focused_target_changed)
         event_system.subscribe("keyboard_create_tab", self._keyboard_create_tab)
         event_system.subscribe("keyboard_open_file", self._keyboard_open_file)
         event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
-        event_system.subscribe("keyboard_undo", self._keyboard_undo)
-        event_system.subscribe("keyboard_redo", self._keyboard_redo)
         event_system.subscribe("keyboard_prev_tab", self._keyboard_prev_tab)
         event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
         event_system.subscribe("keyboard_move_tab_left", self._keyboard_move_tab_left)
         event_system.subscribe("keyboard_move_tab_right", self._keyboard_move_tab_right)
-        event_system.subscribe("keyboard_insert_mark", self._keyboard_insert_mark)
-        event_system.subscribe("keyboard_clear_marks", self._keyboard_clear_marks)
         event_system.subscribe("keyboard_move_tab_to_1", self._keyboard_move_tab_to_1)
         event_system.subscribe("keyboard_move_tab_to_2", self._keyboard_move_tab_to_2)
+
+        event_system.subscribe("toggle_highlight_line", self._toggle_highlight_line)
+        event_system.subscribe("keyboard_move_lines_up", self._keyboard_move_lines_up)
+        event_system.subscribe("keyboard_move_lines_down", self._keyboard_move_lines_down)
+        event_system.subscribe("keyboard_undo", self._keyboard_undo)
+        event_system.subscribe("keyboard_redo", self._keyboard_redo)
+        event_system.subscribe("keyboard_insert_mark", self._keyboard_insert_mark)
+        event_system.subscribe("keyboard_clear_marks", self._keyboard_clear_marks)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
         event_system.subscribe("keyboard_scale_down_text", self._keyboard_scale_down_text)
         event_system.subscribe("keyboard_save_file", self._keyboard_save_file)
         event_system.subscribe("keyboard_save_file_as", self._keyboard_save_file_as)
-        event_system.subscribe("focused_target_changed", self._focused_target_changed)
 
 
     def _focused_target_changed(self, target):
@@ -184,11 +186,11 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def _keyboard_insert_mark(self):
         self.action_controller("keyboard_insert_mark")
 
-    def _move_lines_up(self):
-        self.action_controller("move_lines_up")
+    def _keyboard_move_lines_up(self):
+        self.action_controller("keyboard_move_lines_up")
 
-    def _move_lines_down(self):
-        self.action_controller("move_lines_down")
+    def _keyboard_move_lines_down(self):
+        self.action_controller("keyboard_move_lines_down")
 
     def _keyboard_clear_marks(self):
         self.action_controller("keyboard_clear_marks")

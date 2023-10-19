@@ -49,6 +49,7 @@ class Controller(SignalsMixins, ControllerData):
         self.window.connect("key-release-event", self.on_global_key_release_controller)
 
     def _subscribe_to_events(self):
+        event_system.subscribe("shutting_down", lambda: print("Shutting down..."))
         event_system.subscribe("handle_file_from_ipc", self.handle_file_from_ipc)
         event_system.subscribe("set_active_src_view", self.set_active_src_view)
         event_system.subscribe("get_active_src_view", self.get_active_src_view)

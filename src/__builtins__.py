@@ -48,4 +48,3 @@ builtins.logger            = Logger(settings_manager.get_home_config_path(), \
 
 builtins.threaded          = threaded_wrapper
 builtins.daemon_threaded   = daemon_threaded_wrapper
-builtins.event_sleep_time  = 0.05

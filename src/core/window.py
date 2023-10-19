@@ -100,6 +100,8 @@ class Window(Gtk.ApplicationWindow):
 
 
     def _tear_down(self, widget=None, eve=None):
+        event_system.emit("shutting_down")
+
         size = self.get_size()
         pos  = self.get_position()
 
@@ -110,5 +112,4 @@ class Window(Gtk.ApplicationWindow):
         settings_manager.save_settings()
 
         settings_manager.clear_pid()
-        time.sleep(event_sleep_time)
         Gtk.main_quit()

@@ -50,10 +50,10 @@ class EditorControllerMixin:
             self.keyboard_insert_mark(source_view)
         if action == "keyboard_clear_marks":
             self.keyboard_clear_marks(source_view)
-        if action == "move_lines_up":
-            self.move_lines_up(source_view)
-        if action == "move_lines_down":
-            self.move_lines_down(source_view)
+        if action == "keyboard_move_lines_up":
+            self.keyboard_move_lines_up(source_view)
+        if action == "keyboard_move_lines_down":
+            self.keyboard_move_lines_down(source_view)
         if action == "set_buffer_language":
             self.set_buffer_language(source_view, query)
         if action == "set_buffer_style":

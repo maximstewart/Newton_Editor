@@ -122,11 +122,11 @@ class EditorEventsMixin:
     def keyboard_clear_marks(self, source_view):
         source_view.keyboard_clear_marks()
 
-    def move_lines_up(self, source_view):
-        source_view.move_lines_up()
+    def keyboard_move_lines_up(self, source_view):
+        source_view.keyboard_move_lines_up()
 
-    def move_lines_down(self, source_view):
-        source_view.move_lines_down()
+    def keyboard_move_lines_down(self, source_view):
+        source_view.keyboard_move_lines_down()
 
     def set_buffer_language(self, source_view, language = "python3"):
         source_view.set_buffer_language(language)

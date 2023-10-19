@@ -1,9 +1,11 @@
 # Python imports
+import signal
 import os
 
 # Lib imports
 
 # Application imports
+from utils.debugging import debug_signal_handler
 from utils.ipc_server import IPCServer
 from core.window import Window
 
@@ -23,7 +25,7 @@ class Application(IPCServer):
             try:
                 self.create_ipc_listener()
             except Exception:
-                ...
+                self.socket_realization_check()
 
             if not self.is_ipc_alive:
                 for arg in unknownargs + [args.new_tab,]:
@@ -33,4 +35,22 @@ class Application(IPCServer):
 
                 raise AppLaunchException(f"{app_name} IPC Server Exists: Will send path(s) to it and close...")
 
+        self.setup_debug_hook()
+
         Window(args, unknownargs)
+
+
+    def socket_realization_check(self):
+        self.send_test_ipc_message()
+        self.create_ipc_listener()
+
+    def setup_debug_hook(self):
+        try:
+            # kill -SIGUSR2 <pid> from Linux/Unix or SIGBREAK signal from Windows
+            signal.signal(
+                vars(signal).get("SIGBREAK") or vars(signal).get("SIGUSR1"),
+                debug_signal_handler
+            )
+        except ValueError:
+            # Typically: ValueError: signal only works in main thread
+            ...
