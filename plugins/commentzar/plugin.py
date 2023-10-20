@@ -76,8 +76,9 @@ class Plugin(AddCommentMixin, RemoveCommentMixin, CodeCommentTags, PluginBase):
             buffer.end_user_action()
             return
 
+        self._event_system.emit("pause_event_processing")
         new_code = self.add_comment_characters(buffer, start_tag, end_tag, start, end, deselect, oldPos)
-
+        self._event_system.emit("resume_event_processing")
 
     def discard_white_spaces(self, iter):
         count = 0

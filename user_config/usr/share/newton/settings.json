@@ -117,7 +117,7 @@
         "error_color":"#ff0000"
     },
     "debugging":{
-        "ch_log_lvl":10,
+        "ch_log_lvl":20,
         "fh_log_lvl":20
     }
 }

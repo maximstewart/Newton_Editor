@@ -1,4 +1,5 @@
 # Python imports
+import random
 
 # Lib imports
 import gi
@@ -20,6 +21,8 @@ class Plugin(ColorConverterMixin, PluginBase):
         self.name               = "Colorize"    # NOTE: Need to remove after establishing private bidirectional 1-1 message bus
                                                 #       where self.name should not be needed for message comms
         self.tag_stub_name      = "colorize_tag"
+        self._buffer = None
+
 
     def run(self):
         ...
@@ -36,28 +39,82 @@ class Plugin(ColorConverterMixin, PluginBase):
     def _set_active_src_view(self, source_view):
         self._active_src_view = source_view
 
+
     def _buffer_changed_first_load(self, buffer):
+        self._buffer = buffer
         self._do_colorize(buffer)
 
-
     def _buffer_changed(self, buffer):
-        tag_table = buffer.get_tag_table()
-        mark      = buffer.get_insert()
-        iter      = buffer.get_iter_at_mark(mark)
-        tags      = iter.get_tags()
+        self._event_system.emit("pause_event_processing")
+        self._handle_colorize(buffer)
+        self._event_system.emit("resume_event_processing")
 
-        iter.forward_line()  # NOTE: Jump to start of next line
-        end   = iter.copy()
-        iter.backward_line() # NOTE: To now easily get start of prior line
-        start = iter.copy()
+    def _handle_colorize(self, buffer):
+        self._buffer = buffer
+        tag_table    = buffer.get_tag_table()
+        mark         = buffer.get_insert()
+        start        = None
+        end          = buffer.get_iter_at_mark(mark)
 
-        for tag in tags:
-            if tag.props.name and self.tag_stub_name in tag.props.name:
-                buffer.remove_tag(tag, start, end)
-                tag_table.remove(tag)
+        i            = 0
+        walker_iter  = end.copy()
+        working_tag  = self.find_working_tag(walker_iter, i)
+        if working_tag:
+            start = self.find_start_range(walker_iter, working_tag)
+
+            self.find_end_range(end, working_tag)
+            buffer.remove_tag(working_tag, start, end)
+        else:
+            start = self.traverse_backward_25_or_less(walker_iter)
+            self.traverse_forward_25_or_less(end)
 
         self._do_colorize(buffer, start, end)
 
+
+
+    def find_working_tag(self, walker_iter, i):
+        tags = walker_iter.get_tags()
+        for tag in tags:
+            if tag.props.name and self.tag_stub_name in tag.props.name:
+                return tag
+
+        res = walker_iter.backward_char()
+
+        if not res: return
+        if i > 25: return
+        return self.find_working_tag(walker_iter, i + 1)
+
+    def find_start_range(self, walker_iter, working_tag):
+        tags = walker_iter.get_tags()
+        for tag in tags:
+            if tag.props.name and working_tag.props.name in tag.props.name:
+                res = walker_iter.backward_char()
+                if res:
+                    self.find_start_range(walker_iter, working_tag)
+
+        return walker_iter
+
+    def find_end_range(self, end, working_tag):
+        tags = end.get_tags()
+        for tag in tags:
+            if tag.props.name and working_tag.props.name in tag.props.name:
+                res = end.forward_char()
+                if res:
+                    self.find_end_range(end, working_tag)
+
+    def traverse_backward_25_or_less(self, walker_iter):
+        i = 1
+        while i <= 25:
+            res = walker_iter.backward_char()
+            if not res: break
+            i += 1
+
+    def traverse_forward_25_or_less(self, end):
+        i = 1
+        while i <= 25:
+            res = end.forward_char()
+            if not res: break
+            i += 1
 
     def _do_colorize(self, buffer = None, start_itr = None, end_itr = None):
         # rgb(a), hsl, hsv
@@ -135,18 +192,28 @@ class Plugin(ColorConverterMixin, PluginBase):
         results = []
 
         for start, end in result_hits:
-            while not end.get_char() in [";", " "]:
-                end.forward_char()
+            i   = 0
+            _ch = end.get_char()
+            ch  = ord(end.get_char()) if _ch else -1
 
-            results.append([start, end])
+            while ((ch >= 48 and ch <= 57) or (ch >= 65 and ch <= 70) or (ch >= 97 and ch <= 102)):
+                if i > 16: break
+
+                i += 1
+                end.forward_char()
+                _ch = end.get_char()
+                ch  = ord(end.get_char()) if _ch else -1
+
+            if i in [3, 4, 6, 8, 9, 12, 16]:
+                results.append([start, end])
 
         return results
 
     def process_results(self, buffer, results):
-        # NOTE: HSV and HSL parsing are available in Gtk 4.0. Not lower...
         for start, end in results:
             text  = self.get_color_text(buffer, start, end)
             color = Gdk.RGBA()
+
             if color.parse(text):
                 tag = self.get_colorized_tag(buffer, text, color)
                 buffer.apply_tag(tag, start, end)
