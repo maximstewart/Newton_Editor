@@ -64,14 +64,14 @@ class FileEventsMixin:
             self.update_labels(gfile)
             return
 
-        file = GtkSource.File()
+        file   = GtkSource.File()
+        buffer = self.get_buffer()
         file.set_location(gfile)
-        self._file_loader = GtkSource.FileLoader.new(self._buffer, file)
+        self._file_loader = GtkSource.FileLoader.new(buffer, file)
 
-        def finish_load_callback(obj, res, user_data=None):
+        def finish_load_callback(obj, res, user_data = None):
             self._file_loader.load_finish(res)
-            self._document_loaded()
-            self.got_to_line(line)
+            self._document_loaded(line)
             self.update_labels(gfile)
             self._loading_file = False
 
@@ -97,7 +97,8 @@ class FileEventsMixin:
                         Gio.FileMonitorEvent.RENAMED,
                         Gio.FileMonitorEvent.MOVED_IN,
                         Gio.FileMonitorEvent.MOVED_OUT]:
-            self._buffer.set_modified(True)
+            buffer = self.get_buffer()
+            buffer.set_modified(True)
 
         if eve_type in [ Gio.FileMonitorEvent.CHANGES_DONE_HINT ]:
             if self._ignore_internal_change:
@@ -116,16 +117,16 @@ class FileEventsMixin:
     def _write_file(self, gfile, save_as = False):
         if not gfile: return
 
+        buffer = self.get_buffer()
         with open(gfile.get_path(), 'w') as f:
             if not save_as:
                 self._ignore_internal_change = True
 
-            start_itr = self._buffer.get_start_iter()
-            end_itr   = self._buffer.get_end_iter()
-            text      = self._buffer.get_text(start_itr, end_itr, True)
+            start_itr = buffer.get_start_iter()
+            end_itr   = buffer.get_end_iter()
+            text      = buffer.get_text(start_itr, end_itr, True)
 
             f.write(text)
-            f.close()
 
-        self._buffer.set_modified(False)
+        buffer.set_modified(False)
         return gfile

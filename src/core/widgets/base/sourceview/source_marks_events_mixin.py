@@ -13,8 +13,10 @@ from gi.repository import Gtk
 class MarkEventsMixin:
 
     def keyboard_insert_mark(self, target_iter = None, is_keyboard_insert = True):
+        buffer = self.get_buffer()
+
         if not target_iter:
-            target_iter  = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
+            target_iter  = buffer.get_iter_at_mark( buffer.get_insert() )
 
         found_mark  = self.check_for_insert_marks(target_iter, is_keyboard_insert)
         if not found_mark:
@@ -22,7 +24,7 @@ class MarkEventsMixin:
             hash = "%032x" % random_bits
             mark = Gtk.TextMark.new(name = f"multi_insert_{hash}", left_gravity = False)
 
-            self._buffer.add_mark(mark, target_iter)
+            buffer.add_mark(mark, target_iter)
             self._multi_insert_marks.append(mark)
             mark.set_visible(True)
 
@@ -38,13 +40,15 @@ class MarkEventsMixin:
         self.keyboard_insert_mark(target_iter, is_keyboard_insert = False)
 
     def check_for_insert_marks(self, target_iter, is_keyboard_insert):
-        marks = target_iter.get_marks()
+        marks      = target_iter.get_marks()
+        buffer     = self.get_buffer()
         found_mark = False
+
         for mark in marks:
             for _mark in self._multi_insert_marks:
                 if _mark == mark:
                     mark.set_visible(False)
-                    self._buffer.delete_mark(mark)
+                    buffer.delete_mark(mark)
                     found_mark = True
                     break
 
@@ -60,39 +64,41 @@ class MarkEventsMixin:
         return found_mark
 
     def keyboard_clear_marks(self):
-        self._buffer.begin_user_action()
+        buffer = self.get_buffer()
+
+        buffer.begin_user_action()
 
         for mark in self._multi_insert_marks:
             mark.set_visible(False)
-            self._buffer.delete_mark(mark)
+            buffer.delete_mark(mark)
 
         self._multi_insert_marks.clear()
-        self._buffer.end_user_action()
+        buffer.end_user_action()
 
 
-    def _update_multi_line_markers(self, text_str):
+    def _update_multi_line_markers(self, buffer, text_str):
         for mark in self._multi_insert_marks:
-            iter = self._buffer.get_iter_at_mark(mark)
-            self._buffer.insert(iter, text_str, -1)
+            iter = buffer.get_iter_at_mark(mark)
+            buffer.insert(iter, text_str, -1)
 
-        self.end_user_action()
+        self.end_user_action(buffer)
 
-    def _delete_on_multi_line_markers(self):
-        iter = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
-        self._buffer.backspace(iter, interactive = True, default_editable = True)
+    def _delete_on_multi_line_markers(self, buffer):
+        iter = buffer.get_iter_at_mark( buffer.get_insert() )
+        buffer.backspace(iter, interactive = True, default_editable = True)
 
         for mark in self._multi_insert_marks:
-            iter = self._buffer.get_iter_at_mark(mark)
-            self._buffer.backspace(iter, interactive = True, default_editable = True)
+            iter = buffer.get_iter_at_mark(mark)
+            buffer.backspace(iter, interactive = True, default_editable = True)
 
-        self.end_user_action()
+        self.end_user_action(buffer)
 
-    def begin_user_action(self):
+    def begin_user_action(self, buffer):
         if len(self._multi_insert_marks) > 0:
-            self._buffer.begin_user_action()
+            buffer.begin_user_action()
             self.freeze_multi_line_insert = True
 
-    def end_user_action(self):
+    def end_user_action(self, buffer):
         if len(self._multi_insert_marks) > 0:
-            self._buffer.end_user_action()
+            buffer.end_user_action()
             self.freeze_multi_line_insert = False

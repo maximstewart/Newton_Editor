@@ -12,6 +12,7 @@ from gi.repository import Gio
 from gi.repository import GtkSource
 
 # Application imports
+# from .auto_indenter import AutoIndenter
 from .source_view_events import SourceViewEventsMixin
 from .custom_completion_providers.example_completion_provider import ExampleCompletionProvider
 from .custom_completion_providers.python_completion_provider import PythonCompletionProvider
@@ -36,7 +37,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self._skip_file_load         = False
         self._ignore_internal_change = False
         self._loading_file           = False
-        self._buffer                 = self.get_buffer()
         self._completion             = self.get_completion()
         self._px_value               = settings.theming.default_zoom
 
@@ -55,6 +55,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         ctx.add_class("source-view")
         ctx.add_class(f"px{self._px_value}")
 
+        self.set_vexpand(True)
 
         self.set_show_line_marks(True)
         self.set_show_line_numbers(True)
@@ -67,12 +68,13 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.set_show_right_margin(True)
         self.set_right_margin_position(80)
         self.set_background_pattern(0) # 0 = None, 1 = Grid
+        # NOTE: Add back once we move to Gtk 4 and use GtkSource 5
+        # self.set_indenter( AutoIndenter() )
 
-        self._create_default_tag()
-        self.set_buffer_language()
-        self.set_buffer_style()
-
-        self.set_vexpand(True)
+        buffer = self.get_buffer()
+        self._create_default_tag(buffer)
+        self.set_buffer_language(buffer)
+        self.set_buffer_style(buffer)
 
 
     def _setup_signals(self):
@@ -84,10 +86,12 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.connect("button-press-event", self._button_press_event)
         self.connect("scroll-event", self._scroll_event)
 
-        self._buffer.connect('changed', self._is_modified)
-        self._buffer.connect("mark-set", self._on_cursor_move)
-        self._buffer.connect('insert-text', self._insert_text)
-        self._buffer.connect('modified-changed', self._buffer_modified_changed)
+        buffer = self.get_buffer()
+        buffer.connect('changed', self._is_modified)
+        buffer.connect("mark-set", self._on_cursor_move)
+        buffer.connect('insert-text', self._insert_text)
+        buffer.connect('modified-changed', self._buffer_modified_changed)
+
 
     def _subscribe_to_events(self):
         ...
@@ -96,14 +100,15 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         ...
 
 
-    def _document_loaded(self):
+    def _document_loaded(self, line: int = 0):
         for provider in self._completion.get_providers():
             self._completion.remove_provider(provider)
 
         # TODO: actually load a meaningful provider based on file type...
-        file = self._current_file.get_path()
+        file   = self._current_file.get_path()
+        buffer = self.get_buffer()
         word_completion = GtkSource.CompletionWords.new("word_completion")
-        word_completion.register(self._buffer)
+        word_completion.register(buffer)
         self._completion.add_provider(word_completion)
 
         # example_completion_provider = ExampleCompletionProvider()
@@ -111,27 +116,30 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         # py_completion_provider = PythonCompletionProvider(file)
         # self._completion.add_provider(py_completion_provider)
+        self.got_to_line(buffer, line)
 
 
-    def _create_default_tag(self):
-        general_style_tag = self._buffer.create_tag('general_style')
+    def _create_default_tag(self, buffer):
+        general_style_tag = buffer.create_tag('general_style')
         general_style_tag.set_property('size', 100)
         general_style_tag.set_property('scale', 100)
 
     def _is_modified(self, *args):
+        buffer = self.get_buffer()
+
         if not self._loading_file:
-            event_system.emit("buffer_changed", (self._buffer, ))
+            event_system.emit("buffer_changed", (buffer, ))
         else:
-            event_system.emit("buffer_changed_first_load", (self._buffer, ))
+            event_system.emit("buffer_changed_first_load", (buffer, ))
 
-        self.update_cursor_position()
+        self.update_cursor_position(buffer)
 
-    def _insert_text(self, text_buffer, location_itr, text_str, len_int):
+    def _insert_text(self, buffer, location_itr, text_str, len_int):
         if self.freeze_multi_line_insert: return
 
-        self.begin_user_action()
-        with self._buffer.freeze_notify():
-            GLib.idle_add(self._update_multi_line_markers, *(text_str,))
+        self.begin_user_action(buffer)
+        with buffer.freeze_notify():
+            GLib.idle_add(self._update_multi_line_markers, *(buffer, text_str,))
 
     def _buffer_modified_changed(self, buffer):
         tab_widget = self.get_parent().get_tab_widget()
@@ -144,6 +152,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         modifiers  = Gdk.ModifierType(eve.get_state() & ~Gdk.ModifierType.LOCK_MASK)
         is_control = True if modifiers & Gdk.ModifierType.CONTROL_MASK else False
         is_shift   = True if modifiers & Gdk.ModifierType.SHIFT_MASK else False
+        buffer     = self.get_buffer()
 
         try:
             is_alt = True if modifiers & Gdk.ModifierType.ALT_MASK else False
@@ -156,7 +165,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
             if is_shift:
                 if keyname in [ "z", "Up", "Down", "Left", "Right" ]:
-                    # NOTE: For now do like so for completion sake above. 
+                    # NOTE: For now do like so for completion sake above.
                     if keyname in ["Left", "Right"]:
                         return False
 
@@ -168,9 +177,9 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         if keyname == "BackSpace":
             if len(self._multi_insert_marks) > 0:
-                self.begin_user_action()
-                with self._buffer.freeze_notify():
-                    GLib.idle_add(self._delete_on_multi_line_markers)
+                self.begin_user_action(buffer)
+                with buffer.freeze_notify():
+                    GLib.idle_add(self._delete_on_multi_line_markers, *(buffer,))
 
                 return True
 
@@ -190,12 +199,13 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
     def _scroll_event(self, widget, eve):
         accel_mask = Gtk.accelerator_get_default_mod_mask()
-        x, y, z  = eve.get_scroll_deltas()
+        x, y, z    = eve.get_scroll_deltas()
         if eve.state & accel_mask == Gdk.ModifierType.CONTROL_MASK:
+            buffer = self.get_buffer()
             if z > 0:
-                self.scale_down_text()
+                self.scale_down_text(buffer)
             else:
-                self.scale_up_text()
+                self.scale_up_text(buffer)
 
             return True
 
@@ -226,10 +236,10 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         return False
 
-    def _on_cursor_move(self, buf, cursor_iter, mark, user_data = None):
-        if mark != buf.get_insert(): return
+    def _on_cursor_move(self, buffer, cursor_iter, mark, user_data = None):
+        if mark != buffer.get_insert(): return
 
-        self.update_cursor_position()
+        self.update_cursor_position(buffer)
 
         # NOTE: Not sure but this might not be efficient if the map reloads the same view...
         event_system.emit(f"set_source_view", (self,))
@@ -246,12 +256,13 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         if info == 70: return
 
         if info == 80:
-            uris  = data.get_uris()
+            buffer = self.get_buffer()
+            uris   = data.get_uris()
 
             if len(uris) == 0:
                 uris = data.get_text().split("\n")
 
-            if not self._current_file and not self._buffer.get_modified():
+            if not self._current_file and not buffer.get_modified():
                 gfile = Gio.File.new_for_uri(uris[0])
                 self.open_file(gfile)
                 uris.pop(0)
