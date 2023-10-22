@@ -110,6 +110,7 @@
         ]
     },
     "theming":{
+        "transparency":64,
         "default_zoom":12,
         "syntax_theme":"solarized-dark",
         "success_color":"#88cc27",

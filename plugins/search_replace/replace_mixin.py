@@ -15,15 +15,15 @@ class ReplaceMixin:
             iter       = self._buffer.get_start_iter()
             search_tag = self._tag_table.lookup(self.search_tag)
 
-            iter.forward_to_tag_toggle(replace_text)
-            self._do_replace(iter, find_text)
-            self._active_src_view.scroll_to_mark( self._buffer.get_insert(), 0.0, True, 0.0, 0.0 )
+            iter.forward_to_tag_toggle(search_tag)
+            self._do_replace(iter, replace_text)
+            self._active_src_view.scroll_to_iter( iter, 0.0, True, 0.0, 0.0 )
 
             self._buffer.end_user_action()
 
     def replace_all(self, widget):
         replace_text = self._replace_entry.get_text()
-        if self.find_text and replace_text:
+        if self.find_text:
             self._buffer.begin_user_action()
 
             mark       = self._buffer.get_insert()

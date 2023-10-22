@@ -11,6 +11,7 @@ from ..controls.save_as_button import SaveAsButton
 from ..controls.scale_up_button import ScaleUpButton
 from ..controls.scale_down_button import ScaleDownButton
 from ..controls.toggle_line_highlight import ToggleLineHighlight
+from ..controls.transparency_scale import TransparencyScale
 from ..controls.theme_button import ThemeButton
 
 
@@ -47,6 +48,8 @@ class BannerControls(Gtk.Box):
         center_box.add(ScaleUpButton())
         center_box.add(ScaleDownButton())
         center_box.add(ToggleLineHighlight())
+        center_box.add(TransparencyScale())
+
         center_box.set_margin_left(15)
         center_box.set_margin_right(15)
         self.set_center_widget(center_box)

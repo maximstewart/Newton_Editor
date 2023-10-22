@@ -1,0 +1,12 @@
+{
+    "manifest": {
+        "name": "Snippets",
+        "author": "ITDominator",
+        "version": "0.0.1",
+        "support": "",
+        "requests": {
+            "pass_events": "true",
+            "bind_keys": ["Snippets||show_snippets_ui:<Control>f"]
+        }
+    }
+}

@@ -73,13 +73,13 @@ class SettingsManager(StartCheckMixin, Singleton):
                 bindings = json.load(file)["keybindings"]
                 keybindings.configure(bindings)
         except Exception as e:
-            print( f"Settings: {self._KEY_BINDINGS_FILE}\n\t\t{repr(e)}" )
+            print( f"Settings Manager: {self._KEY_BINDINGS_FILE}\n\t\t{repr(e)}" )
 
         try:
             with open(self._CONTEXT_MENU) as file:
                 self._context_menu_data = json.load(file)
         except Exception as e:
-            print( f"Settings: {self._CONTEXT_MENU}\n\t\t{repr(e)}" )
+            print( f"Settings Manager: {self._CONTEXT_MENU}\n\t\t{repr(e)}" )
 
 
         self.settings: Settings = None

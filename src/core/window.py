@@ -26,6 +26,7 @@ class Window(Gtk.ApplicationWindow):
 
     def __init__(self, args, unknownargs):
         super(Window, self).__init__()
+        settings_manager.set_main_window(self)
 
         self._controller = None
 
@@ -34,7 +35,6 @@ class Window(Gtk.ApplicationWindow):
         self._setup_signals()
         self._subscribe_to_events()
 
-        settings_manager.set_main_window(self)
         self._load_widgets(args, unknownargs)
         self._set_size_constraints()
 
@@ -46,6 +46,9 @@ class Window(Gtk.ApplicationWindow):
         self.set_icon_from_file( settings_manager.get_window_icon() )
         self.set_gravity(5)  # 5 = CENTER
         self.set_position(1) # 1 = CENTER, 4 = CENTER_ALWAYS
+
+        ctx = self.get_style_context()
+        ctx.add_class("main-window")
 
     def _setup_signals(self):
         self.connect("delete-event", self._tear_down)
@@ -99,7 +102,7 @@ class Window(Gtk.ApplicationWindow):
         cr.set_operator(cairo.OPERATOR_OVER)
 
 
-    def _tear_down(self, widget=None, eve=None):
+    def _tear_down(self, widget = None, eve = None):
         event_system.emit("shutting_down")
 
         size = self.get_size()
