@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Theming:
-    transparency: int  = 64
+    transparency: int  = 62
     default_zoom: int  = 12
     syntax_theme: str  = "tango"
     success_color: str = "#88cc27"

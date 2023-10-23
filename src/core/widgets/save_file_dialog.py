@@ -33,7 +33,7 @@ class SaveFileDialog:
 
     def _load_widgets(self):
         self._file_filter_text = Gtk.FileFilter()
-        self._file_filter_text.set_name("Text Files")
+        self._file_filter_text.set_name("Code Files")
 
         for p in settings.filters.code:
             self._file_filter_text.add_pattern(p)
@@ -53,7 +53,9 @@ class SaveFileDialog:
         dlg.add_filter(self._file_filter_all)
 
         if current_filename == "":
+            import os
             dlg.set_current_name("new.txt")
+            filechooser.set_current_folder(os.path.expanduser('~'))
         else:
             dlg.set_current_folder(current_file.get_parent().get_path())
             dlg.set_current_name(current_filename)

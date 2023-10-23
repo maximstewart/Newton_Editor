@@ -33,7 +33,11 @@ class ThemePopover(Gtk.Popover):
         event_system.subscribe("show_theme_popup", self._show_theme_popup)
 
     def _load_widgets(self):
+        manager      = GtkSource.StyleSchemeManager()
+        style_scheme = manager.get_scheme(settings.theming.syntax_theme)
+
         self._style_choser = GtkSource.StyleSchemeChooserWidget()
+        self._style_choser.set_style_scheme(style_scheme)
         self._style_choser.show_all()
         self._style_choser.connect("button-release-event", self._set_theme)
 

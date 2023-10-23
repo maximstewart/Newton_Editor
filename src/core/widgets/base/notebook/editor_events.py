@@ -132,4 +132,5 @@ class EditorEventsMixin:
         source_view.set_buffer_language(language)
 
     def set_buffer_style(self, source_view, style = settings.theming.syntax_theme):
-        source_view.set_buffer_style(style)
+        buffer = source_view.get_buffer()
+        source_view.set_buffer_style(buffer, style)

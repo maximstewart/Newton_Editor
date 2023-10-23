@@ -24,7 +24,10 @@ class TransparencyScale(Gtk.Scale):
 
     def _setup_styling(self):
         self.set_digits(0)
+        self.set_hexpand(True)
+        self.set_size_request(240, -1)
         self.set_value_pos(Gtk.PositionType.RIGHT)
+        self.add_mark(0.0, Gtk.PositionType.TOP, "Transparency:")
         self.add_mark(50.0, Gtk.PositionType.TOP, "50%")
 
 
