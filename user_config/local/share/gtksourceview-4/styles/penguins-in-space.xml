@@ -1,6 +1,6 @@
-<style-scheme name="Peacocks In Space" id="peacocks-in-space" version="1.0">
-    <author>    ITDominator</author>
-    <description>An attempted clone of Dayle Rees' Peacocks In Space theme.</description>
+<style-scheme name="Penguins In Space" id="penguins-in-space" version="1.0">
+    <author> ITDominator</author>
+    <description>An homage to Dayle Rees' Peacocks In Space theme.</description>
 
     <style name="current-line"	background="#2b303b" />
     <style name="current-line-number"	background="#f7b83d" />
@@ -10,7 +10,7 @@
     <style name="bracket-mismatch"	foreground="#white" background="#FF5D38" />
     <style name="right-margin"	foreground="#dee3ec" background="#454a54" />
     <style name="search-match"	background="#E6DB74" />
-    <style name="def:comment"	foreground="#8998b9" />
+    <style name="def:comment"	foreground="#454a54" />
     <style name="def:shebang"	foreground="#00a8c6" bold="true" />
     <style name="def:doc-comment-element"	italic="true" />
     <style name="def:constant"	foreground="#E6DB74" />
@@ -45,7 +45,7 @@
     <style name="python:class-name"	foreground="#ff5d38" />
     <style name="python:function-name"	foreground="#e6db74" />
     <style name="python:keyword"	foreground="#00a8c6" />
-    <style name="python:special-variable"	/>
+    <style name="python:special-variable"	foreground="#26a269" />
     <style name="python:boolean"	foreground="#ff5d38" />
     <style name="python:complex"	foreground="#ff5d38" />
     <style name="python:format"	foreground="#bf3f3f" />
@@ -82,9 +82,9 @@
     <style name="php:string"	foreground="#e6db74" />
     <style name="json:keyname"	foreground="#ff5d38" />
     <style name="json:string"	foreground="#e6db74" />
-    <style name="json:null-value"	foreground="#ff5d38" />
-    <style name="json:float"	foreground="#e6db74" />
-    <style name="json:boolean"	foreground="#ff5d38" />
+    <style name="json:null-value"	foreground="#e01b24" />
+    <style name="json:float"	foreground="#00a8c6" />
+    <style name="json:boolean"	foreground="#33d17a" />
     <style name="java:reserved"	foreground="#ff5d38" />
     <style name="js:function-expression"	/>
     <style name="js:identifier"	/>
@@ -112,9 +112,6 @@
     <style name="js:try-catch-statement"	foreground="#00a8c6" />
     <style name="js:spread-syntax"	/>
     <style name="js:switch-statement"	foreground="#00a8c6" />
-    <style name="python3:keyword"	foreground="#00a8c6" />
-    <style name="python3:module-handler"	foreground="#00a8c6" />
+    <style name="python:multiline-string"	foreground="#454a54" />
     <style name="python3:method-calls"	foreground="#e6db74" />
-    <style name="java:keyword"	foreground="#8998b9" />
-    <style name="method-calls"	foreground="#e6db74" />
 </style-scheme>
