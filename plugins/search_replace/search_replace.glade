@@ -261,6 +261,7 @@
                 <property name="primary-icon-activatable">False</property>
                 <property name="primary-icon-sensitive">False</property>
                 <property name="placeholder-text" translatable="yes">Find in current buffer</property>
+                <signal name="key-release-event" handler="on_enter_search" swapped="no"/>
                 <signal name="search-changed" handler="search_for_string" swapped="no"/>
               </object>
               <packing>

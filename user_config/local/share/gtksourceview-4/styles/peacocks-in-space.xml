@@ -1,5 +1,5 @@
 <style-scheme name="Peacocks In Space" id="peacocks-in-space" version="1.0">
-    <author>    ITDominator</author>
+    <author> ITDominator</author>
     <description>An attempted clone of Dayle Rees' Peacocks In Space theme.</description>
 
     <style name="current-line"	background="#2b303b" />
@@ -117,4 +117,6 @@
     <style name="python3:method-calls"	foreground="#e6db74" />
     <style name="java:keyword"	foreground="#8998b9" />
     <style name="method-calls"	foreground="#e6db74" />
+    <style name="xml:processing-instruction"	/>
+    <style name="xml:cdata-delim"	foreground="#8998b9" />
 </style-scheme>

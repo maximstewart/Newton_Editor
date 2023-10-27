@@ -6,7 +6,9 @@ import threading
 # Lib imports
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GLib
 
 # Application imports
@@ -124,6 +126,14 @@ class Plugin(StylingMixin, ReplaceMixin, PluginBase):
         self.timer.daemon = True
         self.timer.start()
 
+
+    def on_enter_search(self, widget, eve):
+        text = widget.get_text()
+        if not text: return
+
+        keyname = Gdk.keyval_name(eve.keyval)
+        if keyname == "Return":
+            self.find_next(widget)
 
     def search_for_string(self, widget):
         self.cancel_timer()

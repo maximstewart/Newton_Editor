@@ -114,4 +114,5 @@
     <style name="js:switch-statement"	foreground="#00a8c6" />
     <style name="python:multiline-string"	foreground="#454a54" />
     <style name="python3:method-calls"	foreground="#e6db74" />
+    <style name="xml:cdata-delim"	foreground="#8998b9" />
 </style-scheme>
