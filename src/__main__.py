@@ -38,6 +38,8 @@ if __name__ == "__main__":
 
         # Read arguments (If any...)
         args, unknownargs = parser.parse_known_args()
+        print(args)
+        print(unknownargs)
 
         if args.debug == "true":
             settings_manager.set_debug(True)

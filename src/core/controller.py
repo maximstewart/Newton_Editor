@@ -20,6 +20,7 @@ class Controller(SignalsMixins, ControllerData):
     def __init__(self, args, unknownargs):
         messages = []
         for arg in unknownargs + [args.new_tab,]:
+            logger.debug(f"{arg}")
             # NOTE: If passing line number with file split against :
             if os.path.isfile(arg.replace("file://", "").split(":")[0]):
                 messages.append(f"FILE|{arg.replace('file://', '')}")

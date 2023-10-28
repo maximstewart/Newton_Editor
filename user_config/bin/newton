@@ -9,21 +9,16 @@
 
 function main() {
     call_path=`pwd`
-    path=""
 
-    if [[ ! "${1::1}" == /* ]]; then
-        path="${call_path}/${1}"
-    else
-        path="${1}"
-    fi
-
-    # NOTE: Remove if you want to pass file(s) besides directories...
-    if [ ! -f "${path}" ]; then
-        echo "Newton: Path given not a file..."
-        exit 1
-    fi
+    files=()
+    for f in "$@"; do
+        target=$(readlink -f "${f}")
+        i="${#files[@]}"
+        size=$(($i + 1))
+        files[$size]="${target}"
+    done
 
     cd "/opt/"
-    python /opt/newton.zip "$@"
+    python /opt/newton.zip "${files[@]}"
 }
 main "$@";
