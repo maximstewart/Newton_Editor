@@ -119,4 +119,5 @@
     <style name="method-calls"	foreground="#e6db74" />
     <style name="xml:processing-instruction"	/>
     <style name="xml:cdata-delim"	foreground="#8998b9" />
+    <style name="gdscript:method-calls"	foreground="#e6db74" />
 </style-scheme>

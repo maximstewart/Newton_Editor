@@ -6,8 +6,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from .widgets.miniview_widget import MiniViewWidget
-from .widgets.base.notebook.editor_notebook import EditorNotebook
+from ..widgets.miniview_widget import MiniViewWidget
+from ..widgets.base.notebook.editor_notebook import EditorNotebook
 
 
 

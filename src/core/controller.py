@@ -11,7 +11,7 @@ from gi.repository import GLib
 
 # Application imports
 from .controller_data import ControllerData
-from .core_widget import CoreWidget
+from .containers.core_widget import CoreWidget
 from .mixins.signals_mixins import SignalsMixins
 
 
