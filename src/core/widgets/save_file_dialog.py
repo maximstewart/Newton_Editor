@@ -55,7 +55,7 @@ class SaveFileDialog:
         if current_filename == "":
             import os
             dlg.set_current_name("new.txt")
-            filechooser.set_current_folder(os.path.expanduser('~'))
+            dlg.set_current_folder(os.path.expanduser('~'))
         else:
             dlg.set_current_folder(current_file.get_parent().get_path())
             dlg.set_current_name(current_filename)
