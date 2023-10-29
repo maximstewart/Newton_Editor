@@ -160,9 +160,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
             is_alt = True if modifiers & Gdk.ModifierType.MOD1_MASK else False
 
         if is_control:
-            if keyname in [ "slash", "Up", "Down", "z" ]:
-                return True
-
             if is_shift:
                 if keyname in [ "z", "Up", "Down", "Left", "Right" ]:
                     # NOTE: For now do like so for completion sake above.
@@ -171,17 +168,31 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
                     return True
 
+            if keyname in [ "slash", "Up", "Down", "z" ]:
+                return True
+
         if is_alt:
             if keyname in [ "Up", "Down", "Left", "Right" ]:
                 return True
 
-        if keyname == "BackSpace":
-            if len(self._multi_insert_marks) > 0:
+
+        if len(self._multi_insert_marks) > 0:
+            if keyname == "BackSpace":
                 self.begin_user_action(buffer)
                 with buffer.freeze_notify():
                     GLib.idle_add(self._delete_on_multi_line_markers, *(buffer,))
 
-                return True
+            if keyname in {"Return", "Enter"}:
+                self.begin_user_action(buffer)
+                with buffer.freeze_notify():
+                    GLib.idle_add(self._new_line_on_multi_line_markers, *(buffer,))
+            else:
+                ...
+
+            return True
+        
+        if keyname in {"Return", "Enter"}:
+            return self.insert_indent_handler(buffer)
 
         # NOTE: if a plugin recieves the call and handles, it will be the final decider for propigation
         return event_system.emit_and_await("autopairs", (keyname, is_control, is_alt, is_shift))

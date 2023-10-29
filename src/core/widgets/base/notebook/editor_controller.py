@@ -59,6 +59,7 @@ class EditorControllerMixin:
         if action == "set_buffer_style":
             self.set_buffer_style(source_view, query)
         if action == "save_file":
-            source_view.save_file()
+            return source_view.save_file()
         if action == "save_file_as":
-            source_view.save_file_as()
+            return source_view.save_file_as()
+

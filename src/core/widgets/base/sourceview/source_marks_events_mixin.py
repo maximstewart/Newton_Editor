@@ -92,6 +92,49 @@ class MarkEventsMixin:
             buffer.backspace(iter, interactive = True, default_editable = True)
 
         self.end_user_action(buffer)
+    
+    def _new_line_on_multi_line_markers(self, buffer):
+        self.insert_indent_handler(buffer)
+
+        for mark in self._multi_insert_marks:
+            iter = buffer.get_iter_at_mark(mark)
+            self.insert_indent_handler(buffer, iter)
+
+        self.end_user_action(buffer)
+
+    def insert_indent_handler(self, buffer, iter = None):
+        if not iter:
+            iter   = buffer.get_iter_at_mark( buffer.get_insert() )
+
+        iter_copy  = iter.copy()
+        iter_moved = iter_copy.backward_char()
+ 
+        if iter_moved:
+            _char  = iter_copy.get_char()
+            self._base_indent(buffer, iter, iter_copy)
+            if _char in ["{", ":"]:
+                self._indent_deeper(buffer, iter)
+
+        return True
+    
+    def _base_indent(self, buffer, iter, iter_copy):
+        line_num  = iter_copy.get_line()
+        iter_copy = buffer.get_iter_at_line(line_num)
+
+        spaces = ""
+        _char  = iter_copy.get_char()
+        while _char == " ":
+            spaces += " "
+            iter_copy.forward_char()
+            _char = iter_copy.get_char()
+
+        buffer.insert(iter, f"\n{spaces}")
+
+
+    def _indent_deeper(self, buffer, iter):
+        buffer.insert(iter, "    ")
+
+
 
     def begin_user_action(self, buffer):
         if len(self._multi_insert_marks) > 0:

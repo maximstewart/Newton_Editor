@@ -6,6 +6,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
+from ..widgets.separator_widget import Separator
 from ..widgets.miniview_widget import MiniViewWidget
 from ..widgets.base.notebook.editor_notebook import EditorNotebook
 
@@ -38,7 +39,6 @@ class EditorsPaned(Gtk.Paned):
 
 
 
-
 class EditorsContainer(Gtk.Box):
     def __init__(self):
         super(EditorsContainer, self).__init__()
@@ -61,5 +61,7 @@ class EditorsContainer(Gtk.Box):
         ...
 
     def _load_widgets(self):
+        self.add(Separator("separator_left"))
         self.add(EditorsPaned())
+        self.add(Separator("separator_right"))
         self.add(MiniViewWidget())
