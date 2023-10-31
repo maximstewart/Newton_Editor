@@ -83,6 +83,7 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         self.connect("drag-data-received", self._on_drag_data_received)
         self.connect("key-press-event", self._key_press_event)
+        self.connect("key-release-event", self._key_release_event)
         self.connect("button-press-event", self._button_press_event)
         self.connect("scroll-event", self._scroll_event)
 
@@ -182,21 +183,31 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
                 with buffer.freeze_notify():
                     GLib.idle_add(self._delete_on_multi_line_markers, *(buffer,))
 
-            if keyname in {"Return", "Enter"}:
-                self.begin_user_action(buffer)
-                with buffer.freeze_notify():
-                    GLib.idle_add(self._new_line_on_multi_line_markers, *(buffer,))
-            else:
-                ...
-
             return True
         
-        if keyname in {"Return", "Enter"}:
-            return self.insert_indent_handler(buffer)
-
         # NOTE: if a plugin recieves the call and handles, it will be the final decider for propigation
         return event_system.emit_and_await("autopairs", (keyname, is_control, is_alt, is_shift))
 
+    def _key_release_event(self, widget, eve):
+        if self.freeze_multi_line_insert: return
+
+        keyname    = Gdk.keyval_name(eve.keyval)
+        modifiers  = Gdk.ModifierType(eve.get_state() & ~Gdk.ModifierType.LOCK_MASK)
+        is_control = True if modifiers & Gdk.ModifierType.CONTROL_MASK else False
+        is_shift   = True if modifiers & Gdk.ModifierType.SHIFT_MASK else False
+        buffer     = self.get_buffer()
+
+        if keyname in {"Return", "Enter"}:
+            if len(self._multi_insert_marks) > 0:
+                self.begin_user_action(buffer)
+                with buffer.freeze_notify():
+                    GLib.idle_add(self._new_line_on_multi_line_markers, *(buffer,))
+
+                return
+
+            has_selection = buffer.get_has_selection()
+            if not has_selection:
+                return self.insert_indent_handler(buffer)
 
     def _button_press_event(self, widget = None, eve = None, user_data = None):
         if eve.type == Gdk.EventType.BUTTON_PRESS and eve.button == 1 :   # l-click
@@ -286,3 +297,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
                     gfile = Gio.File.new_for_path(uri)
 
                 event_system.emit('create_view', (gfile,))
+
+    def get_filetype(self):
+        return self._current_filetype

@@ -11,7 +11,7 @@ from gi.repository import Gtk
 
 
 class MarkEventsMixin:
-
+    
     def keyboard_insert_mark(self, target_iter = None, is_keyboard_insert = True):
         buffer = self.get_buffer()
 
@@ -94,12 +94,19 @@ class MarkEventsMixin:
         self.end_user_action(buffer)
     
     def _new_line_on_multi_line_markers(self, buffer):
-        self.insert_indent_handler(buffer)
+        self.freeze_multi_line_insert = True
+        
+        iter = buffer.get_iter_at_mark( buffer.get_insert() )
+
+        self._base_indent(buffer, iter)
+        self.insert_indent_handler(buffer, iter)
 
         for mark in self._multi_insert_marks:
             iter = buffer.get_iter_at_mark(mark)
+            self._base_indent(buffer, iter)
             self.insert_indent_handler(buffer, iter)
 
+        self.freeze_multi_line_insert = False
         self.end_user_action(buffer)
 
     def insert_indent_handler(self, buffer, iter = None):
@@ -107,17 +114,20 @@ class MarkEventsMixin:
             iter   = buffer.get_iter_at_mark( buffer.get_insert() )
 
         iter_copy  = iter.copy()
-        iter_moved = iter_copy.backward_char()
- 
-        if iter_moved:
-            _char  = iter_copy.get_char()
-            self._base_indent(buffer, iter, iter_copy)
-            if _char in ["{", ":"]:
-                self._indent_deeper(buffer, iter)
+        iter_copy.backward_sentence_start()
+        iter_copy.forward_sentence_end()
+        iter_copy.backward_char()
+
+        _char = iter_copy.get_char()
+        if _char in ["{", ":"]:
+            self._indent_deeper(buffer, iter)
 
         return True
     
-    def _base_indent(self, buffer, iter, iter_copy):
+    def _base_indent(self, buffer, iter, iter_copy = None):
+        if not iter_copy:
+            iter_copy  = iter.copy()
+        
         line_num  = iter_copy.get_line()
         iter_copy = buffer.get_iter_at_line(line_num)
 
