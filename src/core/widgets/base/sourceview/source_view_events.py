@@ -7,11 +7,13 @@ from gi.repository import Gtk
 
 # Application imports
 from .source_file_events_mixin import FileEventsMixin
-from .source_marks_events_mixin import MarkEventsMixin
+from .source_mark_events_mixin import MarkEventsMixin
 
 
 
 class SourceViewEventsMixin(MarkEventsMixin, FileEventsMixin):
+    def get_current_filepath(self):
+        return self._current_file
 
     def set_buffer_language(self, buffer, language = "python3"):
         buffer.set_language( self._language_manager.get_language(language) )

@@ -98,6 +98,8 @@ class Plugin(StylingMixin, ReplaceMixin, PluginBase):
         elif not data and is_visible:
             self._search_replace_dialog.popdown()
             self._find_entry.set_text("")
+        else:
+            self._find_entry.grab_focus()
 
 
     def get_search_tag(self, buffer):

@@ -105,13 +105,14 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         for provider in self._completion.get_providers():
             self._completion.remove_provider(provider)
 
-        # TODO: actually load a meaningful provider based on file type...
         file   = self._current_file.get_path()
         buffer = self.get_buffer()
+
         word_completion = GtkSource.CompletionWords.new("word_completion")
         word_completion.register(buffer)
         self._completion.add_provider(word_completion)
 
+        # TODO: actually load a meaningful provider based on file type...
         # example_completion_provider = ExampleCompletionProvider()
         # self._completion.add_provider(example_completion_provider)
 
@@ -180,8 +181,11 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         if len(self._multi_insert_marks) > 0:
             if keyname == "BackSpace":
                 self.begin_user_action(buffer)
+
                 with buffer.freeze_notify():
                     GLib.idle_add(self._delete_on_multi_line_markers, *(buffer,))
+
+                self.end_user_action(buffer)
 
             return True
         

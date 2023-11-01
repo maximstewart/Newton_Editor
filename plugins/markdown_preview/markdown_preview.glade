@@ -26,7 +26,11 @@
     <property name="enable-webrtc">True</property>
   </object>
   <object class="GtkPopover" id="markdown_preview_dialog">
+    <property name="width-request">620</property>
+    <property name="height-request">480</property>
     <property name="can-focus">False</property>
+    <property name="vexpand">True</property>
+    <property name="position">left</property>
     <property name="modal">False</property>
     <property name="transitions-enabled">False</property>
     <property name="constrain-to">none</property>
@@ -34,21 +38,23 @@
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkButtonBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="layout-style">start</property>
+            <property name="layout-style">end</property>
             <child>
-              <object class="GtkButton">
-                <property name="label">gtk-media-play</property>
+              <object class="GtkToggleButton">
+                <property name="label">gtk-media-pause</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-stock">True</property>
                 <property name="always-show-image">True</property>
-                <signal name="clicked" handler="_resume_preview_updates" swapped="no"/>
+                <signal name="toggled" handler="_tggle_preview_updates" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -58,34 +64,17 @@
             </child>
             <child>
               <object class="GtkButton">
-                <property name="label">gtk-media-pause</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-stock">True</property>
-                <property name="always-show-image">True</property>
-                <signal name="clicked" handler="_pause_preview_updates" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Settings</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="image">settings_img</property>
-                <signal name="clicked" handler="_handle_ettings" swapped="no"/>
+                <signal name="clicked" handler="_handle_settings" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">2</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>
@@ -96,15 +85,28 @@
           </packing>
         </child>
         <child>
-          <object class="WebKitWebView" type-func="webkit_web_view_get_type" id="markdown_view">
-            <property name="width-request">200</property>
-            <property name="height-request">400</property>
+          <object class="GtkScrolledWindow">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="settings">web_view_settings</property>
-            <property name="is-ephemeral">True</property>
+            <property name="shadow-type">in</property>
             <child>
-              <placeholder/>
+              <object class="GtkViewport">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <object class="WebKitWebView" type-func="webkit_web_view_get_type" id="markdown_view">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="settings">web_view_settings</property>
+                    <property name="is-ephemeral">True</property>
+                    <property name="is-muted">True</property>
+                    <property name="default-content-security-policy">*</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                </child>
+              </object>
             </child>
           </object>
           <packing>

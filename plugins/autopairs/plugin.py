@@ -72,39 +72,14 @@ class Plugin(PluginBase):
         self._buffer          = self._active_src_view.get_buffer()
         self._tag_table       = self._buffer.get_tag_table()
 
-    def _buffer_changed_first_load(self, buffer):
-        self._do_colorize(buffer)
-
-
-    def _buffer_changed(self, buffer):
-        tag_table = buffer.get_tag_table()
-        mark      = buffer.get_insert()
-        iter      = buffer.get_iter_at_mark(mark)
-        tags      = iter.get_tags()
-
     def _autopairs(self, keyval_name, ctrl, alt, shift):
         if keyval_name in self.chars:
             return self.text_insert(self._buffer, keyval_name)
-        elif ctrl and keyval_name == "Return":
-            self.move_to_next_line(self._buffer)
 
     # NOTE: All of below to EOF, lovingly taken from Hamad Al Marri's Gamma
     #       text editor. I did do some cleanup of comments but otherwise pretty
     #       much the same code just fitted to my plugin architecture.
     # Link: https://gitlab.com/hamadmarri/gamma-text-editor
-    def move_to_next_line(self, buffer):
-        selection = buffer.get_selection_bounds()
-        if selection != (): return False
-
-        position = buffer.get_iter_at_mark(buffer.get_insert())
-
-        if position.ends_line(): return False
-
-        position.forward_to_line_end()
-        buffer.place_cursor(position)
-
-        return False
-
     def text_insert(self, buffer, text):
         selection = buffer.get_selection_bounds()
         if selection == ():
@@ -116,7 +91,7 @@ class Plugin(PluginBase):
         text = self.chars[text]
         text += self.close[text]
 
-        position = buffer.get_iter_at_mark(buffer.get_insert())
+        position = buffer.get_iter_at_mark( buffer.get_insert() )
 
         c = position.get_char()
         if not c in (" ", "", ";", ":", "\t", ",", ".", "\n", "\r") \
