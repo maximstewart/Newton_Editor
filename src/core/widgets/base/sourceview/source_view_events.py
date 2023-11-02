@@ -3,121 +3,98 @@
 # Lib imports
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GLib
 
 # Application imports
-from .source_view_dnd_mixin import SourceViewDnDMixin
-from .source_file_events_mixin import FileEventsMixin
-from .source_mark_events_mixin import MarkEventsMixin
+from .mixins.source_view_dnd_mixin import SourceViewDnDMixin
+from .mixins.source_file_events_mixin import FileEventsMixin
+from .mixins.source_mark_events_mixin import MarkEventsMixin
 
 
+class SourceViewEvents(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
+    def _create_default_tag(self, buffer):
+        general_style_tag = buffer.create_tag('general_style')
+        general_style_tag.set_property('size', 100)
+        general_style_tag.set_property('scale', 100)
 
-class SourceViewEventsMixin(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
-    def get_current_filepath(self):
-        return self._current_file
-
-    def get_filetype(self):
-        return self._current_filetype
-
-    def set_buffer_language(self, buffer, language = "python3"):
-        buffer.set_language( self._language_manager.get_language(language) )
-
-    def set_buffer_style(self, buffer, style = settings.theming.syntax_theme):
-        buffer.set_style_scheme( self._style_scheme_manager.get_scheme(style) )
-
-    def toggle_highlight_line(self, widget = None, eve = None):
-        self.set_highlight_current_line( not self.get_highlight_current_line() )
-
-    def scale_up_text(self, buffer, scale_step = 10):
-        ctx = self.get_style_context()
-
-        if self._px_value < 99:
-            self._px_value += 1
-            ctx.add_class(f"px{self._px_value}")
-
-        # NOTE: Hope to bring this or similar back after we decouple scaling issues coupled with the miniview.
-        # tag_table = buffer.get_tag_table()
-        # start_itr = buffer.get_start_iter()
-        # end_itr   = buffer.get_end_iter()
-        # tag       = tag_table.lookup('general_style')
-        #
-        # tag.set_property('scale', tag.get_property('scale') + scale_step)
-        # buffer.apply_tag(tag, start_itr, end_itr)
-
-    def scale_down_text(self, buffer, scale_step = 10):
-        ctx = self.get_style_context()
-
-        if self._px_value > 1:
-            ctx.remove_class(f"px{self._px_value}")
-            self._px_value -= 1
-            ctx.add_class(f"px{self._px_value}")
-
-        # NOTE: Hope to bring this or similar back after we decouple scaling issues coupled with the miniview.
-        # tag_table = buffer.get_tag_table()
-        # start_itr = buffer.get_start_iter()
-        # end_itr   = buffer.get_end_iter()
-        # tag       = tag_table.lookup('general_style')
-        #
-        # tag.set_property('scale', tag.get_property('scale') - scale_step)
-        # buffer.apply_tag(tag, start_itr, end_itr)
-
-    def update_cursor_position(self, buffer = None):
-        buffer = self.get_buffer() if not buffer else buffer
-        iter   = buffer.get_iter_at_mark( buffer.get_insert() )
-        chars  = iter.get_offset()
-        row    = iter.get_line() + 1
-        col    = self.get_visual_column(iter) + 1
-
-        event_system.emit("set_line_char_label", (f"{row}:{col}",))
-
-    def got_to_line(self, buffer = None, line: int = 0):
-        buffer    = self.get_buffer() if not buffer else buffer
-        line_itr  = buffer.get_iter_at_line(line)
-        char_iter = buffer.get_iter_at_line_offset(line, line_itr.get_bytes_in_line())
-
-        buffer.place_cursor(char_iter)
-        if not buffer.get_mark("starting_cursor"):
-             buffer.create_mark("starting_cursor", char_iter, True)
-        self.scroll_to_mark( buffer.get_mark("starting_cursor"), 0.0, True, 0.0, 0.0 )
-
-    def keyboard_undo(self):
+    def _is_modified(self, *args):
         buffer = self.get_buffer()
-        buffer.undo()
 
-    def keyboard_redo(self):
-        buffer = self.get_buffer()
-        buffer.redo()
+        if not self._loading_file:
+            event_system.emit("buffer_changed", (buffer, ))
+        else:
+            event_system.emit("buffer_changed_first_load", (buffer, ))
 
-    def keyboard_move_lines_up(self):
-        buffer = self.get_buffer()
+        self.update_cursor_position(buffer)
+
+    def _insert_text(self, buffer, location_itr, text_str, len_int):
+        if self.freeze_multi_line_insert: return
 
         self.begin_user_action(buffer)
+        with buffer.freeze_notify():
+            GLib.idle_add(self._update_multi_line_markers, *(buffer, text_str,))
 
-        self.emit("move-lines", *(False,))
-        # unindent_lines
-        # self.emit("move-words", *(self, 4,))
-
-        self.end_user_action(buffer)
-
-    def keyboard_move_lines_down(self):
-        buffer = self.get_buffer()
-
-        self.begin_user_action(buffer)
-
-        self.emit("move-lines", *(True,))
-        # self.emit("move-words", *(self, -4,))
-
-        self.end_user_action(buffer)
-
-    def update_labels(self, gfile = None):
-        if not gfile: return
-
+    def _buffer_modified_changed(self, buffer):
         tab_widget = self.get_parent().get_tab_widget()
-        tab_widget.set_tab_label(self._current_filename)
-        self.set_bottom_labels(gfile)
+        tab_widget.set_status(changed = True if buffer.get_modified() else False)
 
-    def set_bottom_labels(self, gfile = None):
-        if not gfile: return
 
-        event_system.emit("set_bottom_labels", (gfile, None, self._current_filetype, None))
-        self.update_cursor_position()
+    def _button_press_event(self, widget = None, eve = None, user_data = None):
+        if eve.type == Gdk.EventType.BUTTON_PRESS and eve.button == 1 :   # l-click
+            if eve.state & Gdk.ModifierType.CONTROL_MASK:
+                self.button_press_insert_mark(eve)
+                return True
+            else:
+                self.keyboard_clear_marks()
+        elif eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 3: # r-click
+            ...
+
+    def _scroll_event(self, widget, eve):
+        accel_mask = Gtk.accelerator_get_default_mod_mask()
+        x, y, z    = eve.get_scroll_deltas()
+        if eve.state & accel_mask == Gdk.ModifierType.CONTROL_MASK:
+            buffer = self.get_buffer()
+            if z > 0:
+                self.scale_down_text(buffer)
+            else:
+                self.scale_up_text(buffer)
+
+            return True
+
+        if eve.state & accel_mask == Gdk.ModifierType.SHIFT_MASK:
+            adjustment  = self.get_hadjustment()
+            current_val = adjustment.get_value()
+            step_val    = adjustment.get_step_increment()
+
+            if z > 0: # NOTE: scroll left
+                adjustment.set_value(current_val - step_val * 2)
+            else:     # NOTE: scroll right
+                adjustment.set_value(current_val + step_val * 2)
+
+            return True
+
+    def _focus_in_event(self, widget, eve = None):
+        event_system.emit("set_active_src_view", (self,))
+        self.get_parent().get_parent().is_editor_focused = True
+
+    def _on_widget_focus(self, widget, eve = None):
+        tab_view = self.get_parent().get_parent()
+        path     = self._current_file if self._current_file else ""
+
+        event_system.emit('focused_target_changed', (tab_view.NAME,))
+        event_system.emit("set_path_label", (path,))
+        event_system.emit("set_encoding_label")
+        event_system.emit("set_file_type_label", (self._current_filetype,))
+
+        return False
+
+    def _on_cursor_move(self, buffer, cursor_iter, mark, user_data = None):
+        if mark != buffer.get_insert(): return
+
+        self.update_cursor_position(buffer)
+
+        # NOTE: Not sure but this might not be efficient if the map reloads the same view...
+        event_system.emit(f"set_source_view", (self,))

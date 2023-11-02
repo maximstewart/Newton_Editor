@@ -130,3 +130,34 @@ class FileEventsMixin:
 
         buffer.set_modified(False)
         return gfile
+
+
+    def _document_loaded(self, line: int = 0):
+        for provider in self._completion.get_providers():
+            self._completion.remove_provider(provider)
+
+        file   = self._current_file.get_path()
+        buffer = self.get_buffer()
+
+        word_completion = GtkSource.CompletionWords.new("word_completion")
+        word_completion.register(buffer)
+        self._completion.add_provider(word_completion)
+
+        # TODO: actually load a meaningful provider based on file type...
+        # example_completion_provider = ExampleCompletionProvider()
+        # self._completion.add_provider(example_completion_provider)
+
+        # py_completion_provider = PythonCompletionProvider(file)
+        # self._completion.add_provider(py_completion_provider)
+        self.got_to_line(buffer, line)
+
+
+
+
+
+
+
+
+
+
+

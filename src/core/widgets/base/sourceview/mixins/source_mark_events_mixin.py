@@ -11,7 +11,7 @@ from gi.repository import Gtk
 
 
 class MarkEventsMixin:
-    
+
     def keyboard_insert_mark(self, target_iter = None, is_keyboard_insert = True):
         buffer = self.get_buffer()
 

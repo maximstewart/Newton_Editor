@@ -10,13 +10,11 @@ from gi.repository import Gio
 
 # Application imports
 from .editor_controller import EditorControllerMixin
-from .editor_events import EditorEventsMixin
 
 
 
 # NOTE: https://github.com/Axel-Erfurt/TextEdit/tree/b65f09be945196eb05bef83d81a6abcd129b4eb0
-
-class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
+class EditorNotebook(EditorControllerMixin, Gtk.Notebook):
     ccount = 0
 
     def __new__(cls, *args, **kwargs):
@@ -35,7 +33,6 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.set_group_name("editor_widget")
         self.builder.expose_object(self.NAME, self)
 
-        self._add_action_widgets()
         self._setup_styling()
         self._setup_signals()
         self._subscribe_to_events()
@@ -57,35 +54,30 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _setup_signals(self):
         self.connect("switch-page", self._switch_page_update)
+        self.connect("key-press-event", self._key_press_event)
+        self.connect("key-release-event", self._key_release_event)
 
     def _subscribe_to_events(self):
         event_system.subscribe("create_view", self._create_view)
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
-
         event_system.subscribe("focused_target_changed", self._focused_target_changed)
-        event_system.subscribe("keyboard_create_tab", self._keyboard_create_tab)
-        event_system.subscribe("keyboard_open_file", self._keyboard_open_file)
-        event_system.subscribe("keyboard_close_tab", self._keyboard_close_tab)
-        event_system.subscribe("keyboard_prev_tab", self._keyboard_prev_tab)
-        event_system.subscribe("keyboard_next_tab", self._keyboard_next_tab)
-        event_system.subscribe("keyboard_move_tab_left", self._keyboard_move_tab_left)
-        event_system.subscribe("keyboard_move_tab_right", self._keyboard_move_tab_right)
-        event_system.subscribe("keyboard_move_tab_to_1", self._keyboard_move_tab_to_1)
-        event_system.subscribe("keyboard_move_tab_to_2", self._keyboard_move_tab_to_2)
 
-        event_system.subscribe("toggle_highlight_line", self._toggle_highlight_line)
-        event_system.subscribe("keyboard_move_lines_up", self._keyboard_move_lines_up)
-        event_system.subscribe("keyboard_move_lines_down", self._keyboard_move_lines_down)
-        event_system.subscribe("keyboard_undo", self._keyboard_undo)
-        event_system.subscribe("keyboard_redo", self._keyboard_redo)
-        event_system.subscribe("keyboard_insert_mark", self._keyboard_insert_mark)
-        event_system.subscribe("keyboard_clear_marks", self._keyboard_clear_marks)
+        event_system.subscribe("keyboard_open_file", self._keyboard_open_file)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
         event_system.subscribe("keyboard_scale_down_text", self._keyboard_scale_down_text)
-        event_system.subscribe("keyboard_save_file", self._keyboard_save_file)
-        event_system.subscribe("keyboard_save_file_as", self._keyboard_save_file_as)
 
+        # event_system.subscribe("keyboard_save_file_as", self._keyboard_save_file_as)
+
+
+    def _load_widgets(self):
+        self._add_action_widgets()
+        if self.NAME == "notebook_1" and not settings_manager.is_starting_with_file():
+            self.create_view()
+
+    def _dbl_click_create_view(self, notebook, eve):
+        if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
+            ...
 
     def _focused_target_changed(self, target):
         self.is_editor_focused = True if target == self.NAME else False
@@ -107,14 +99,6 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         # PACKTYPE: 0 Start, 1 = End
         self.set_action_widget(start_box, 0)
         self.set_action_widget(end_box, 1)
-
-    def _load_widgets(self):
-        if self.NAME == "notebook_1" and not settings_manager.is_starting_with_file():
-            self.create_view()
-
-    def _dbl_click_create_view(self, notebook, eve):
-        if eve.type == Gdk.EventType.DOUBLE_BUTTON_PRESS and eve.button == 1:   # l-click
-            ...
 
     def _switch_page_update(self, notebook, page, page_num):
         source_view = page.get_source_view()
@@ -150,66 +134,8 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
         self.open_file(gfile)
 
-    def _keyboard_create_tab(self, _gfile = None):
-        if not self.is_editor_focused: # TODO: Find way to converge this
-            return
-
-        self.create_view(gfile = _gfile)
-
-
-    def _keyboard_close_tab(self):
-        self.action_controller("close_tab")
-
-    def _keyboard_move_tab_right(self):
-        self.action_controller("keyboard_move_tab_right")
-
-    def _keyboard_move_tab_left(self):
-        self.action_controller("keyboard_move_tab_left")
-
-    def _keyboard_move_tab_to_1(self):
-        self.action_controller("keyboard_move_tab_to_1")
-
-    def _keyboard_move_tab_to_2(self):
-        self.action_controller("keyboard_move_tab_to_2")
-
-    def _keyboard_prev_tab(self):
-        self.action_controller("keyboard_prev_tab")
-
-    def _keyboard_next_tab(self):
-        self.action_controller("keyboard_next_tab")
-
-
-    # NOTE: These feel bad being here man...
-    def _keyboard_undo(self):
-        self.action_controller("keyboard_undo")
-
-    def _keyboard_redo(self):
-        self.action_controller("keyboard_redo")
-
-    def _toggle_highlight_line(self):
-        self.action_controller("toggle_highlight_line")
-
-
-    def _keyboard_insert_mark(self):
-        self.action_controller("keyboard_insert_mark")
-
-    def _keyboard_move_lines_up(self):
-        self.action_controller("keyboard_move_lines_up")
-
-    def _keyboard_move_lines_down(self):
-        self.action_controller("keyboard_move_lines_down")
-
-    def _keyboard_clear_marks(self):
-        self.action_controller("keyboard_clear_marks")
-
     def _keyboard_scale_up_text(self):
         self.action_controller("scale_up_text")
 
     def _keyboard_scale_down_text(self):
         self.action_controller("scale_down_text")
-
-    def _keyboard_save_file(self):
-        self.action_controller("save_file")
-
-    def _keyboard_save_file_as(self):
-        self.action_controller("save_file_as")

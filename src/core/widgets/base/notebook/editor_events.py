@@ -101,32 +101,11 @@ class EditorEventsMixin:
 
 
     # NOTE: These feel bad being here man...
-    def keyboard_undo(self, source_view):
-        source_view.keyboard_undo()
-
-    def keyboard_redo(self, source_view):
-        source_view.keyboard_redo()
-
     def scale_up_text(self, source_view):
         source_view.scale_up_text()
 
     def scale_down_text(self, source_view):
         source_view.scale_down_text()
-
-    def toggle_highlight_line(self, source_view):
-        source_view.toggle_highlight_line()
-
-    def keyboard_insert_mark(self, source_view):
-        source_view.keyboard_insert_mark()
-
-    def keyboard_clear_marks(self, source_view):
-        source_view.keyboard_clear_marks()
-
-    def keyboard_move_lines_up(self, source_view):
-        source_view.keyboard_move_lines_up()
-
-    def keyboard_move_lines_down(self, source_view):
-        source_view.keyboard_move_lines_down()
 
     def set_buffer_language(self, source_view, language = "python3"):
         source_view.set_buffer_language(language)
@@ -134,3 +113,5 @@ class EditorEventsMixin:
     def set_buffer_style(self, source_view, style = settings.theming.syntax_theme):
         buffer = source_view.get_buffer()
         source_view.set_buffer_style(buffer, style)
+
+
