@@ -62,7 +62,6 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("create_view", self._create_view)
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)
-        event_system.subscribe("set_buffer_style", self.action_controller)
 
         event_system.subscribe("focused_target_changed", self._focused_target_changed)
         event_system.subscribe("keyboard_create_tab", self._keyboard_create_tab)
@@ -158,13 +157,29 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
         self.create_view(gfile = _gfile)
 
 
+    def _keyboard_close_tab(self):
+        self.action_controller("close_tab")
+
+    def _keyboard_move_tab_right(self):
+        self.action_controller("keyboard_move_tab_right")
+
+    def _keyboard_move_tab_left(self):
+        self.action_controller("keyboard_move_tab_left")
+
+    def _keyboard_move_tab_to_1(self):
+        self.action_controller("keyboard_move_tab_to_1")
+
+    def _keyboard_move_tab_to_2(self):
+        self.action_controller("keyboard_move_tab_to_2")
+
+    def _keyboard_prev_tab(self):
+        self.action_controller("keyboard_prev_tab")
+
+    def _keyboard_next_tab(self):
+        self.action_controller("keyboard_next_tab")
+
+
     # NOTE: These feel bad being here man...
-    def _keyboard_close_tab(self):
-        self.action_controller("close_tab")
-
-    def _keyboard_close_tab(self):
-        self.action_controller("close_tab")
-
     def _keyboard_undo(self):
         self.action_controller("keyboard_undo")
 
@@ -174,14 +189,6 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
     def _toggle_highlight_line(self):
         self.action_controller("toggle_highlight_line")
 
-    def _keyboard_next_tab(self):
-        self.action_controller("keyboard_next_tab")
-
-    def _keyboard_move_tab_left(self):
-        self.action_controller("keyboard_move_tab_left")
-
-    def _keyboard_move_tab_right(self):
-        self.action_controller("keyboard_move_tab_right")
 
     def _keyboard_insert_mark(self):
         self.action_controller("keyboard_insert_mark")
@@ -194,15 +201,6 @@ class EditorNotebook(EditorEventsMixin, EditorControllerMixin, Gtk.Notebook):
 
     def _keyboard_clear_marks(self):
         self.action_controller("keyboard_clear_marks")
-
-    def _keyboard_move_tab_to_1(self):
-        self.action_controller("keyboard_move_tab_to_1")
-
-    def _keyboard_move_tab_to_2(self):
-        self.action_controller("keyboard_move_tab_to_2")
-
-    def _keyboard_prev_tab(self):
-        self.action_controller("keyboard_prev_tab")
 
     def _keyboard_scale_up_text(self):
         self.action_controller("scale_up_text")

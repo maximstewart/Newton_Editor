@@ -6,14 +6,18 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
+from .source_view_dnd_mixin import SourceViewDnDMixin
 from .source_file_events_mixin import FileEventsMixin
 from .source_mark_events_mixin import MarkEventsMixin
 
 
 
-class SourceViewEventsMixin(MarkEventsMixin, FileEventsMixin):
+class SourceViewEventsMixin(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
     def get_current_filepath(self):
         return self._current_file
+
+    def get_filetype(self):
+        return self._current_filetype
 
     def set_buffer_language(self, buffer, language = "python3"):
         buffer.set_language( self._language_manager.get_language(language) )

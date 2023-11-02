@@ -13,13 +13,14 @@ from gi.repository import GtkSource
 
 # Application imports
 # from .auto_indenter import AutoIndenter
+from .key_input_controller import KeyInputController
 from .source_view_events import SourceViewEventsMixin
 from .custom_completion_providers.example_completion_provider import ExampleCompletionProvider
 from .custom_completion_providers.python_completion_provider import PythonCompletionProvider
 
 
 
-class SourceView(SourceViewEventsMixin, GtkSource.View):
+class SourceView(KeyInputController, SourceViewEventsMixin, GtkSource.View):
     def __init__(self):
         super(SourceView, self).__init__()
 
@@ -148,71 +149,6 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         tab_widget.set_status(changed = True if buffer.get_modified() else False)
 
 
-    # NOTE: Mostly sinking pre-bound keys here to let our keybinder control instead...
-    def _key_press_event(self, widget, eve):
-        keyname    = Gdk.keyval_name(eve.keyval)
-        modifiers  = Gdk.ModifierType(eve.get_state() & ~Gdk.ModifierType.LOCK_MASK)
-        is_control = True if modifiers & Gdk.ModifierType.CONTROL_MASK else False
-        is_shift   = True if modifiers & Gdk.ModifierType.SHIFT_MASK else False
-        buffer     = self.get_buffer()
-
-        try:
-            is_alt = True if modifiers & Gdk.ModifierType.ALT_MASK else False
-        except Exception:
-            is_alt = True if modifiers & Gdk.ModifierType.MOD1_MASK else False
-
-        if is_control:
-            if is_shift:
-                if keyname in [ "z", "Up", "Down", "Left", "Right" ]:
-                    # NOTE: For now do like so for completion sake above.
-                    if keyname in ["Left", "Right"]:
-                        return False
-
-                    return True
-
-            if keyname in [ "slash", "Up", "Down", "z" ]:
-                return True
-
-        if is_alt:
-            if keyname in [ "Up", "Down", "Left", "Right" ]:
-                return True
-
-
-        if len(self._multi_insert_marks) > 0:
-            if keyname == "BackSpace":
-                self.begin_user_action(buffer)
-
-                with buffer.freeze_notify():
-                    GLib.idle_add(self._delete_on_multi_line_markers, *(buffer,))
-
-                self.end_user_action(buffer)
-
-            return True
-        
-        # NOTE: if a plugin recieves the call and handles, it will be the final decider for propigation
-        return event_system.emit_and_await("autopairs", (keyname, is_control, is_alt, is_shift))
-
-    def _key_release_event(self, widget, eve):
-        if self.freeze_multi_line_insert: return
-
-        keyname    = Gdk.keyval_name(eve.keyval)
-        modifiers  = Gdk.ModifierType(eve.get_state() & ~Gdk.ModifierType.LOCK_MASK)
-        is_control = True if modifiers & Gdk.ModifierType.CONTROL_MASK else False
-        is_shift   = True if modifiers & Gdk.ModifierType.SHIFT_MASK else False
-        buffer     = self.get_buffer()
-
-        if keyname in {"Return", "Enter"}:
-            if len(self._multi_insert_marks) > 0:
-                self.begin_user_action(buffer)
-                with buffer.freeze_notify():
-                    GLib.idle_add(self._new_line_on_multi_line_markers, *(buffer,))
-
-                return
-
-            has_selection = buffer.get_has_selection()
-            if not has_selection:
-                return self.insert_indent_handler(buffer)
-
     def _button_press_event(self, widget = None, eve = None, user_data = None):
         if eve.type == Gdk.EventType.BUTTON_PRESS and eve.button == 1 :   # l-click
             if eve.state & Gdk.ModifierType.CONTROL_MASK:
@@ -252,10 +188,10 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
         self.get_parent().get_parent().is_editor_focused = True
 
     def _on_widget_focus(self, widget, eve = None):
-        target = self.get_parent().get_parent().NAME
-        path   = self._current_file if self._current_file else ""
+        tab_view = self.get_parent().get_parent()
+        path     = self._current_file if self._current_file else ""
 
-        event_system.emit('focused_target_changed', (target,))
+        event_system.emit('focused_target_changed', (tab_view.NAME,))
         event_system.emit("set_path_label", (path,))
         event_system.emit("set_encoding_label")
         event_system.emit("set_file_type_label", (self._current_filetype,))
@@ -269,38 +205,3 @@ class SourceView(SourceViewEventsMixin, GtkSource.View):
 
         # NOTE: Not sure but this might not be efficient if the map reloads the same view...
         event_system.emit(f"set_source_view", (self,))
-
-    def _set_up_dnd(self):
-        PLAIN_TEXT_TARGET_TYPE = 70
-        URI_TARGET_TYPE        = 80
-        text_target        = Gtk.TargetEntry.new('text/plain', Gtk.TargetFlags(0), PLAIN_TEXT_TARGET_TYPE)
-        uri_target         = Gtk.TargetEntry.new('text/uri-list', Gtk.TargetFlags(0), URI_TARGET_TYPE)
-        targets            = [ text_target, uri_target ]
-        self.drag_dest_set_target_list(targets)
-
-    def _on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
-        if info == 70: return
-
-        if info == 80:
-            buffer = self.get_buffer()
-            uris   = data.get_uris()
-
-            if len(uris) == 0:
-                uris = data.get_text().split("\n")
-
-            if not self._current_file and not buffer.get_modified():
-                gfile = Gio.File.new_for_uri(uris[0])
-                self.open_file(gfile)
-                uris.pop(0)
-
-            for uri in uris:
-                gfile = None
-                try:
-                    gfile = Gio.File.new_for_uri(uri)
-                except Exception as e:
-                    gfile = Gio.File.new_for_path(uri)
-
-                event_system.emit('create_view', (gfile,))
-
-    def get_filetype(self):
-        return self._current_filetype
