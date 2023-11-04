@@ -1,0 +1,16 @@
+{
+    "manifest": {
+        "name": "LSP Client",
+        "author": "ITDominator",
+        "version": "0.0.1",
+        "credit": "Avi Yeger for the pylspclient used by this plugin. Link:  https://github.com/yeger00/pylspclient",
+        "support": "",
+        "requests": {
+            "pass_events": "true",
+            "bind_keys": [
+                "LSP Client||do_goto:<Control>g",
+                "LSP Client||do_get_implementation:<Control>n"
+                ]
+        }
+    }
+}
