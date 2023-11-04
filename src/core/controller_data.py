@@ -28,7 +28,7 @@ class ControllerData:
 
     def set_active_src_view(self, source_view):
         if self.active_src_view:
-            self.active_src_view.get_parent().get_parent().is_editor_focused = False
+            self.active_src_view.get_parent().is_editor_focused = False
 
         self.active_src_view = source_view
 

@@ -35,17 +35,21 @@ class EditorEventsMixin:
             source_view.open_file(gfile)
         else:
             self.create_view(None, None, gfile)
-
+    
+    # Note: Need to get parent instead given we pass the close_tab method
+    #       from a potentially former notebook. 
     def close_tab(self, button, container, source_view, eve = None):
-        if self.NAME == "notebook_1" and self.get_n_pages() == 1:
+        notebook = container.get_parent()
+        if notebook.NAME == "notebook_1" and notebook.get_n_pages() == 1:
             return
 
-        page_num = self.page_num(container)
+        page_num = notebook.page_num(container)
         source_view._cancel_current_file_watchers()
-        self.remove_page(page_num)
+        notebook.remove_page(page_num)
 
-        if self.NAME == "notebook_2" and self.get_n_pages() == 0:
-            self.hide()
+        if notebook.NAME == "notebook_2" and notebook.get_n_pages() == 0:
+            notebook.hide()
+            event_system.emit("focused_target_changed", ("notebook_1",))
 
     def keyboard_prev_tab(self, page_num):
         page_num = self.get_n_pages() - 1 if page_num == 0 else page_num - 1
@@ -113,5 +117,3 @@ class EditorEventsMixin:
     def set_buffer_style(self, source_view, style = settings.theming.syntax_theme):
         buffer = source_view.get_buffer()
         source_view.set_buffer_style(buffer, style)
-
-
