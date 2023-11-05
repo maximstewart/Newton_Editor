@@ -11,7 +11,7 @@ from gi.repository import Gdk
 from gi.repository import WebKit2
 
 # Application imports
-import markdown
+from . import markdown
 from .markdown_template_mixin import MarkdownTemplateMixin
 from plugins.plugin_base import PluginBase
 
