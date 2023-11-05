@@ -61,7 +61,8 @@ class EditorsContainer(Gtk.Box):
         ...
 
     def _load_widgets(self):
+        miniview = MiniViewWidget()
         self.add(Separator("separator_left"))
         self.add(EditorsPaned())
         self.add(Separator("separator_right"))
-        self.add(MiniViewWidget())
+        self.add(miniview)

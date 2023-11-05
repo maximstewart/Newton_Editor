@@ -67,8 +67,6 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self.set_show_right_margin(True)
         self.set_right_margin_position(80)
         self.set_background_pattern(0) # 0 = None, 1 = Grid
-        # NOTE: Add back once we move to Gtk 4 and use GtkSource 5
-        # self.set_indenter( AutoIndenter() )
 
         buffer = self.get_buffer()
         self._create_default_tag(buffer)
