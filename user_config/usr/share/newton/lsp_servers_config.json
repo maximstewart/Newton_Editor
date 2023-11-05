@@ -1,0 +1,32 @@
+{
+    "sh": {
+        "info": "",
+        "command": [],
+        "initialization_options": {}
+    },
+    "python": {
+        "info": "https://pypi.org/project/jedi-language-server/",
+        "command": ["jedi-language-server"],
+        "initialization_options": {}
+    },
+    "python3": {
+        "info": "https://pypi.org/project/jedi-language-server/",
+        "command": ["jedi-language-server"],
+        "initialization_options": {}
+    },
+    "c": {
+        "info": "https://clangd.llvm.org/",
+        "command": ["/usr/bin/clangd"],
+        "initialization_options": {}
+    },
+    "cpp": {
+        "info": "https://clangd.llvm.org/",
+        "command": ["/usr/bin/clangd"],
+        "initialization_options": {}
+    },
+    "java": {
+        "info": "https://download.eclipse.org/jdtls/",
+        "command": ["java-language-server"],
+        "initialization_options": {}
+    }
+}
