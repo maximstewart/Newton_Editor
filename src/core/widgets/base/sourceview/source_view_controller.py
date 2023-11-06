@@ -4,6 +4,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import GLib
 
 # Application imports
 from .key_input_controller import KeyInputController
@@ -53,9 +54,8 @@ class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
         char_iter = buffer.get_iter_at_line_offset(line, line_itr.get_bytes_in_line())
 
         buffer.place_cursor(char_iter)
-        if not buffer.get_mark("starting_cursor"):
-             buffer.create_mark("starting_cursor", char_iter, True)
-        self.scroll_to_mark( buffer.get_mark("starting_cursor"), 0.0, True, 0.0, 0.0 )
+        # Note: scroll_to_iter and scroll_to_mark depend on an idle recalculate of buffers after load to work
+        GLib.idle_add(self.scroll_to_mark, buffer.get_insert(), 0.1, True, 0.0, 0.1)
 
     def toggle_highlight_line(self, widget = None, eve = None):
         self.set_highlight_current_line( not self.get_highlight_current_line() )
