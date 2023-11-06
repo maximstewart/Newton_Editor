@@ -55,7 +55,13 @@ class LSPController:
         if not language or not server_proc: return False
 
         json_rpc_endpoint  = pylspclient.JsonRpcEndpoint(server_proc.stdin, server_proc.stdout)
-        lsp_endpoint       = pylspclient.LspEndpoint(json_rpc_endpoint)
+
+        callbacks = {
+            "textDocument/symbolStatus": print,
+            "textDocument/publishDiagnostics": self.blame,
+        }
+
+        lsp_endpoint       = pylspclient.LspEndpoint(json_rpc_endpoint, notify_callbacks = callbacks)
         lsp_client         = pylspclient.LspClient(lsp_endpoint)
 
         self.lsp_clients[language] = lsp_client
@@ -70,6 +76,15 @@ class LSPController:
         read_pipe.start()
 
         return server_proc
+    
+
+    def blame(self, response):
+        for d in response['diagnostics']:
+            if d['severity'] == 1:
+                print(f"An error occurs in {response['uri']} at {d['range']}:")
+                print(f"\t[{d['source']}] {d['message']}")
+
+
 
     def _shutting_down(self):
         keys = self.lsp_clients.keys()
@@ -77,4 +92,3 @@ class LSPController:
             print(f"LSP Server: ( {key} ) Shutting Down...")
             self.lsp_clients[key].shutdown()
             self.lsp_clients[key].exit()
-

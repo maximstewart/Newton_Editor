@@ -95,7 +95,11 @@ class LspClient(object):
         :param TextDocumentItem textDocument: The document that was opened.
         """
 
+        self.lsp_endpoint.send_notification("textDocument/didClose", textDocument = textDocument)
         return self.lsp_endpoint.send_notification("textDocument/didOpen", textDocument = textDocument)
+
+    def didClose(self, textDocument):
+        return self.lsp_endpoint.send_notification("textDocument/didClose", textDocument = textDocument)
 
     def didChange(self, textDocument, contentChanges):
         """
@@ -121,6 +125,7 @@ class LspClient(object):
         """
         result_dict = self.lsp_endpoint.call_method( "textDocument/documentSymbol", textDocument=textDocument )
 
+        if not result_dict: return []
         return [lsp_structs.SymbolInformation(**sym) for sym in result_dict]
 
     def declaration(self, textDocument, position):
@@ -142,6 +147,8 @@ class LspClient(object):
                                                     position = position
                                                     )
 
+        if not result_dict: return []
+
         if "uri" in result_dict:
             return lsp_structs.Location(**result_dict)
 
@@ -162,6 +169,7 @@ class LspClient(object):
                                                     position = position
                                                     )
 
+        if not result_dict: return []
         return [lsp_structs.Location(**loc) for loc in result_dict]
 
     def typeDefinition(self, textDocument, position):
@@ -179,6 +187,7 @@ class LspClient(object):
                                                     position = position
                                                     )
 
+        if not result_dict: return []
         return [lsp_structs.Location(**loc) for loc in result_dict]
 
     def signatureHelp(self, textDocument, position):
@@ -195,6 +204,7 @@ class LspClient(object):
                                                         position = position
                                                 )
 
+        if not result_dict: return []
         return lsp_structs.SignatureHelp(**result_dict)
 
     def completion(self, textDocument, position, context):
@@ -214,34 +224,12 @@ class LspClient(object):
                                                     position = position,
                                                     context = context
                                                     )
+        if not result_dict: return []
+
         if "isIncomplete" in result_dict:
             return lsp_structs.CompletionList(**result_dict)
 
         return [lsp_structs.CompletionItem(**loc) for loc in result_dict]
-
-    def definition(self, textDocument, position):
-        """
-        The go to definition request is sent from the client to the server to
-        resolve the declaration location of a symbol at a given text document
-        position.
-
-        The result type LocationLink[] got introduce with version 3.14.0 and
-        depends in the corresponding client capability
-        `clientCapabilities.textDocument.declaration.linkSupport`.
-
-        :param TextDocumentItem textDocument: The text document.
-        :param Position position: The position inside the text document.
-        """
-
-        result_dict = self.lsp_endpoint.call_method("textDocument/definition",
-                                                    textDocument = textDocument,
-                                                    position = position)
-
-        if "uri" in result_dict:
-            return lsp_structs.Location(**result_dict)
-
-        return [lsp_structs.Location(**l)
-                if "uri" in l else lsp_structs.LinkLocation(**l) for l in result_dict]
 
     def references(self, textDocument, position):
         """
@@ -257,4 +245,5 @@ class LspClient(object):
                                                     textDocument = textDocument,
                                                     position = position)
 
+        if not result_dict: return []
         return [lsp_structs.Location(**loc) for loc in result_dict]

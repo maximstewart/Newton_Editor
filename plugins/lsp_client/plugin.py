@@ -12,6 +12,12 @@ from .lsp_controller import LSPController
 
 
 
+
+class LSPPliginException(Exception):
+    ...
+
+
+
 class Plugin(PluginBase):
     def __init__(self):
         super().__init__()
@@ -90,6 +96,12 @@ class Plugin(PluginBase):
         else:
             self.lsp_client = self.load_lsp_server()
 
+        if self.lsp_client:
+            # Note: textDocument/didClose is actually called from the open api beforehand
+            #       to insure no more than one instanmce of a file is opened
+            uri = self._active_src_view.get_current_filepath().get_uri()
+            self.register_opened_file(self._file_type, uri)
+
     def load_lsp_server(self):
         command = self.lsp_servers_config[self._file_type]["command"]
         if command:
@@ -98,12 +110,10 @@ class Plugin(PluginBase):
 
             if client_created:
                 return self.lsp_controller.lsp_clients[self._file_type]
-            else:
-                text      = f"LSP could not be created for file type:  {self._file_type}  ..."
-                self._event_system.emit("bubble_message", ("warning", self.name, text,))
 
+        text      = f"LSP could not be created for file type:  {self._file_type}  ..."
+        self._event_system.emit("bubble_message", ("warning", self.name, text,))
         return None
-
 
     def _buffer_changed_first_load(self, buffer):
         if self.lsp_disabled: return
@@ -112,18 +122,73 @@ class Plugin(PluginBase):
 
     def _buffer_changed(self, buffer):
         if self.lsp_disabled: return
+        self._do_completion()
+
+
+    def _do_completion(self, is_invoked = False):
+        if self.lsp_disabled: return
+
+        uri     = self._active_src_view.get_current_filepath().get_uri()
+        iter    = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
+        line    = iter.get_line()
+        offset  = iter.get_line_offset()
+        trigger = pylspclient.lsp_structs.CompletionTriggerKind.TriggerCharacter
+        _char   = iter.get_char()
+        trigger = None
+
+        if _char in [".", " "]:
+            trigger = pylspclient.lsp_structs.CompletionTriggerKind.TriggerCharacter
+        elif is_invoked:
+            trigger = pylspclient.lsp_structs.CompletionTriggerKind.Invoked
+        else:
+            trigger = pylspclient.lsp_structs.CompletionTriggerKind.TriggerForIncompleteCompletions
+
+        result = self.lsp_client.completion(
+                        pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+                        pylspclient.lsp_structs.Position(line, offset),
+                        pylspclient.lsp_structs.CompletionContext(trigger, _char)
+                )
+        
+        if result.items:
+            for item in result.items:
+                print(item.label)
+        else:
+            print(result.label)
 
     def _do_goto(self):
         if self.lsp_disabled: return
 
-        iter   = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
-        line   = iter.get_line() + 1
-        offset = iter.get_line_offset() + 1
-        uri    = self._active_src_view.get_current_filepath().get_uri()
-        result = self.lsp_client.declaration(pylspclient.lsp_structs.TextDocumentIdentifier(uri), pylspclient.lsp_structs.Position(line, offset))
+        iter    = self._buffer.get_iter_at_mark( self._buffer.get_insert() )
+        line    = iter.get_line()
+        offset  = iter.get_line_offset()
+        uri     = self._active_src_view.get_current_filepath().get_uri()
+        results = self.lsp_client.definition(
+                        pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+                        pylspclient.lsp_structs.Position(line, offset)
+                )
 
-        print(result)
-
+        results = []
+        if len(results) == 1:
+            result  = results[0]
+            file    = result.uri[7:]
+            line    = result.range.end.line
+            message = f"FILE|{file}:{line}"
+            self._event_system.emit("post_file_to_ipc", message)
 
     def _do_get_implementation(self):
         if self.lsp_disabled: return
+        results = self.lsp_client.declaration(pylspclient.lsp_structs.TextDocumentIdentifier(uri), pylspclient.lsp_structs.Position(line, offset))
+
+    def register_opened_file(self, language_id = "", uri = ""):
+        if not language_id or not uri: return
+
+        text    = open(uri[7:], "r").read()
+        version = 1
+
+        self.lsp_client.didClose(
+            pylspclient.lsp_structs.TextDocumentItem(uri, language_id, version, text)
+        )
+
+        self.lsp_client.didOpen(
+            pylspclient.lsp_structs.TextDocumentItem(uri, language_id, version, text)
+        )
