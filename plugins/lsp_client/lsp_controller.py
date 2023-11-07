@@ -118,27 +118,26 @@ class LSPController:
                             pylspclient.lsp_structs.Position(line, offset)
                     )
 
-
-    def register_opened_file(self, language_id = "", uri = "", lsp_client = None):
-        if not language_id or not uri: return
-
-        text    = open(uri[7:], "r").read()
-        version = 1
-
-        lsp_client.didOpen(
-            pylspclient.lsp_structs.TextDocumentItem(uri, language_id, version, text)
-        )
-
     def load_lsp_server(self, language_id):
-        command        = self.lsp_servers_config[language_id]["command"]
-        config_options = self.lsp_servers_config[language_id]["initialization_options"]
-        if command:
-            server_proc    = self.create_lsp_server(command)
-            client_created = self.create_client(language_id, server_proc, config_options)
+        if not language_id in self.lsp_servers_config.keys():
+            return
 
-            if client_created:
+        command         = self.lsp_servers_config[language_id]["command"]
+        config_options  = self.lsp_servers_config[language_id]["initialization_options"]
+
+        if command:
+            server_proc = self.create_lsp_server(command)
+            if self.create_client(language_id, server_proc, config_options):
                 return self.lsp_clients[language_id]
 
-        text      = f"LSP could not be created for file type:  {language_id}  ..."
-        self._event_system.emit("bubble_message", ("warning", self.name, text,))
         return None
+
+    def register_opened_file(self, language_id = "", uri = "", lsp_client = None):
+            if not language_id or not uri: return
+
+            text    = open(uri[7:], "r").read()
+            version = 1
+
+            lsp_client.didOpen(
+                pylspclient.lsp_structs.TextDocumentItem(uri, language_id, version, text)
+            )
