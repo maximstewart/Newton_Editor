@@ -18,7 +18,7 @@ class Plugin(PluginBase):
         self.name                 = "Snippets"  # NOTE: Need to remove after establishing private bidirectional 1-1 message bus
                                                 #       where self.name should not be needed for message comms
         self.snippet_data         = None
-        self.file_type            = None
+        self._file_type           = None
         self.active_snippit_group = None
         self.snippit_groups       = []
         self.snippit_prefixes     = []
@@ -42,16 +42,16 @@ class Plugin(PluginBase):
 
     def _set_active_src_view(self, source_view):
         self._active_src_view = source_view
-        self._buffer          = self._active_src_view.get_buffer()
+        self._buffer          = source_view.get_buffer()
+        self._file_type       = source_view.get_filetype()
         self._tag_table       = self._buffer.get_tag_table()
-        self.file_type        = source_view.get_filetype()
 
         self.load_target_snippt_group()
 
     def load_target_snippt_group(self):
         self.active_snippit_group = None
         for group in self.snippit_groups:
-            if group in self.file_type:
+            if group in self._file_type:
                 self.active_snippit_group = group
                 break
 

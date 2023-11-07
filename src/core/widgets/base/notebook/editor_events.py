@@ -43,6 +43,11 @@ class EditorEventsMixin:
         if notebook.NAME == "notebook_1" and notebook.get_n_pages() == 1:
             return
 
+        file_type = source_view.get_filetype()
+        if not file_type == "buffer": 
+            uri = source_view.get_current_filepath().get_uri()
+            event_system.emit("textDocument/didClose", (file_type, uri,))
+
         page_num = notebook.page_num(container)
         source_view._cancel_current_file_watchers()
         notebook.remove_page(page_num)

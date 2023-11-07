@@ -5,14 +5,34 @@
         "initialization_options": {}
     },
     "python": {
-        "info": "https://pypi.org/project/jedi-language-server/",
-        "command": ["jedi-language-server"],
+        "info": "https://github.com/python-lsp/python-lsp-server",
+        "command": ["pylsp"],
         "initialization_options": {}
     },
     "python3": {
         "info": "https://pypi.org/project/jedi-language-server/",
         "command": ["jedi-language-server"],
-        "initialization_options": {}
+        "initialization_options": {
+            "jediSettings": {
+                "autoImportModules": [],
+                "caseInsensitiveCompletion": true,
+                "debug": false
+            },
+            "completion": {
+                "disableSnippets": false,
+                "resolveEagerly": false,
+                "ignorePatterns": []
+            },
+            "markupKindPreferred": "markdown",
+            "workspace": {
+                "extraPaths": [],
+                "environmentPath": "/path/to/venv/bin/python",
+                "symbols": {
+                    "ignoreFolders": [".nox", ".tox", ".venv", "__pycache__", "venv"],
+                    "maxSymbols": 20
+                }
+            }
+        }
     },
     "c": {
         "info": "https://clangd.llvm.org/",

@@ -95,10 +95,19 @@ class LspClient(object):
         :param TextDocumentItem textDocument: The document that was opened.
         """
 
-        self.lsp_endpoint.send_notification("textDocument/didClose", textDocument = textDocument)
         return self.lsp_endpoint.send_notification("textDocument/didOpen", textDocument = textDocument)
 
+    def didSave(self, textDocument):
+        """
+        :param TextDocumentIdentifier textDocument: The document that was saved.
+        """
+
+        return self.lsp_endpoint.send_notification("textDocument/didSave", textDocument = textDocument)
+
     def didClose(self, textDocument):
+        """
+        :param TextDocumentIdentifier textDocument: The document that was closed.
+        """
         return self.lsp_endpoint.send_notification("textDocument/didClose", textDocument = textDocument)
 
     def didChange(self, textDocument, contentChanges):
@@ -182,7 +191,7 @@ class LspClient(object):
         :param Position position: The position inside the text document.
         """
 
-        result_dict = self.lsp_endpoint.call_method("textDocument/definition",
+        result_dict = self.lsp_endpoint.call_method("textDocument/typeDefinition",
                                                     textDocument = textDocument,
                                                     position = position
                                                     )

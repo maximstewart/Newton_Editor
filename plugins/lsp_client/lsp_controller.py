@@ -23,11 +23,40 @@ class ReadPipe(threading.Thread):
 
 
 class LSPController:
-    def __init__(self):
+    def __init__(self, lsp_servers_config = {}):
         super().__init__()
         
+        self.lsp_servers_config = lsp_servers_config
         self.lsp_clients = {}
     
+    def _blame(self, response):
+        for d in response['diagnostics']:
+            if d['severity'] == 1:
+                print(f"An error occurs in {response['uri']} at {d['range']}:")
+                print(f"\t[{d['source']}] {d['message']}")
+
+    def _shutting_down(self):
+        keys = self.lsp_clients.keys()
+        for key in keys:
+            print(f"LSP Server: ( {key} ) Shutting Down...")
+            self.lsp_clients[key].shutdown()
+            self.lsp_clients[key].exit()
+
+    def _generate_client(self, language = "", server_proc = None):
+        if not language or not server_proc: return False
+
+        json_rpc_endpoint  = pylspclient.JsonRpcEndpoint(server_proc.stdin, server_proc.stdout)
+
+        callbacks = {
+            "textDocument/symbolStatus": print,
+            "textDocument/publishDiagnostics": self._blame,
+        }
+
+        lsp_endpoint       = pylspclient.LspEndpoint(json_rpc_endpoint, notify_callbacks = callbacks)
+        lsp_client         = pylspclient.LspClient(lsp_endpoint)
+
+        self.lsp_clients[language] = lsp_client
+        return lsp_client
 
     def create_client(self, language = "", server_proc = None, initialization_options = None):
         if not language or not server_proc: return False
@@ -50,23 +79,6 @@ class LSPController:
         lsp_client.initialized()
 
         return True
-    
-    def _generate_client(self, language = "", server_proc = None):
-        if not language or not server_proc: return False
-
-        json_rpc_endpoint  = pylspclient.JsonRpcEndpoint(server_proc.stdin, server_proc.stdout)
-
-        callbacks = {
-            "textDocument/symbolStatus": print,
-            "textDocument/publishDiagnostics": self.blame,
-        }
-
-        lsp_endpoint       = pylspclient.LspEndpoint(json_rpc_endpoint, notify_callbacks = callbacks)
-        lsp_client         = pylspclient.LspClient(lsp_endpoint)
-
-        self.lsp_clients[language] = lsp_client
-        return lsp_client
-
 
     def create_lsp_server(self, server_command: [] = []):
         if not server_command: return None
@@ -76,19 +88,57 @@ class LSPController:
         read_pipe.start()
 
         return server_proc
-    
-
-    def blame(self, response):
-        for d in response['diagnostics']:
-            if d['severity'] == 1:
-                print(f"An error occurs in {response['uri']} at {d['range']}:")
-                print(f"\t[{d['source']}] {d['message']}")
 
 
+    def do_open(self, language_id, uri):
+        if language_id in self.lsp_clients.keys():
+            lsp_client = self.lsp_clients[language_id]
+        else:
+            lsp_client = self.load_lsp_server(language_id)
 
-    def _shutting_down(self):
-        keys = self.lsp_clients.keys()
-        for key in keys:
-            print(f"LSP Server: ( {key} ) Shutting Down...")
-            self.lsp_clients[key].shutdown()
-            self.lsp_clients[key].exit()
+        if lsp_client:
+            self.register_opened_file(language_id, uri, lsp_client)
+
+    def do_save(self, language_id, uri):
+        if language_id in self.lsp_clients.keys():
+            self.lsp_clients[language_id].didSave(
+                pylspclient.lsp_structs.TextDocumentIdentifier(uri)
+            )
+
+    def do_close(self, language_id, uri):
+        if language_id in self.lsp_clients.keys():
+            self.lsp_clients[language_id].didClose(
+                pylspclient.lsp_structs.TextDocumentIdentifier(uri)
+            )
+
+    def do_goto(self, language_id, uri, line, offset):
+        if language_id in self.lsp_clients.keys():
+            return self.lsp_clients[language_id].definition(
+                            pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+                            pylspclient.lsp_structs.Position(line, offset)
+                    )
+
+
+    def register_opened_file(self, language_id = "", uri = "", lsp_client = None):
+        if not language_id or not uri: return
+
+        text    = open(uri[7:], "r").read()
+        version = 1
+
+        lsp_client.didOpen(
+            pylspclient.lsp_structs.TextDocumentItem(uri, language_id, version, text)
+        )
+
+    def load_lsp_server(self, language_id):
+        command        = self.lsp_servers_config[language_id]["command"]
+        config_options = self.lsp_servers_config[language_id]["initialization_options"]
+        if command:
+            server_proc    = self.create_lsp_server(command)
+            client_created = self.create_client(language_id, server_proc, config_options)
+
+            if client_created:
+                return self.lsp_clients[language_id]
+
+        text      = f"LSP could not be created for file type:  {language_id}  ..."
+        self._event_system.emit("bubble_message", ("warning", self.name, text,))
+        return None

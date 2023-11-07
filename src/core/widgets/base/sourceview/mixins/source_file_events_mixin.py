@@ -137,7 +137,10 @@ class FileEventsMixin:
             self._completion.remove_provider(provider)
 
         file   = self._current_file.get_path()
+        uri    = self._current_file.get_uri()
         buffer = self.get_buffer()
+
+        event_system.emit("textDocument/didOpen", (self._current_filetype, uri,))
 
         word_completion = GtkSource.CompletionWords.new("word_completion")
         word_completion.register(buffer)
@@ -150,9 +153,6 @@ class FileEventsMixin:
         # py_completion_provider = PythonCompletionProvider(file)
         # self._completion.add_provider(py_completion_provider)
         self.got_to_line(buffer, line)
-
-
-
 
 
 

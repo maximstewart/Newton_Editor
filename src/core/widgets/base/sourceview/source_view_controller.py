@@ -25,6 +25,15 @@ class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
     def set_buffer_style(self, buffer, style = settings.theming.syntax_theme):
         buffer.set_style_scheme( self._style_scheme_manager.get_scheme(style) )
 
+    def go_to_call(self):
+        buffer  = self.get_buffer()
+        iter    = buffer.get_iter_at_mark( buffer.get_insert() )
+        line    = iter.get_line()
+        offset  = iter.get_line_offset()
+        uri     = self.get_current_filepath().get_uri()
+
+        event_system.emit("textDocument/definition", (self.get_filetype(), uri, line, offset,))
+
 
     def update_cursor_position(self, buffer = None):
         buffer = self.get_buffer() if not buffer else buffer
