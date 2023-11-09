@@ -10,6 +10,7 @@ from gi.repository import Gio
 from gi.repository import GtkSource
 
 # Application imports
+from ..custom_completion_providers.lsp_completion_provider import LSPCompletionProvider
 
 
 
@@ -135,8 +136,7 @@ class FileEventsMixin:
     def _document_loaded(self, line: int = 0):
         for provider in self._completion.get_providers():
             self._completion.remove_provider(provider)
-
-        file   = self._current_file.get_path()
+            
         uri    = self._current_file.get_uri()
         buffer = self.get_buffer()
 
@@ -145,19 +145,11 @@ class FileEventsMixin:
         word_completion = GtkSource.CompletionWords.new("word_completion")
         word_completion.register(buffer)
         self._completion.add_provider(word_completion)
+        
+        lsp_completion_provider = LSPCompletionProvider(self)
+        self._completion.add_provider(lsp_completion_provider)
 
-        # TODO: actually load a meaningful provider based on file type...
-        # example_completion_provider = ExampleCompletionProvider()
-        # self._completion.add_provider(example_completion_provider)
-
-        # py_completion_provider = PythonCompletionProvider(file)
-        # self._completion.add_provider(py_completion_provider)
         self.got_to_line(buffer, line)
-
-
-
-
-
 
 
 

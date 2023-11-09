@@ -14,8 +14,8 @@ from gi.repository import GtkSource
 # Application imports
 from .source_view_controller import SourceViewControllerMixin
 
-from .custom_completion_providers.example_completion_provider import ExampleCompletionProvider
-from .custom_completion_providers.python_completion_provider import PythonCompletionProvider
+# from .custom_completion_providers.example_completion_provider import ExampleCompletionProvider
+# from .custom_completion_providers.python_completion_provider import PythonCompletionProvider
 
 
 

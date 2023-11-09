@@ -48,6 +48,7 @@ class LSPController:
         json_rpc_endpoint  = pylspclient.JsonRpcEndpoint(server_proc.stdin, server_proc.stdout)
 
         callbacks = {
+            "window/showMessage": print,
             "textDocument/symbolStatus": print,
             "textDocument/publishDiagnostics": self._blame,
         }
@@ -117,6 +118,41 @@ class LSPController:
                             pylspclient.lsp_structs.TextDocumentIdentifier(uri),
                             pylspclient.lsp_structs.Position(line, offset)
                     )
+        
+        return []
+
+    def do_change(self, language_id, line, start, end, text):
+        if language_id in self.lsp_clients.keys():
+
+            start_pos    = pylspclient.lsp_structs.Position(line, start.get_line_offset())
+            end_pos      = pylspclient.lsp_structs.Position(line, end.get_line_offset())
+            range_info   = pylspclient.lsp_structs.Range(start_pos, end_pos)
+            text_length  = len(text)
+            change_event = pylspclient.lsp_structs.TextDocumentContentChangeEvent(range_info, text_length, text)
+
+            return self.lsp_clients[language_id].didChange( None, change_event )
+        
+        return []
+
+    def do_completion(self, language_id, uri, line, offset, _char, is_invoked = False):
+        if language_id in self.lsp_clients.keys():
+            trigger = pylspclient.lsp_structs.CompletionTriggerKind.TriggerCharacter
+
+            if _char in [".", " "]:
+                trigger = pylspclient.lsp_structs.CompletionTriggerKind.TriggerCharacter
+            elif is_invoked:
+                trigger = pylspclient.lsp_structs.CompletionTriggerKind.Invoked
+            else:
+                trigger = pylspclient.lsp_structs.CompletionTriggerKind.TriggerForIncompleteCompletions
+
+            return self.lsp_clients[language_id].completion(
+                            pylspclient.lsp_structs.TextDocumentIdentifier(uri),
+                            pylspclient.lsp_structs.Position(line, offset),
+                            pylspclient.lsp_structs.CompletionContext(trigger, _char)
+                    )
+
+        return []
+        
 
     def load_lsp_server(self, language_id):
         if not language_id in self.lsp_servers_config.keys():

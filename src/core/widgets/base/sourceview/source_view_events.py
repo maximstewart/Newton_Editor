@@ -21,10 +21,12 @@ class SourceViewEvents(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
         general_style_tag.set_property('scale', 100)
 
     def _is_modified(self, *args):
-        buffer = self.get_buffer()
+        buffer    = self.get_buffer()
+        file_type = self.get_filetype()
 
         if not self._loading_file:
             event_system.emit("buffer_changed", (buffer, ))
+            event_system.emit("textDocument/didChange", (file_type, buffer, ))
         else:
             event_system.emit("buffer_changed_first_load", (buffer, ))
 

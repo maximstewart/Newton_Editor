@@ -41,7 +41,7 @@ class LspEndpoint(threading.Thread):
                 params = jsonrpc_message.get("params")
 
                 if method:
-                    if rpc_id:
+                    if rpc_id is not None:
                         if method not in self.method_callbacks:
                             raise lsp_structs.ResponseError(
                                 lsp_structs.ErrorCodes.MethodNotFound,

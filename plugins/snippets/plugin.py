@@ -99,4 +99,5 @@ class Plugin(PluginBase):
                     body = self.snippet_data[self.active_snippit_group][key]["body"]
                     snippits.append(body)
 
-        print(snippits)
+        # print(snippits)
+        print("Snippits Plugin:  _handle_update > results > stub...")
