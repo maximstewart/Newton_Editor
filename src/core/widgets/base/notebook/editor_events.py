@@ -78,8 +78,7 @@ class EditorEventsMixin:
         if self.get_n_pages() == 0:
             self.hide()
 
-        notebook.set_current_page(-1)
-        page.get_children()[0].grab_focus()
+        self.set_page_focus_after_move(page, notebook)
 
     def keyboard_move_tab_to_2(self, page_num):
         if self.NAME == "notebook_2":
@@ -95,9 +94,15 @@ class EditorEventsMixin:
         self.detach_tab(page)
         notebook.show()
         notebook.insert_page(page, tab, -1)
-        
+
+        self.set_page_focus_after_move(page, notebook)
+
+    def set_page_focus_after_move(self, page, notebook):
+        self.is_editor_focused = False
         notebook.set_current_page(-1)
         page.get_children()[0].grab_focus()
+        notebook.is_editor_focused = True
+        
 
     def keyboard_move_tab_left(self, page_num):
         page     = self.get_nth_page(page_num)
