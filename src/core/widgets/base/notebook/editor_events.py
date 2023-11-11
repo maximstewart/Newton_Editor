@@ -65,36 +65,39 @@ class EditorEventsMixin:
         self.set_current_page(page_num)
 
     def keyboard_move_tab_to_1(self, page_num):
+        if self.NAME == "notebook_1": return
+
         notebook = self.builder.get_object("notebook_1")
-        if self.NAME == "notebook_1":
-            if self.get_n_pages() == 1:
-                return
+        page     = self.get_nth_page(page_num)
+        tab      = page.get_tab_widget()
 
-            notebook = self.builder.get_object("notebook_2")
-
-        page = self.get_nth_page(page_num)
-        tab  = page.get_tab_widget()
         self.detach_tab(page)
-
-        notebook.insert_page(page, tab, -1)
         notebook.show()
+        notebook.insert_page(page, tab, -1)
+
+        if self.get_n_pages() == 0:
+            self.hide()
+
+        notebook.set_current_page(-1)
+        page.get_children()[0].grab_focus()
 
     def keyboard_move_tab_to_2(self, page_num):
+        if self.NAME == "notebook_2":
+            return
+
         if self.NAME == "notebook_1" and self.get_n_pages() == 1:
             return
 
         notebook = self.builder.get_object("notebook_2")
-        if self.NAME == "notebook_2":
-            notebook = self.builder.get_object("notebook_1")
+        page     = self.get_nth_page(page_num)
+        tab      = page.get_tab_widget()
 
-        page = self.get_nth_page(page_num)
-        tab  = page.get_tab_widget()
         self.detach_tab(page)
-
-        notebook.insert_page(page, tab, -1)
         notebook.show()
-        if self.NAME == "notebook_2" and self.get_n_pages() == 0:
-            self.hide()
+        notebook.insert_page(page, tab, -1)
+        
+        notebook.set_current_page(-1)
+        page.get_children()[0].grab_focus()
 
     def keyboard_move_tab_left(self, page_num):
         page     = self.get_nth_page(page_num)
@@ -105,8 +108,6 @@ class EditorEventsMixin:
         page     = self.get_nth_page(page_num)
         page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
         self.reorder_child(page, page_num)
-
-
 
 
     # NOTE: These feel bad being here man...
