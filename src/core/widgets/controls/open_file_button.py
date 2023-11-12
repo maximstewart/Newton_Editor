@@ -46,6 +46,12 @@ class OpenFileButton(Gtk.Button):
                                         Gtk.FileChooserAction.OPEN,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                          Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+ 
+        try:
+            folder = widget.get_current_file().get_parent()
+            chooser.set_current_folder( folder.get_uri() )
+        except Exception as e:
+            ...
 
         response = chooser.run()
         if response == Gtk.ResponseType.OK:
