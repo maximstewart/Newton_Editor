@@ -13,9 +13,6 @@ class EditorEventsMixin:
         page_num  = self.append_page(container, container.get_tab_widget())
 
         self.set_tab_detachable(container, True)
-
-        ctx = self.get_style_context()
-        ctx.add_class("notebook-unselected-focus")
         self.set_tab_reorderable(container, True)
 
         self.show_all()
@@ -72,7 +69,7 @@ class EditorEventsMixin:
         i        = notebook.get_current_page()
         page     = notebook.get_nth_page(i)
 
-        self.set_page_focus_after_move(page, notebook)
+        self.set_page_focus(page, notebook, self)
 
     def keyboard_focus_2nd_pane(self):
         if self.NAME == "notebook_2":
@@ -82,11 +79,12 @@ class EditorEventsMixin:
         if not notebook.is_visible():
             notebook.show()
             notebook.create_view()
+            event_system.emit("update_paned_handle")
 
         i        = notebook.get_current_page()
         page     = notebook.get_nth_page(i)
 
-        self.set_page_focus_after_move(page, notebook)
+        self.set_page_focus(page, notebook, self)
 
     def keyboard_move_tab_to_1(self, page_num):
         if self.NAME == "notebook_1": return
@@ -102,7 +100,7 @@ class EditorEventsMixin:
         if self.get_n_pages() == 0:
             self.hide()
 
-        self.set_page_focus_after_move(page, notebook)
+        self.set_page_focus(page, notebook, self)
 
     def keyboard_move_tab_to_2(self, page_num):
         if self.NAME == "notebook_2":
@@ -119,14 +117,19 @@ class EditorEventsMixin:
         notebook.show()
         notebook.insert_page(page, tab, -1)
 
-        self.set_page_focus_after_move(page, notebook)
+        self.set_page_focus(page, notebook, self)
 
-    def set_page_focus_after_move(self, page, notebook):
-        self.is_editor_focused = False
+    def set_page_focus(self, page, notebook, old_notebook):
+        old_notebook.is_editor_focused = False
         notebook.set_current_page(-1)
         page.get_children()[0].grab_focus()
         notebook.is_editor_focused = True
-        
+
+        ctx = old_notebook.get_style_context()
+        ctx.remove_class("notebook-selected-focus")
+
+        ctx = notebook.get_style_context()
+        ctx.add_class("notebook-selected-focus")
 
     def keyboard_move_tab_left(self, page_num):
         page     = self.get_nth_page(page_num)

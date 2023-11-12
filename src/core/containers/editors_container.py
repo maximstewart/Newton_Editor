@@ -31,12 +31,23 @@ class EditorsPaned(Gtk.Paned):
         ...
 
     def _subscribe_to_events(self):
-        ...
+        event_system.subscribe("update_paned_handle", self._update_paned_handle)
 
     def _load_widgets(self):
         self.add1(EditorNotebook())
         self.add2(EditorNotebook())
 
+    def _update_paned_handle(self):
+        rect = self.get_allocation()
+        pos = -1
+
+        try:
+            size = rect.width / 2
+            pos  = int(size)
+        except:
+            ...
+
+        self.set_position(size)
 
 
 class EditorsContainer(Gtk.Box):
