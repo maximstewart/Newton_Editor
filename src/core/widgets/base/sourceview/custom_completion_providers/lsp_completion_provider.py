@@ -15,10 +15,10 @@ from gi.repository import GObject
 
 class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
     """
-        This code is A python code completion plugin for Newton.
+        This code is an LSP code completion plugin for Newton.
         # NOTE: Some code pulled/referenced from here --> https://github.com/isamert/gedi
     """
-    __gtype_name__ = 'PythonProvider'
+    __gtype_name__ = 'LSPProvider'
 
     def __init__(self, source_view):
         GObject.Object.__init__(self)
@@ -47,19 +47,9 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         if result:
             if result.items:
                 for item in result.items:
-                    comp_item = GtkSource.CompletionItem.new()
-                    comp_item.set_label(item.label)
-                    comp_item.set_text(item.textEdit)
-                    comp_item.set_icon( self.get_icon_for_type(item.kind) )
-                    comp_item.set_info(item.documentation)
-                    proposals.append(comp_item)
+                    proposals.append( self.create_completion_item(item) )
             else:
-                comp_item = GtkSource.CompletionItem.new()
-                comp_item.set_label(item.label)
-                comp_item.set_text(item.textEdit)
-                comp_item.set_icon( self.get_icon_for_type(item.kind) )
-                comp_item.set_info(item.documentation)
-                proposals.append(comp_item)
+                proposals.append( self.create_completion_item(result) )
 
         context.add_proposals(self, proposals, True)
 
@@ -67,7 +57,32 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         try:
             return self._theme.load_icon(icon_names[_type.lower()], 16, 0)
         except:
-            try:
-                return self._theme.load_icon(Gtk.STOCK_ADD, 16, 0)
-            except:
-                return None
+            ...
+
+        try:
+            return self._theme.load_icon(Gtk.STOCK_ADD, 16, 0)
+        except:
+            ...
+
+        return None
+
+    def create_completion_item(self, item):
+        comp_item = GtkSource.CompletionItem.new()
+        comp_item.set_label(item.label)
+        comp_item.set_text(item.textEdit)
+        comp_item.set_icon( self.get_icon_for_type(item.kind) )
+        comp_item.set_info(item.documentation)
+        
+        return comp_item
+
+
+
+
+
+
+
+
+
+
+
+
