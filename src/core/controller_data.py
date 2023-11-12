@@ -34,10 +34,15 @@ class ControllerData:
             ctx = old_notebook.get_style_context()
             ctx.remove_class("notebook-selected-focus")
 
-
         notebook = source_view.get_parent().get_parent()
         ctx = notebook.get_style_context()
         ctx.add_class("notebook-selected-focus")
+        
+        file = source_view.get_current_file()
+        if file:
+            source_view.set_bottom_labels(file)
+        else:
+            event_system.emit("set_bottom_labels")
 
         self.active_src_view = source_view
 

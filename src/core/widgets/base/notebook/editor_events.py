@@ -42,7 +42,7 @@ class EditorEventsMixin:
 
         file_type = source_view.get_filetype()
         if not file_type == "buffer": 
-            uri = source_view.get_current_filepath().get_uri()
+            uri = source_view.get_current_file().get_uri()
             event_system.emit("textDocument/didClose", (file_type, uri,))
 
         page_num = notebook.page_num(container)

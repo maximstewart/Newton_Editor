@@ -96,7 +96,7 @@ class Plugin(PluginBase):
         self.delay_completion(source_view, context, callback)
 
     def _do_completion(self, source_view, context, callback):
-        filepath = source_view.get_current_filepath()
+        filepath = source_view.get_current_file()
 
         if not filepath: return
 
