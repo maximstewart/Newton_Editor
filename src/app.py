@@ -17,10 +17,11 @@ class AppLaunchException(Exception):
 
 
 class Application(IPCServer):
-    ''' Create Settings and Controller classes. Bind signal to Builder. Inherit from Builtins to bind global methods and classes.'''
+    """ docstring for Application. """
 
     def __init__(self, args, unknownargs):
         super(Application, self).__init__()
+
         if not settings_manager.is_trace_debug():
             self.socket_realization_check()
 
@@ -30,7 +31,7 @@ class Application(IPCServer):
                         message = f"FILE|{arg}"
                         self.send_ipc_message(message)
 
-                raise AppLaunchException(f"{app_name} IPC Server Exists: Will send path(s) to it and close...")
+                raise AppLaunchException(f"{app_name} IPC Server Exists: Have sent path(s) to it and closing...")
 
         self.setup_debug_hook()
         Window(args, unknownargs)
