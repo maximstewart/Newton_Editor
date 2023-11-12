@@ -114,7 +114,10 @@ class EditorEventsMixin:
         tab      = page.get_tab_widget()
 
         self.detach_tab(page)
-        notebook.show()
+        if not notebook.is_visible():
+            notebook.show()
+            event_system.emit("update_paned_handle")
+
         notebook.insert_page(page, tab, -1)
 
         self.set_page_focus(page, notebook, self)
