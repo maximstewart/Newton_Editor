@@ -52,6 +52,28 @@ tab > box > button:hover {
     background: rgba(256, 0, 0, 0.64);
 }
 
+notebook > header > tabs > tab:checked {
+    /* Neon Blue 00e8ff */
+    /* background-color: rgba(0, 232, 255, 0.2); */
+
+    background-color: rgba(255, 255, 255, 0.46);
+
+    /* Dark Bergundy */
+    /* background-color: rgba(116, 0, 0, 0.25); */
+
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.notebook-selected-focus {
+    /* Neon Blue 00e8ff border */
+    /* border: 2px solid rgba(0, 232, 255, 0.34); */
+
+    border: 2px solid rgba(255, 255, 255, 0.46);
+
+    /* Dark Bergundy */
+    /* border: 2px solid rgba(116, 0, 0, 0.64); */
+}
+
 
 /* ----  source code notebooks  ---- */
 notebook > stack > scrolledwindow > textview {
@@ -99,7 +121,8 @@ popover {
 
 /* other properties */
 .buffer_changed {
-    color: rgba(0, 232, 255, 0.64);
+    color: rgba(255, 168, 0, 1.0);
+    /* color: rgba(0, 232, 255, 0.64); */
 }
 
 
