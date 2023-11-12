@@ -66,9 +66,8 @@ class EditorNotebook(EditorControllerMixin, Gtk.Notebook):
         event_system.subscribe("keyboard_open_file", self._keyboard_open_file)
         event_system.subscribe("keyboard_scale_up_text", self._keyboard_scale_up_text)
         event_system.subscribe("keyboard_scale_down_text", self._keyboard_scale_down_text)
-
-        # event_system.subscribe("keyboard_save_file_as", self._keyboard_save_file_as)
-
+        event_system.subscribe("keyboard_focus_1st_pane", self.keyboard_focus_1st_pane)
+        event_system.subscribe("keyboard_focus_2nd_pane", self.keyboard_focus_2nd_pane)
 
     def _load_widgets(self):
         self._add_action_widgets()

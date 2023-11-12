@@ -64,6 +64,30 @@ class EditorEventsMixin:
         page_num = 0 if self.get_n_pages() - 1 == page_num else page_num + 1
         self.set_current_page(page_num)
 
+    def keyboard_focus_1st_pane(self):
+        if self.NAME == "notebook_1":
+            return
+
+        notebook = self.builder.get_object("notebook_1")
+        i        = notebook.get_current_page()
+        page     = notebook.get_nth_page(i)
+
+        self.set_page_focus_after_move(page, notebook)
+
+    def keyboard_focus_2nd_pane(self):
+        if self.NAME == "notebook_2":
+            return
+
+        notebook = self.builder.get_object("notebook_2")
+        if not notebook.is_visible():
+            notebook.show()
+            notebook.create_view()
+
+        i        = notebook.get_current_page()
+        page     = notebook.get_nth_page(i)
+
+        self.set_page_focus_after_move(page, notebook)
+
     def keyboard_move_tab_to_1(self, page_num):
         if self.NAME == "notebook_1": return
 
