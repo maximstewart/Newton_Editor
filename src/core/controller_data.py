@@ -28,7 +28,16 @@ class ControllerData:
 
     def set_active_src_view(self, source_view):
         if self.active_src_view:
-            self.active_src_view.get_parent().is_editor_focused = False
+            old_notebook = self.active_src_view.get_parent().get_parent()
+            old_notebook.is_editor_focused = False
+
+            ctx = old_notebook.get_style_context()
+            ctx.remove_class("notebook-selected-focus")
+
+
+        notebook = source_view.get_parent().get_parent()
+        ctx = notebook.get_style_context()
+        ctx.add_class("notebook-selected-focus")
 
         self.active_src_view = source_view
 
