@@ -13,7 +13,7 @@ from .source_view_events import SourceViewEvents
 
 
 class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
-    def get_current_filepath(self):
+    def get_current_file(self):
         return self._current_file
 
     def get_filetype(self):
@@ -30,7 +30,7 @@ class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
         iter    = buffer.get_iter_at_mark( buffer.get_insert() )
         line    = iter.get_line()
         offset  = iter.get_line_offset()
-        uri     = self.get_current_filepath().get_uri()
+        uri     = self.get_current_file().get_uri()
 
         event_system.emit("textDocument/definition", (self.get_filetype(), uri, line, offset,))
 

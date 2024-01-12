@@ -50,7 +50,8 @@ class KeyInputController:
                 if keyname == "t":
                     self._create_view()
                 if keyname == "o":
-                    event_system.emit("open_files")
+                    page_num, container, source_view = self.get_active_view()
+                    event_system.emit("open_files", (source_view,))
 
                 return True
 

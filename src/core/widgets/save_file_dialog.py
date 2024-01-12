@@ -57,7 +57,7 @@ class SaveFileDialog:
             dlg.set_current_name("new.txt")
             dlg.set_current_folder(os.path.expanduser('~'))
         else:
-            dlg.set_current_folder(current_file.get_parent().get_path())
+            dlg.set_current_folder(current_file.get_parent().get_uri())
             dlg.set_current_name(current_filename)
 
         response = dlg.run()

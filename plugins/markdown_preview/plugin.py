@@ -103,7 +103,7 @@ class Plugin(MarkdownTemplateMixin, PluginBase):
         text       = buffer.get_text(start_iter, end_iter, include_hidden_chars = False)
         html       = markdown.markdown(text)
 
-        path       = self._active_src_view.get_current_filepath().get_parent().get_path()
+        path       = self._active_src_view.get_current_file().get_parent().get_path()
         data       = self.wrap_html_to_body(html)
         self._markdown_view.load_html(content = data, base_uri = f"file://{path}/")
     

@@ -65,11 +65,13 @@ class GeneralInfoWidget:
 
     def set_bottom_labels(self, path = None, line_char = None, file_type = None, encoding_type = None):
         self._set_path_label(path)
-        self._set_line_char_label()
+        self._set_line_char_label(line_char)
         self._set_file_type_label(file_type)
-        self._set_encoding_label()
+        self._set_encoding_label(encoding_type)
 
     def _set_path_label(self, gfile = ""):
+        gfile = "" if not gfile else gfile
+
         if isinstance(gfile, str):
             self.bottom_path_label.set_text( gfile )
             self.bottom_path_label.set_tooltip_text( gfile )
@@ -78,10 +80,18 @@ class GeneralInfoWidget:
             self.bottom_path_label.set_tooltip_text( gfile.get_path() )
 
     def _set_line_char_label(self, line_char = "1:1"):
+        line_char = "1:1" if not line_char else line_char
+
         self.bottom_line_char_label.set_text(line_char)
 
     def _set_file_type_label(self, file_type = "buffer"):
+        file_type = "buffer" if not file_type else file_type 
+
         self.bottom_file_type_label.set_text(file_type)
 
     def _set_encoding_label(self, encoding_type = "utf-8"):
+        encoding_type = "utf-8" if not encoding_type else encoding_type
+
         self.bottom_encoding_label.set_text(encoding_type)
+
+

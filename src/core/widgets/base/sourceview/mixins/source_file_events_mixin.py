@@ -70,7 +70,10 @@ class FileEventsMixin:
         file.set_location(gfile)
         self._file_loader = GtkSource.FileLoader.new(buffer, file)
 
+        event_system.emit("pause_event_processing")
         def finish_load_callback(obj, res, user_data = None):
+            event_system.emit("resume_event_processing")
+
             self._file_loader.load_finish(res)
             self._document_loaded(line)
             self.update_labels(gfile)
@@ -150,6 +153,5 @@ class FileEventsMixin:
         self._completion.add_provider(lsp_completion_provider)
 
         self.got_to_line(buffer, line)
-
 
 

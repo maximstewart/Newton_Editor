@@ -80,7 +80,8 @@ class EditorNotebook(EditorControllerMixin, Gtk.Notebook):
 
     def _focused_target_changed(self, target):
         self.is_editor_focused = True if target == self.NAME else False
-        self.grab_focus()
+        if self.is_editor_focused:
+            self.grab_focus()
 
     def _add_action_widgets(self):
         start_box = Gtk.Box()

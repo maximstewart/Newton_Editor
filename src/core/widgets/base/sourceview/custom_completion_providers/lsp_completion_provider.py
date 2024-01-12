@@ -25,6 +25,7 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
 
         self._theme       = Gtk.IconTheme.get_default()
         self._source_view = source_view
+        
 
     def do_get_name(self):
         return "LSP Code Completion"
@@ -33,6 +34,11 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         return context.get_iter()[1] if isinstance(context.get_iter(), tuple) else context.get_iter()
 
     def do_match(self, context):
+        iter   = self.get_iter_correctly(context)
+        buffer = iter.get_buffer()
+        if buffer.get_context_classes_at_iter(iter) != ['no-spell-check']:
+            return False
+
         event_system.emit("textDocument/completion", (self._source_view, context, self.do_populate))
         return True
 
@@ -45,7 +51,7 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
     def do_populate(self, context, result = None):
         proposals = []
         if result:
-            if result.items:
+            if not result.items is None:
                 for item in result.items:
                     proposals.append( self.create_completion_item(item) )
             else:
@@ -69,20 +75,17 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
     def create_completion_item(self, item):
         comp_item = GtkSource.CompletionItem.new()
         comp_item.set_label(item.label)
-        comp_item.set_text(item.textEdit)
+
+        if item.textEdit:
+            if isinstance(item.textEdit, dict):
+                comp_item.set_text(item.textEdit["newText"])
+            else:
+                comp_item.set_text(item.textEdit)
+        else:
+            comp_item.set_text(item.insertText)
+
         comp_item.set_icon( self.get_icon_for_type(item.kind) )
         comp_item.set_info(item.documentation)
         
+        
         return comp_item
-
-
-
-
-
-
-
-
-
-
-
-

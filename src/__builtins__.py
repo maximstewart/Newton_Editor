@@ -5,11 +5,11 @@ import threading
 # Lib imports
 
 # Application imports
-from utils.event_system import EventSystem
-from utils.endpoint_registry import EndpointRegistry
-from utils.keybindings import Keybindings
-from utils.logger import Logger
-from utils.settings_manager.manager import SettingsManager
+from libs.event_system import EventSystem
+from libs.endpoint_registry import EndpointRegistry
+from libs.keybindings import Keybindings
+from libs.logger import Logger
+from libs.settings_manager.manager import SettingsManager
 
 
 class BuiltinsException(Exception):

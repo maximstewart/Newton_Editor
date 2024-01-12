@@ -5,8 +5,8 @@ import os
 # Lib imports
 
 # Application imports
-from utils.debugging import debug_signal_handler
-from utils.ipc_server import IPCServer
+from libs.debugging import debug_signal_handler
+from libs.ipc_server import IPCServer
 from core.window import Window
 
 
