@@ -10,13 +10,13 @@ from gi.repository import Gdk
 from gi.repository import GLib
 
 # Application imports
-from .controller_data import ControllerData
-from .containers.core_widget import CoreWidget
-from .mixins.signals_mixins import SignalsMixins
+from ..mixins.signals_mixins import SignalsMixins
+from ..containers.core_widget import CoreWidget
+from .base_controller_data import BaseControllerData
 
 
 
-class Controller(SignalsMixins, ControllerData):
+class BaseController(SignalsMixins, BaseControllerData):
     def __init__(self, args, unknownargs):
         messages = []
         for arg in unknownargs + [args.new_tab,]:

@@ -1,5 +1,4 @@
 # Python imports
-import time
 import signal
 
 # Lib imports
@@ -12,7 +11,8 @@ from gi.repository import Gdk
 from gi.repository import GLib
 
 # Application imports
-from core.controller import Controller
+from core.controllers.base_controller import BaseController
+
 
 
 class ControllerStartExceptiom(Exception):
@@ -62,9 +62,9 @@ class Window(Gtk.ApplicationWindow):
         if settings_manager.is_debug():
             self.set_interactive_debugging(True)
 
-        self._controller = Controller(args, unknownargs)
+        self._controller = BaseController(args, unknownargs)
         if not self._controller:
-            raise ControllerStartException("Controller exited and doesn't exist...")
+            raise ControllerStartException("BaseController exited and doesn't exist...")
 
         self.add( self._controller.get_core_widget() )
 
