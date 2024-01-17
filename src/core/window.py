@@ -51,6 +51,9 @@ class Window(Gtk.ApplicationWindow):
         ctx.add_class(f"mw_transparency_{settings.theming.transparency}")
 
     def _setup_signals(self):
+        self.connect("focus-in-event", self._on_focus_in_event)
+        self.connect("focus-out-event", self._on_focus_out_event)
+
         self.connect("delete-event", self._tear_down)
         GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, self._tear_down)
 
@@ -102,9 +105,15 @@ class Window(Gtk.ApplicationWindow):
         cr.paint()
         cr.set_operator(cairo.OPERATOR_OVER)
 
+
+    def _on_focus_in_event(self, widget, event):
+        event_system.emit("pause_dnd_signals")
+
+    def _on_focus_out_event(self, widget, event):
+        event_system.emit("listen_dnd_signals")
+
     def _load_interactive_debug(self):
         self.set_interactive_debugging(True)
-
 
     def _tear_down(self, widget = None, eve = None):
         event_system.emit("shutting_down")

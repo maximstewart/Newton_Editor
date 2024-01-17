@@ -94,4 +94,3 @@ class FilesController:
                 return False
 
         return True
-

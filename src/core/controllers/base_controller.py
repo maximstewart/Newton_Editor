@@ -13,6 +13,8 @@ from gi.repository import GLib
 from ..mixins.signals_mixins import SignalsMixins
 from ..containers.core_widget import CoreWidget
 from .base_controller_data import BaseControllerData
+from .bridge_controller import BridgeController
+from .files_controller import FilesController
 
 
 
@@ -32,6 +34,7 @@ class BaseController(SignalsMixins, BaseControllerData):
         self._setup_styling()
         self._setup_signals()
         self._subscribe_to_events()
+        self._load_controllers()
 
         if args.no_plugins == "false":
             self.plugins.launch_plugins()
@@ -53,6 +56,10 @@ class BaseController(SignalsMixins, BaseControllerData):
         event_system.subscribe("handle_file_from_ipc", self.handle_file_from_ipc)
         event_system.subscribe("set_active_src_view", self.set_active_src_view)
         event_system.subscribe("get_active_src_view", self.get_active_src_view)
+
+    def _load_controllers(self):
+        BridgeController()
+        FilesController()
 
     def load_glade_file(self):
         self.builder     = Gtk.Builder()

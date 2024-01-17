@@ -9,6 +9,7 @@ from gi.repository import Gtk
 from ..widgets.separator_widget import Separator
 from ..widgets.miniview_widget import MiniViewWidget
 from ..widgets.base.notebook.editor_notebook import EditorNotebook
+from .fixed_box import FixedBox
 
 
 
@@ -34,8 +35,11 @@ class EditorsPaned(Gtk.Paned):
         event_system.subscribe("update_paned_handle", self._update_paned_handle)
 
     def _load_widgets(self):
-        self.add1(EditorNotebook())
-        self.add2(EditorNotebook())
+        self.add1(FixedBox())
+        self.add2(FixedBox())
+
+        # self.add1(EditorNotebook())
+        # self.add2(EditorNotebook())
 
     def _update_paned_handle(self):
         rect = self.get_allocation()
