@@ -20,7 +20,6 @@ class ControllerStartExceptiom(Exception):
 
 
 
-
 class Window(Gtk.ApplicationWindow):
     """docstring for Window."""
 
@@ -30,12 +29,12 @@ class Window(Gtk.ApplicationWindow):
 
         self._controller = None
 
-        self._set_window_data()
         self._setup_styling()
         self._setup_signals()
         self._subscribe_to_events()
-
         self._load_widgets(args, unknownargs)
+
+        self._set_window_data()
         self._set_size_constraints()
 
         self.show()
@@ -49,6 +48,7 @@ class Window(Gtk.ApplicationWindow):
 
         ctx = self.get_style_context()
         ctx.add_class("main-window")
+        ctx.add_class(f"mw_transparency_{settings.theming.transparency}")
 
     def _setup_signals(self):
         self.connect("delete-event", self._tear_down)
@@ -56,6 +56,7 @@ class Window(Gtk.ApplicationWindow):
 
     def _subscribe_to_events(self):
         event_system.subscribe("tear_down", self._tear_down)
+        event_system.subscribe("load_interactive_debug", self._load_interactive_debug)
 
     def _load_widgets(self, args, unknownargs):
         if settings_manager.is_debug():
@@ -83,7 +84,7 @@ class Window(Gtk.ApplicationWindow):
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
 
-        if visual != None and screen.is_composited():
+        if visual != None and screen.is_composited() and settings.config.make_transparent == 0:
             self.set_visual(visual)
             self.set_app_paintable(True)
             self.connect("draw", self._area_draw)
@@ -101,6 +102,9 @@ class Window(Gtk.ApplicationWindow):
         cr.paint()
         cr.set_operator(cairo.OPERATOR_OVER)
 
+    def _load_interactive_debug(self):
+        self.set_interactive_debugging(True)
+
 
     def _tear_down(self, widget = None, eve = None):
         event_system.emit("shutting_down")
@@ -116,3 +120,6 @@ class Window(Gtk.ApplicationWindow):
 
         settings_manager.clear_pid()
         Gtk.main_quit()
+
+    def main(self):
+        Gtk.main()
