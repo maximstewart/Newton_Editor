@@ -21,7 +21,6 @@ class ReadPipe(threading.Thread):
             line = self.pipe.readline().decode('utf-8')
 
 
-
 class LSPController:
     def __init__(self, lsp_servers_config = {}):
         super().__init__()
@@ -29,6 +28,7 @@ class LSPController:
         self.lsp_servers_config = lsp_servers_config
         self.lsp_clients = {}
     
+
     def _blame(self, response):
         for d in response['diagnostics']:
             if d['severity'] == 1:
@@ -63,8 +63,10 @@ class LSPController:
         if not language or not server_proc: return False
 
         root_path         = None
-        root_uri          = 'file:///home/abaddon/Coding/Projects/Active/C_n_CPP_Projects/gtk/Newton/src/'
-        workspace_folders = [{'name': 'python-lsp', 'uri': root_uri}]
+        # root_uri          = 'file:///home/abaddon/Coding/Projects/Active/C_n_CPP_Projects/gtk/Newton/src/'
+        # workspace_folders = [{'name': 'python-lsp', 'uri': root_uri}]
+        root_uri          = ''
+        workspace_folders = [{'name': '', 'uri': root_uri}]
 
         lsp_client        = self._generate_client(language, server_proc)
         lsp_client.initialize(
@@ -148,7 +150,8 @@ class LSPController:
             return self.lsp_clients[language_id].completion(
                             pylspclient.lsp_structs.TextDocumentIdentifier(uri),
                             pylspclient.lsp_structs.Position(line, offset),
-                            pylspclient.lsp_structs.CompletionContext(trigger, _char)
+                            None
+                            # pylspclient.lsp_structs.CompletionContext(trigger, _char)
                     )
 
         return []
