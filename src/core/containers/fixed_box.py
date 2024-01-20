@@ -29,7 +29,7 @@ class FixedBox(Gtk.Fixed):
 
 
     def _setup_styling(self):
-        self.size_allocate( self.get_parent().get_allocated_size().allocation )
+        ...
 
     def _setup_signals(self):
         self.connect("realize", self._on_realize)

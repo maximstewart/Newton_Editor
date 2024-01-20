@@ -28,12 +28,6 @@
 
 
 /* CLASSES */
-.editor-container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-}
-
 .ace_status-indicator {
     color: gray;
     position: absolute;

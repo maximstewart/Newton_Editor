@@ -9,6 +9,8 @@ from gi.repository import Gtk
 from ..widgets.separator_widget import Separator
 from ..widgets.miniview_widget import MiniViewWidget
 from ..widgets.base.notebook.editor_notebook import EditorNotebook
+
+from ..widgets.controls.tab_bar import TabBar
 from .fixed_box import FixedBox
 
 
@@ -35,8 +37,30 @@ class EditorsPaned(Gtk.Paned):
         event_system.subscribe("update_paned_handle", self._update_paned_handle)
 
     def _load_widgets(self):
-        self.add1(FixedBox())
-        self.add2(FixedBox())
+        left_view  = Gtk.Box()
+        right_view = Gtk.Box()
+
+        left_view.add( TabBar() )
+        left_view.add( FixedBox() )
+
+        right_view.add( TabBar() )
+        right_view.add( FixedBox() )
+
+        left_view.set_orientation( Gtk.Orientation.VERTICAL )
+        right_view.set_orientation( Gtk.Orientation.VERTICAL )
+
+        left_view.show()
+        right_view.show()
+
+        self.add1(left_view)
+        self.add2(right_view)
+
+
+
+        # self.add1(FixedBox())
+        # self.add2(FixedBox())
+
+
 
         # self.add1(EditorNotebook())
         # self.add2(EditorNotebook())
@@ -77,6 +101,8 @@ class EditorsContainer(Gtk.Box):
 
     def _load_widgets(self):
         miniview = MiniViewWidget()
+        miniview.hide()
+
         self.add(Separator("separator_left"))
         self.add(EditorsPaned())
         self.add(Separator("separator_right"))
