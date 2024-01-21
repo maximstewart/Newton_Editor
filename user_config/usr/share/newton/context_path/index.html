@@ -14,27 +14,7 @@
 </head>
 <body>
 
-    <div class="row">
-        <div id="page-alert-zone" class="col">
-        </div>
-    </div>
-
     <div class="container editor-container">
-        <div class="row">
-            <div class="col col-md-10 scroller">
-                <ul class="nav nav-tabs">
-                </ul>
-            </div>
-            <div class="col col-auto align-self-end">
-                <ul>
-                    <li id="add-tab-icon" class="add-session-bottom" role="presentation" onclick="newSession(this)">
-                        <a href="#">
-                            <i class="bi bi-plus-square" aria-hidden="true"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
         <div class="row">
             <div class="col">
                 <pre id="editor">
@@ -42,12 +22,6 @@
             </div>
         </div>
     </div>
-
-
-    <p>
-        <div id="status-bar">Status Bar: ...</div>
-    </p>
-
 
     <!-- For internal scripts... -->
     <!--  <script src="js/libs/jquery-3.7.1.min.js"></script>  -->
@@ -64,14 +38,13 @@
     <script src="resources/js/libs/ace_editor/ext-settings_menu.js"></script>
     <script src="resources/js/libs/ace_editor/ace-linters.js"></script>
 
-
     <!-- For Application... -->
     <!--  <script src="resources/js/newton/ajax.js"></script>  -->
     <!--  <script src="resources/js/newton/post-ajax.js"></script>  -->
 
-    <script src="resources/js/newton/dnd-sort.js"></script>
-    <script src="resources/js/newton/keybinding-newton.js"></script>
+    <script src="resources/js/newton/globals.js"></script>
     <script src="resources/js/newton/utils.js"></script>
+    <script src="resources/js/newton/keybinding-newton.js"></script>
     <script src="resources/js/newton/ui-logic.js"></script>
     <script src="resources/js/newton/events.js"></script>
 </body>

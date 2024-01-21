@@ -11,8 +11,10 @@ from ..tab_header_widget import TabHeaderWidget
 
 
 class TabBar(Gtk.Notebook):
-    def __init__(self):
+    def __init__(self, index):
         super(TabBar, self).__init__()
+
+        self.INDEX = index
 
         self.set_group_name("editor_widget")
 
@@ -29,12 +31,10 @@ class TabBar(Gtk.Notebook):
 
     def _setup_signals(self):
         self.connect("switch-page", self._switch_page_update)
-        # self.connect("key-press-event", self._key_press_event)
-        # self.connect("key-release-event", self._key_release_event)
-        ...
 
     def _subscribe_to_events(self):
-        ...
+        event_system.subscribe(f"add_tab_{self.INDEX}", self.add_tab)
+        event_system.subscribe(f"update_tab_{self.INDEX}", self.update_tab)
 
     def _load_widgets(self):
         start_box = Gtk.Box()
@@ -51,28 +51,50 @@ class TabBar(Gtk.Notebook):
         self.set_action_widget(start_box, 0)
         self.set_action_widget(end_box, 1)
 
-        self.add_tab_click(None)
-
     def _switch_page_update(self, notebook, page, page_num):
+        print(page_num)
         ...
 
     def add_tab_click(self, widget):
-        container = Gtk.Box()
-        page_num  = self.append_page(container, TabHeaderWidget(container, self._close_tab))
+        event_system.emit(f"new_session_{self.INDEX}")
 
+    def add_tab(self, fhash, title = "[BAD TITLE]"):
+        container = Gtk.EventBox()
+        header    = TabHeaderWidget(container, self._close_tab)
+        page_num  = self.append_page(container, header)
+
+        container.fhash = fhash
+
+        header.label.set_label(title)
         self.set_tab_detachable(container, True)
         self.set_tab_reorderable(container, True)
 
         self.show_all()
         self.set_current_page(page_num)
-    
+
+    def update_tab(self, fhash, title = "[BAD TITLE]"):
+        container = Gtk.EventBox()
+        header    = TabHeaderWidget(container, self._close_tab)
+        page_num  = self.append_page(container, header)
+
+        header.label.set_label(title)
+        self.set_tab_detachable(container, True)
+        self.set_tab_reorderable(container, True)
+
+        self.show_all()
+        self.set_current_page(page_num)
+
     # Note: Need to get parent instead given we pass the close_tab method
     #       from a potentially former notebook. 
     def _close_tab(self, widget, container):
         notebook = container.get_parent()
-        page_num = notebook.page_num(container)
-        notebook.remove_page(page_num)
 
+        if notebook.get_n_pages() < 2: return
+
+        page_num = notebook.page_num(container)
+
+        event_system.emit(f"close_session_{self.INDEX}", (container.fhash))
+        notebook.remove_page(page_num)
 
 
     # def close_tab(self, button, container, source_view, eve = None):
@@ -92,5 +114,3 @@ class TabBar(Gtk.Notebook):
     #     if notebook.NAME == "notebook_2" and notebook.get_n_pages() == 0:
     #         notebook.hide()
     #         event_system.emit("focused_target_changed", ("notebook_1",))
-
-

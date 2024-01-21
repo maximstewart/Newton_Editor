@@ -14,7 +14,6 @@ from ..mixins.signals_mixins import SignalsMixins
 from ..containers.core_widget import CoreWidget
 from .base_controller_data import BaseControllerData
 from .bridge_controller import BridgeController
-from .files_controller import FilesController
 
 
 
@@ -59,7 +58,6 @@ class BaseController(SignalsMixins, BaseControllerData):
 
     def _load_controllers(self):
         BridgeController()
-        FilesController()
 
     def load_glade_file(self):
         self.builder     = Gtk.Builder()

@@ -13,3 +13,4 @@ class Event:
     topic: str
     target: str
     content: str
+    originator: int = -1

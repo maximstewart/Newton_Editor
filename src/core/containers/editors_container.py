@@ -8,74 +8,8 @@ from gi.repository import Gtk
 # Application imports
 from ..widgets.separator_widget import Separator
 from ..widgets.miniview_widget import MiniViewWidget
-from ..widgets.base.notebook.editor_notebook import EditorNotebook
+from .editors_paned import EditorsPaned
 
-from ..widgets.controls.tab_bar import TabBar
-from .fixed_box import FixedBox
-
-
-
-class EditorsPaned(Gtk.Paned):
-    def __init__(self):
-        super(EditorsPaned, self).__init__()
-
-        self._setup_styling()
-        self._setup_signals()
-        self._subscribe_to_events()
-        self._load_widgets()
-
-        self.show()
-
-
-    def _setup_styling(self):
-        self.set_wide_handle(True)
-
-    def _setup_signals(self):
-        ...
-
-    def _subscribe_to_events(self):
-        event_system.subscribe("update_paned_handle", self._update_paned_handle)
-
-    def _load_widgets(self):
-        left_view  = Gtk.Box()
-        right_view = Gtk.Box()
-
-        left_view.add( TabBar() )
-        left_view.add( FixedBox() )
-
-        right_view.add( TabBar() )
-        right_view.add( FixedBox() )
-
-        left_view.set_orientation( Gtk.Orientation.VERTICAL )
-        right_view.set_orientation( Gtk.Orientation.VERTICAL )
-
-        left_view.show()
-        right_view.show()
-
-        self.add1(left_view)
-        self.add2(right_view)
-
-
-
-        # self.add1(FixedBox())
-        # self.add2(FixedBox())
-
-
-
-        # self.add1(EditorNotebook())
-        # self.add2(EditorNotebook())
-
-    def _update_paned_handle(self):
-        rect = self.get_allocation()
-        pos = -1
-
-        try:
-            size = rect.width / 2
-            pos  = int(size)
-        except:
-            ...
-
-        self.set_position(size)
 
 
 class EditorsContainer(Gtk.Box):

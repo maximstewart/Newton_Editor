@@ -41,11 +41,11 @@ const getSHA256Hash = async (input) => {
     let textAsBuffer = new TextEncoder().encode(input);
     let hashBuffer   = await window.crypto.subtle.digest("SHA-256", textAsBuffer);
     let hashArray    = Array.from( new Uint8Array(hashBuffer) );
-    let hash         = hashArray.map(
+    let fhash         = hashArray.map(
         (item) => item.toString(16).padStart(2, "0")
     ).join("");
 
-    return hash;
+    return fhash;
 };
 
 const clearChildNodes = (parent) => {

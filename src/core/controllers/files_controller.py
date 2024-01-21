@@ -12,8 +12,9 @@ from gi.repository import Gtk
 
 
 class FilesController:
-    def __init__(self):
+    def __init__(self, index):
 
+        self.INDEX        = index
         self.opened_files = {}
 
         self._setup_signals()
@@ -24,8 +25,8 @@ class FilesController:
         ...
 
     def _subscribe_to_events(self):
-        event_system.subscribe("set_pre_drop_dnd", self.set_pre_drop_dnd)
-        event_system.subscribe("handle_file_event", self.handle_file_event)
+        event_system.subscribe(f"set_pre_drop_dnd_{self.INDEX}", self.set_pre_drop_dnd)
+        event_system.subscribe(f"handle_file_event_{self.INDEX}", self.handle_file_event)
 
     def set_pre_drop_dnd(self, gfiles):
         keys = self.opened_files.keys()
@@ -46,37 +47,38 @@ class FilesController:
     def handle_file_event(self, event):
         match event.topic:
             case "save":
-                content = base64.b64decode( event.content.encode() ).decode("utf-8")
-                self.save_session(event.target, content)
+                content  = base64.b64decode( event.content.encode() ).decode("utf-8")
+                basename = self.save_session(event.target, content)
+
+                if basename:
+                    event_system.emit(f"updated_tab_{event.originator}", (event.target, basename,))
             case "close":
                 self.close_session(event.target)
+            case "load_buffer":
+                self.load_buffer(event.target)
+                event_system.emit(f"add_tab_{event.originator}", (event.target, "buffer",))
             case _:
                 return
 
+    def load_buffer(self, fhash):
+        self.opened_files[fhash] = {"file": None, "ftype": "buffer"}
+
     def save_session(self, fhash, content):
-        keys  = self.opened_files.keys()
+        ftype = self.opened_files[fhash]["ftype"]
         gfile = event_system.emit_and_await(
             "save_file_dialog", ("", None)
-        ) if not fhash in keys else self.opened_files[fhash]["file"]
-
-        if not gfile: return
+        ) if fhash == "buffer" else self.opened_files[fhash]["file"]
 
         file_written = self.write_to_file(fhash, gfile, content)
-        if not fhash in keys and file_written:
-            self.insert_to_sessions(fhash, gfile)
-            event_system.emit(
-                "updated_tab",
-                (
-                    self.opened_files[fhash]["ftype"],
-                    gfile.get_basename(),
-                )
-            )
+        if fhash == "buffer" and file_written:
+            self.update_session(fhash, gfile)
+            return gfile.get_basename()
 
 
     def close_session(self, target):
         del self.opened_files[target]
 
-    def insert_to_sessions(self, fhash, gfile):
+    def update_session(self, fhash, gfile):
         info  = gfile.query_info("standard::*", 0, cancellable = None)
         ftype = info.get_content_type().replace("x-", "").split("/")[1]
 

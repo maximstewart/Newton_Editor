@@ -15,10 +15,11 @@ from libs.data_types import Event
 
 
 class AceEditor(WebKit2.WebView):
-    def __init__(self):
+    def __init__(self, index):
         super(AceEditor, self).__init__()
 
         # self.get_context().set_sandbox_enabled(False)
+        self.INDEX = index
 
         self._load_settings()
         self._setup_styling()
@@ -42,11 +43,11 @@ class AceEditor(WebKit2.WebView):
         ...
 
     def _subscribe_to_events(self):
-        event_system.subscribe("load_file", self.load_file)
-
-        event_system.subscribe("updated_tab", self.updated_tab)
-        event_system.subscribe("ui_message", self.ui_message)
-
+        event_system.subscribe(f"load_file_{self.INDEX}", self.load_file)
+        event_system.subscribe(f"new_session_{self.INDEX}", self.new_session)
+        event_system.subscribe(f"switch_session_{self.INDEX}", self.switch_session)
+        event_system.subscribe(f"close_session_{self.INDEX}", self.close_session)
+        event_system.subscribe(f"ui_message_{self.INDEX}", self.ui_message)
 
     def _load_settings(self):
         self.set_settings( WebkitUISettings() )
@@ -72,6 +73,7 @@ class AceEditor(WebKit2.WebView):
 
         try:
             event = Event( **json.loads(message) )
+            event.originator = self.INDEX
             event_system.emit("handle_bridge_event", (event,))
         except Exception as e:
             logger.info(e)
@@ -80,8 +82,16 @@ class AceEditor(WebKit2.WebView):
         command = f"loadFile('{ftype}', '{fhash}', '{file}', '{content}')"
         self.run_javascript(command, None, None)
 
-    def updated_tab(self, ftype, fname):
-        command = f"updatedTab('{ftype}', '{fname}')"
+    def new_session(self):
+        command = f"newSession()"
+        self.run_javascript(command, None, None)
+
+    def switch_session(self, fhash):
+        command = f"switchSession('{fhash}')"
+        self.run_javascript(command, None, None)
+
+    def close_session(self, fhash):
+        command = f"closeSession('{fhash}')"
         self.run_javascript(command, None, None)
 
     def ui_message(self, message, mtype):

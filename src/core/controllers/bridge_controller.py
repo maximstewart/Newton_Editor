@@ -26,14 +26,17 @@ class BridgeController:
     def handle_bridge_event(self, event):
         match event.topic:
             case "save":
-                event_system.emit("handle_file_event", (event,))
+                event_system.emit(f"handle_file_event_{event.originator}", (event,))
             case "close":
-                event_system.emit("handle_file_event", (event,))
+                event_system.emit(f"handle_file_event_{event.originator}", (event,))
+            case "load_buffer":
+                event_system.emit(f"handle_file_event_{event.originator}", (event,))
+            # case "add_tab":
+            #     event_system.emit(f"add_tab_{event.originator}", (event,))
+
             case "error":
                 content = base64.b64decode( event.content.encode() ).decode("utf-8")
                 logger.info(content)
             case _:
                 ...
-
-
 

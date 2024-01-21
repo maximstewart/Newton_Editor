@@ -37,20 +37,20 @@ class TabHeaderWidget(Gtk.Box):
         ...
 
     def _load_widgets(self):
-        label  = Gtk.Label(label = "buffer")
+        self.label = Gtk.Label(label = "buffer")
         close  = Gtk.Button()
         icon   = Gtk.Image(stock = Gtk.STOCK_CLOSE)
 
         # TODO: Setup with settings and from file
-        label.set_xalign(0.0)
-        label.set_margin_left(25)
-        label.set_margin_right(25)
-        label.set_hexpand(True)
+        self.label.set_xalign(0.0)
+        self.label.set_margin_left(25)
+        self.label.set_margin_right(25)
+        self.label.set_hexpand(True)
 
         close.set_always_show_image(True)
         close.set_hexpand(False)
         close.set_image( Gtk.Image.new_from_icon_name("gtk-close", 4) )
         close.connect("released", self.close_tab, *(self.content,))
 
-        self.add(label)
+        self.add(self.label)
         self.add(close)
