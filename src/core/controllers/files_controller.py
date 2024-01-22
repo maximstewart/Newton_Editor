@@ -29,20 +29,25 @@ class FilesController:
         event_system.subscribe(f"handle_file_event_{self.INDEX}", self.handle_file_event)
 
     def set_pre_drop_dnd(self, gfiles):
-        keys = self.opened_files.keys()
-
         for gfile in gfiles:
-            fhash = str(gfile.hash())
-            if fhash in keys: continue
-
-            ftype, fhash = self.insert_to_sessions(fhash, gfile)
-
+            fname   = gfile.get_basename()
+            fpath   = gfile.get_path()
             content = None
-            path    = gfile.get_path()
-            with open(path) as f:
+
+            with open(fpath) as f:
                 content = base64.b64encode( f.read().encode(), altchars = None ).decode("utf-8")
 
-            event_system.emit("load_file", (ftype, fhash, gfile.get_basename(), content))
+            info  = gfile.query_info("standard::*", 0, cancellable = None)
+            ftype = info.get_content_type().replace("x-", "").split("/")[1]
+            event_system.emit(
+                f"load_file_{self.INDEX}",
+                (
+                    ftype,
+                    fname,
+                    fpath,
+                    content
+                )
+            )
 
     def handle_file_event(self, event):
         match event.topic:
@@ -53,10 +58,13 @@ class FilesController:
                 if basename:
                     event_system.emit(f"updated_tab_{event.originator}", (event.target, basename,))
             case "close":
-                self.close_session(event.target)
+                event_system.emit(f"close_tab_{event.originator}", (event.target))
             case "load_buffer":
                 self.load_buffer(event.target)
                 event_system.emit(f"add_tab_{event.originator}", (event.target, "buffer",))
+            case "load_file":
+                content  = base64.b64decode( event.content.encode() ).decode("utf-8")
+                event_system.emit(f"add_tab_with_name_{event.originator}", (event.target, content,))
             case _:
                 return
 
@@ -73,10 +81,6 @@ class FilesController:
         if fhash == "buffer" and file_written:
             self.update_session(fhash, gfile)
             return gfile.get_basename()
-
-
-    def close_session(self, target):
-        del self.opened_files[target]
 
     def update_session(self, fhash, gfile):
         info  = gfile.query_info("standard::*", 0, cancellable = None)

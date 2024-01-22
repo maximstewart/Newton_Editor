@@ -19,8 +19,10 @@ class DnDBox(DnDMixin, Gtk.DrawingArea):
         understand how to acount for non DnD events.
     """
 
-    def __init__(self):
+    def __init__(self, index):
         super(DnDBox, self).__init__()
+
+        self.INDEX = index
 
         self._setup_styling()
         self._setup_signals()

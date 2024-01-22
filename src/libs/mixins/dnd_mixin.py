@@ -67,5 +67,4 @@ class DnDMixin:
 
                 files.append(gfile)
 
-            event_system.emit('set_pre_drop_dnd', (files,))
-
+            event_system.emit(f"set_pre_drop_dnd_{self.INDEX}", (files,))

@@ -24,16 +24,18 @@ const loadEditor = () => {
     editor.setTheme("ace/theme/one_dark");
 }
 
-const loadInitialSessionTab = async () => {
+const loadInitialSessionTab = () => {
     newSession(null, editor.getSession());
 }
 
-const newSession = async (elm = null, session = null) => {
+
+
+const newSession = (eve = null, session = null) => {
     let ftype          = "buffer";
-    let fhash          = await getSHA256Hash( new Date().toString() );
+    let fhash          = Date.now().toString();
     session            = ( isNotNullOrUndefined(session) ) ? session : ace.createEditSession("");
 
-    aceSessions[fhash] = {"ftype": ftype, "file": "", "session": session};
+    aceSessions[fhash] = {"ftype": ftype, "fname": "", "path": "", "session": session};
 
     setSession(ftype, fhash, session);
     sendMessage("load_buffer", fhash, "");
@@ -46,15 +48,6 @@ const switchSession = (fhash) => {
     setSession(ftype, fhash, session);
 }
 
-
-const closeSession = (fhash) => {
-    delete aceSessions[fhash];
-    
-    keys = Object.keys(aceSessions);
-    console.log(keys.length);
-}
-
-
 const setSession = (ftype, fhash, session) => {
     currentSession = fhash;
     editor.setSession(session);
@@ -64,52 +57,27 @@ const setSession = (ftype, fhash, session) => {
     }
 }
 
+const closeSession = (fhash) => {
+    delete aceSessions[fhash];
+    sendMessage("close", fhash, "");
+}
 
+const removeSession = (fhash) => {
+    delete aceSessions[fhash];
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const loadFile = (ftype, fhash, file, content) => {
-    session = ace.createEditSession( atob(content) );
-    aceSessions[fhash] = {"ftype": ftype, "file": file, "session": session};
-
-//    let tab = `
-//        <li class='tab active-tab' role="presentation" fhash='${fhash}' ftype='${ftype}' draggable="true"
-//            ondragend="dragEnd()" ondragover="dragOver(event)" ondragstart="dragStart(event)"
-//        >
-//            <span class='file-name' onclick='switchSession(this)'>${file}</span>
-//            <span class='close-button' onclick='closeSession(this)'>
-//                <i class="bi bi-x-square" aria-hidden="true"></i>
-//            </span>
-//        </li>
-//    `;
-
-    // TODO: Need to account for given editor we have focused when implimented...
-//    document.getElementsByClassName("nav-tabs")[0]
-//            .insertAdjacentHTML('beforeend', tab);
+const loadFile = (ftype, fname, fpath, content) => {
+    let fhash          = Date.now().toString();
+    session            = ace.createEditSession( atob(content) );
+    aceSessions[fhash] = {"ftype": ftype, "fname": fname, "path": fpath, "session": session};
 
     setSession(ftype, fhash, session);
+    sendMessage("load_file", fhash, fname);
 }
+
+
+
+
 
 const updatedTab = (ftype, fname) => {
 //    let elm         = document.querySelectorAll(`[fhash="${currentSession}"]`)[0];
@@ -126,9 +94,10 @@ const updatedTab = (ftype, fname) => {
 
 
 const saveSession = () => {
-    let fhash   = currentSession;
-    let session = aceSessions[fhash]["session"];
-    let data    = session.getValue();
+//    let fhash   = currentSession;
+//    let session = aceSessions[fhash]["session"];
+//    let data    = session.getValue();
 
-    sendMessage("save", fhash, data);
+//    sendMessage("save", fhash, data);
+    console.log("");
 }

@@ -19,7 +19,7 @@ class FixedBox(Gtk.Fixed):
 
     def __init__(self, index):
         super(FixedBox, self).__init__()
-        
+
         self.INDEX = index
 
         self._setup_styling()
@@ -42,7 +42,7 @@ class FixedBox(Gtk.Fixed):
 
     def _load_widgets(self):
         self.ace_editor = AceEditor(self.INDEX)
-        self.dnd_box    = DnDBox()
+        self.dnd_box    = DnDBox(self.INDEX)
 
         self.add( self.ace_editor )
         self.add( self.dnd_box )

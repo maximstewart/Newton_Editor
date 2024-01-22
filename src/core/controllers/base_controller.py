@@ -71,3 +71,4 @@ class BaseController(SignalsMixins, BaseControllerData):
 
     def get_core_widget(self):
         return self.core_widget
+

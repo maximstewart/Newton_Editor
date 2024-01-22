@@ -5,7 +5,6 @@ window.onload = (eve) => {
     console.log("Window Loaded...");
 }
 
-
 window.onerror = function(msg, url, line, col, error) {
     // Note that col & error are new to the HTML 5 spec and may not be supported in every browser.
     const suppressErrorAlert = false;

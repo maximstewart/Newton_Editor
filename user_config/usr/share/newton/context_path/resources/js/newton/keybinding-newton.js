@@ -28,16 +28,14 @@ const editorCommands = [
         name: "newSession",
         bindKey: {win: "ctrl-t", mac: "ctrl-t"},
         exec: function(editor) {
-            let elm = document.querySelectorAll(`[fhash="${currentSession}"]`)[0];
-            newSession(elm);
+            newSession();
         },
         readOnly: true
     }, {
         name: "closeSession",
         bindKey: {win: "ctrl-w", mac: "ctrl-w"},
         exec: function(editor) {
-            let elm = document.querySelectorAll(`[fhash="${currentSession}"]`)[0];
-            closeSession(elm.children[1]);
+            closeSession(currentSession);
         },
         readOnly: true
     }, {

@@ -47,6 +47,7 @@ class AceEditor(WebKit2.WebView):
         event_system.subscribe(f"new_session_{self.INDEX}", self.new_session)
         event_system.subscribe(f"switch_session_{self.INDEX}", self.switch_session)
         event_system.subscribe(f"close_session_{self.INDEX}", self.close_session)
+        event_system.subscribe(f"remove_session_{self.INDEX}", self.remove_session)
         event_system.subscribe(f"ui_message_{self.INDEX}", self.ui_message)
 
     def _load_settings(self):
@@ -78,8 +79,8 @@ class AceEditor(WebKit2.WebView):
         except Exception as e:
             logger.info(e)
 
-    def load_file(self, ftype: str, fhash: str, file: str, content: str):
-        command = f"loadFile('{ftype}', '{fhash}', '{file}', '{content}')"
+    def load_file(self, ftype: str, fname: str, fpath: str, content: str):
+        command = f"loadFile('{ftype}', '{fname}', '{fpath}', '{content}')"
         self.run_javascript(command, None, None)
 
     def new_session(self):
@@ -92,6 +93,10 @@ class AceEditor(WebKit2.WebView):
 
     def close_session(self, fhash):
         command = f"closeSession('{fhash}')"
+        self.run_javascript(command, None, None)
+
+    def remove_session(self, fhash):
+        command = f"removeSession('{fhash}')"
         self.run_javascript(command, None, None)
 
     def ui_message(self, message, mtype):
