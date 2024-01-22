@@ -33,12 +33,13 @@ const loadInitialSessionTab = () => {
 const newSession = (eve = null, session = null) => {
     let ftype          = "buffer";
     let fhash          = Date.now().toString();
+    let fpath          = ""
     session            = ( isNotNullOrUndefined(session) ) ? session : ace.createEditSession("");
 
-    aceSessions[fhash] = {"ftype": ftype, "fname": "", "path": "", "session": session};
+    aceSessions[fhash] = {"ftype": ftype, "fname": "", "fpath": fpath, "session": session};
 
     setSession(ftype, fhash, session);
-    sendMessage("load_buffer", fhash, "");
+    sendMessage("load_buffer", ftype, fhash, fpath, "");
 }
 
 const switchSession = (fhash) => {
@@ -57,9 +58,18 @@ const setSession = (ftype, fhash, session) => {
     }
 }
 
+const updateSession = (fhash, ftype, fname, fpath) => {
+    aceSessions[fhash]["ftype"] = ftype;
+    aceSessions[fhash]["fname"] = fname;
+    aceSessions[fhash]["fpath"] = fpath;
+}
+
 const closeSession = (fhash) => {
+    let ftype = aceSessions["ftype"];
+    let fpath = aceSessions["fpath"];
+
     delete aceSessions[fhash];
-    sendMessage("close", fhash, "");
+    sendMessage("close", ftype, fhash, fpath, "");
 }
 
 const removeSession = (fhash) => {
@@ -69,35 +79,17 @@ const removeSession = (fhash) => {
 const loadFile = (ftype, fname, fpath, content) => {
     let fhash          = Date.now().toString();
     session            = ace.createEditSession( atob(content) );
-    aceSessions[fhash] = {"ftype": ftype, "fname": fname, "path": fpath, "session": session};
+    aceSessions[fhash] = {"ftype": ftype, "fname": fname, "fpath": fpath, "session": session};
 
     setSession(ftype, fhash, session);
-    sendMessage("load_file", fhash, fname);
+    sendMessage("load_file", ftype, fhash, fpath, fname);
 }
 
+const saveSession = (fhash) => {
+    let ftype   = aceSessions[fhash]["ftype"];
+    let fpath   = aceSessions[fhash]["fpath"];
+    let session = aceSessions[fhash]["session"];
+    let content = session.getValue();
 
-
-
-
-const updatedTab = (ftype, fname) => {
-//    let elm         = document.querySelectorAll(`[fhash="${currentSession}"]`)[0];
-//    let tabTitleElm = elm.children[0];
-
-    aceSessions[currentSession]["ftype"] = ftype;
-    aceSessions[currentSession]["file"]  = fname;
-
-//    elm.setAttribute("ftype", ftype);
-//    tabTitleElm.textContent = fname;
-}
-
-
-
-
-const saveSession = () => {
-//    let fhash   = currentSession;
-//    let session = aceSessions[fhash]["session"];
-//    let data    = session.getValue();
-
-//    sendMessage("save", fhash, data);
-    console.log("");
+    sendMessage("save", ftype, fhash, fpath, content);
 }

@@ -27,10 +27,12 @@ const displayMessage = (message, type, timeout, msgWindow = "page-alert-zone") =
     }
 }
 
-const sendMessage = (topic, target, content) => {
+const sendMessage = (topic, ftype, fhash, fpath, content) => {
     const messageBody = {
         "topic": topic,
-        'target': target,
+        "ftype": ftype,
+        "fhash": fhash,
+        "fpath": fpath,
         "content": btoa(content)
     };
 

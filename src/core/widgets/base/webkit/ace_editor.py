@@ -46,6 +46,7 @@ class AceEditor(WebKit2.WebView):
         event_system.subscribe(f"load_file_{self.INDEX}", self.load_file)
         event_system.subscribe(f"new_session_{self.INDEX}", self.new_session)
         event_system.subscribe(f"switch_session_{self.INDEX}", self.switch_session)
+        event_system.subscribe(f"updated_session_{self.INDEX}", self.updated_session)
         event_system.subscribe(f"close_session_{self.INDEX}", self.close_session)
         event_system.subscribe(f"remove_session_{self.INDEX}", self.remove_session)
         event_system.subscribe(f"ui_message_{self.INDEX}", self.ui_message)
@@ -89,6 +90,10 @@ class AceEditor(WebKit2.WebView):
 
     def switch_session(self, fhash):
         command = f"switchSession('{fhash}')"
+        self.run_javascript(command, None, None)
+
+    def updated_session(self, fhash, ftype, fname, fpath):
+        command = f"updateSession('{fhash}', '{ftype}', '{fname}', '{fpath}')"
         self.run_javascript(command, None, None)
 
     def close_session(self, fhash):

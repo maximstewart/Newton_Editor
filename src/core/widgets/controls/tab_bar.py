@@ -96,17 +96,13 @@ class TabBar(Gtk.Notebook):
         self.set_current_page(page_num)
 
     def update_tab(self, fhash, title = "[BAD TITLE]"):
-        # container = Gtk.EventBox()
-        # header    = TabHeaderWidget(container, self._close_tab)
-        # page_num  = self.append_page(container, header)
+        for child in self.get_children():
+            if child.fhash == fhash:
+                target = child
+                break
 
-        # header.label.set_label(title)
-        # self.set_tab_detachable(container, True)
-        # self.set_tab_reorderable(container, True)
-
-        # self.show_all()
-        # self.set_current_page(page_num)
-        ...
+        label = self.get_tab_label(target).get_children()[0]
+        label.set_label(title)
 
     def close_tab(self, fhash):
         target = None

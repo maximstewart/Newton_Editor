@@ -21,7 +21,7 @@ const editorCommands = [
         name: "saveSession",
         bindKey: {win: "ctrl-s", mac: "ctrl-s"},
         exec: function(editor) {
-            saveSession();
+            saveSession(currentSession);
         },
         readOnly: true
     }, {

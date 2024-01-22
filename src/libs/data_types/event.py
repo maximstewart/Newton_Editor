@@ -11,6 +11,8 @@ import gi
 @dataclass
 class Event:
     topic: str
-    target: str
+    ftype: str
+    fhash: str
+    fpath: str
     content: str
     originator: int = -1
