@@ -11,7 +11,10 @@ from gi.repository import GLib
 
 # Application imports
 from ..mixins.signals_mixins import SignalsMixins
-from ..containers.core_widget import CoreWidget
+
+from ..containers.base_container import BaseContainer
+# from ..containers.core_widget import CoreWidget
+
 from .base_controller_data import BaseControllerData
 from .bridge_controller import BridgeController
 
@@ -52,7 +55,6 @@ class BaseController(SignalsMixins, BaseControllerData):
 
     def _subscribe_to_events(self):
         event_system.subscribe("shutting_down", lambda: print("Shutting down..."))
-        event_system.subscribe("handle_file_from_ipc", self.handle_file_from_ipc)
         event_system.subscribe("set_active_src_view", self.set_active_src_view)
         event_system.subscribe("get_active_src_view", self.get_active_src_view)
 
@@ -65,10 +67,9 @@ class BaseController(SignalsMixins, BaseControllerData):
         self.builder.expose_object("main_window", self.window)
 
         settings_manager.set_builder(self.builder)
-        self.core_widget = CoreWidget()
+        self.core_widget = BaseContainer()
 
         settings_manager.register_signals_to_builder([self, self.core_widget])
 
     def get_core_widget(self):
         return self.core_widget
-

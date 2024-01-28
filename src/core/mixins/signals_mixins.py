@@ -1,7 +1,6 @@
 # Python imports
 
 # Lib imports
-from .signals.ipc_signals_mixin import IPCSignalsMixin
 from .signals.keyboard_signals_mixin import KeyboardSignalsMixin
 
 # Application imports
@@ -9,5 +8,5 @@ from .signals.keyboard_signals_mixin import KeyboardSignalsMixin
 
 
 
-class SignalsMixins(KeyboardSignalsMixin, IPCSignalsMixin):
+class SignalsMixins(KeyboardSignalsMixin):
     ...

@@ -27,9 +27,10 @@ class FilesController:
 
     def _subscribe_to_events(self):
         event_system.subscribe(f"set_pre_drop_dnd_{self.INDEX}", self.set_pre_drop_dnd)
+        event_system.subscribe("handle_file_from_ipc", self.handle_file_from_ipc)
         event_system.subscribe(f"handle_file_event_{self.INDEX}", self.handle_file_event)
 
-    def set_pre_drop_dnd(self, gfiles):
+    def set_pre_drop_dnd(self, gfiles, line: int = 0):
         for gfile in gfiles:
             fname   = gfile.get_basename()
             fpath   = gfile.get_path()
@@ -46,9 +47,29 @@ class FilesController:
                     ftype,
                     fname,
                     fpath,
-                    content
+                    content,
+                    line
                 )
             )
+
+    def handle_file_from_ipc(self, path: str) -> None:
+        logger.debug(f"Path From IPC: {path}")
+        line  = "0"
+        fpath = ""
+
+        try:
+            fpath, line = path.split(":")
+        except:
+            fpath = path
+
+        print(fpath)
+        gfile = Gio.File.new_for_path(fpath)
+
+        try:
+            logger.info(f"Line:  {line}")
+            self.set_pre_drop_dnd([gfile], int(line))
+        except Exception as e:
+            logger.info(repr(e))
 
     def handle_file_event(self, event):
         match event.topic:

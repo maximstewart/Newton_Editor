@@ -14,6 +14,6 @@ window.onerror = function(msg, url, line, col, error) {
 
     sendMessage("error", "", data)
 
-   // If you return true, then error alerts (like in older versions of Internet Explorer) will be suppressed.
-   return suppressErrorAlert;
+    // If you return true, then error alerts (like in older versions of Internet Explorer) will be suppressed.
+    return suppressErrorAlert;
 };

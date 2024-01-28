@@ -80,8 +80,8 @@ class AceEditor(WebKit2.WebView):
         except Exception as e:
             logger.info(e)
 
-    def load_file(self, ftype: str, fname: str, fpath: str, content: str):
-        command = f"loadFile('{ftype}', '{fname}', '{fpath}', '{content}')"
+    def load_file(self, ftype: str, fname: str, fpath: str, content: str, line: int = 0):
+        command = f"loadFile('{ftype}', '{fname}', '{fpath}', '{content}', '{line}')"
         self.run_javascript(command, None, None)
 
     def new_session(self):
@@ -119,6 +119,8 @@ class WebkitUISettings(WebKit2.Settings):
     # Note: Highly insecure setup but most "app" like setup I could think of.
     #       Audit heavily any scripts/links ran/clicked under this setup!
     def _set_default_settings(self):
+        # self.set_enable_xss_auditor(True)
+        # self.set_enable_hyperlink_auditing(True)
         self.set_enable_xss_auditor(False)
         self.set_enable_hyperlink_auditing(False)
         self.set_allow_file_access_from_file_urls(True)
@@ -137,4 +139,6 @@ class WebkitUISettings(WebKit2.Settings):
         self.set_enable_webaudio(True)
         self.set_enable_accelerated_2d_canvas(True)
 
-        self.set_user_agent(f"{app_name}")
+        self.set_user_agent(f"Mozilla/5.0 {app_name}")
+
+

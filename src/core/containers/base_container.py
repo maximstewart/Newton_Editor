@@ -14,9 +14,9 @@ from .editors_container import EditorsContainer
 
 
 
-class CoreWidget(Gtk.Box):
+class BaseContainer(Gtk.Box):
     def __init__(self):
-        super(CoreWidget, self).__init__()
+        super(BaseContainer, self).__init__()
 
         builder  = settings_manager.get_builder()
         self.ctx = self.get_style_context()

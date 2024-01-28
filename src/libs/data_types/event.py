@@ -2,7 +2,6 @@
 from dataclasses import dataclass, field
 
 # Lib imports
-import gi
 
 # Application imports
 

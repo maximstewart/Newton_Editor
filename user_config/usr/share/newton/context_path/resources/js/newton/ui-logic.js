@@ -76,7 +76,7 @@ const removeSession = (fhash) => {
     delete aceSessions[fhash];
 }
 
-const loadFile = (ftype, fname, fpath, content) => {
+const loadFile = (ftype, fname, fpath, content, line = 0) => {
     let fhash          = Date.now().toString();
     session            = ace.createEditSession( atob(content) );
     aceSessions[fhash] = {"ftype": ftype, "fname": fname, "fpath": fpath, "session": session};
