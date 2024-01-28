@@ -10,14 +10,10 @@ import tracemalloc
 tracemalloc.start()
 
 # Lib imports
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 
 # Application imports
 from __builtins__ import *
 from app import Application
-
 
 
 
@@ -47,7 +43,6 @@ if __name__ == "__main__":
 
         settings_manager.do_dirty_start_check()
         Application(args, unknownargs)
-        Gtk.main()
     except Exception as e:
         traceback.print_exc()
         quit()
