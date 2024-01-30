@@ -13,7 +13,10 @@ from .capabilities import Capabilities
 class ReadPipe(threading.Thread):
     def __init__(self, pipe):
         threading.Thread.__init__(self)
-        self.pipe = pipe
+
+        self.daemon = True
+        self.pipe   = pipe
+
 
     def run(self):
         line = self.pipe.readline().decode('utf-8')
@@ -63,7 +66,7 @@ class LSPController:
         if not language or not server_proc: return False
 
         root_path         = None
-        # root_uri          = 'file:///home/abaddon/Coding/Projects/Active/C_n_CPP_Projects/gtk/Newton/src/'
+        # root_uri          = 'file:///home/abaddon/Coding/Projects/Active/Python_Projects/000_Usable/gtk/Newton_Editor/src/'
         # workspace_folders = [{'name': 'python-lsp', 'uri': root_uri}]
         root_uri          = ''
         workspace_folders = [{'name': '', 'uri': root_uri}]
@@ -76,6 +79,7 @@ class LSPController:
             initializationOptions = initialization_options, \
             capabilities = Capabilities.data, \
             trace = "off", \
+            # trace = "on", \
             workspaceFolders = workspace_folders
         )
 
@@ -123,16 +127,17 @@ class LSPController:
         
         return []
 
-    def do_change(self, language_id, line, start, end, text):
+    def do_change(self, uri, language_id, line, start, end, text):
         if language_id in self.lsp_clients.keys():
 
-            start_pos    = pylspclient.lsp_structs.Position(line, start.get_line_offset())
-            end_pos      = pylspclient.lsp_structs.Position(line, end.get_line_offset())
-            range_info   = pylspclient.lsp_structs.Range(start_pos, end_pos)
-            text_length  = len(text)
-            change_event = pylspclient.lsp_structs.TextDocumentContentChangeEvent(range_info, text_length, text)
+            start_pos     = pylspclient.lsp_structs.Position(line, start.get_line_offset())
+            end_pos       = pylspclient.lsp_structs.Position(line, end.get_line_offset())
+            range_info    = pylspclient.lsp_structs.Range(start_pos, end_pos)
+            text_length   = len(text)
+            text_document = pylspclient.lsp_structs.TextDocumentItem(uri, language_id, 1, text)
+            change_event  = pylspclient.lsp_structs.TextDocumentContentChangeEvent(range_info, text_length, text)
 
-            return self.lsp_clients[language_id].didChange( None, change_event )
+            return self.lsp_clients[language_id].didChange( text_document, change_event )
         
         return []
 
@@ -155,7 +160,7 @@ class LSPController:
                     )
 
         return []
-        
+
 
     def load_lsp_server(self, language_id):
         if not language_id in self.lsp_servers_config.keys():

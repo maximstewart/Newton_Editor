@@ -1,3 +1,8 @@
+# Python imports
+
+# Lib imports
+
+# Application imports
 from . import lsp_structs
 
 
@@ -40,13 +45,13 @@ class LspClient(object):
         """
 
         self.lsp_endpoint.start()
-        return self.lsp_endpoint.call_method("initialize", \
-                                                processId = processId, \
-                                                rootPath  = rootPath, \
-                                                rootUri   = rootUri, \
-                                                initializationOptions = initializationOptions, \
-                                                capabilities = capabilities, \
-                                                trace = trace, \
+        return self.lsp_endpoint.call_method("initialize",
+                                                processId = processId,
+                                                rootPath  = rootPath,
+                                                rootUri   = rootUri,
+                                                initializationOptions = initializationOptions,
+                                                capabilities = capabilities,
+                                                trace = trace,
                                                 workspaceFolders = workspaceFolders
         )
 
@@ -61,18 +66,12 @@ class LspClient(object):
 
     def shutdown(self):
         """
-        The initialized notification is sent from the client to the server after the client received the result of the initialize request
-        but before the client is sending any other request or notification to the server. The server can use the initialized notification
-        for example to dynamically register capabilities. The initialized notification may only be sent once.
         """
 
         return self.lsp_endpoint.call_method("shutdown")
 
     def exit(self):
         """
-        The initialized notification is sent from the client to the server after the client received the result of the initialize request
-        but before the client is sending any other request or notification to the server. The server can use the initialized notification
-        for example to dynamically register capabilities. The initialized notification may only be sent once.
         """
 
         self.lsp_endpoint.send_notification("exit")
@@ -115,7 +114,7 @@ class LspClient(object):
         The document change notification is sent from the client to the server to signal changes to a text document.
         In 2.0 the shape of the params has changed to include proper version numbers and language ids.
 
-        :param VersionedTextDocumentIdentifier textDocument: The initial trace setting. If omitted trace is disabled ('off').
+        :param TextDocumentItem textDocument: The text document.
         :param TextDocumentContentChangeEvent[] contentChanges: The actual content changes. The content changes describe single state changes
             to the document. So if there are two content changes c1 and c2 for a document in state S then c1 move the document
             to S' and c2 to S''.

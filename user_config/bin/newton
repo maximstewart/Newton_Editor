@@ -12,11 +12,25 @@ function main() {
 
     files=()
     for f in "$@"; do
+#        ff=${f%:*}
+#        ii=${f#*:}
+#        target=$(readlink -f "${ff}")
+
         target=$(readlink -f "${f}")
         i="${#files[@]}"
         size=$(($i + 1))
+
         files[$size]="${target}"
+
+#        if [ -n "$ii" ]; then
+#            files[$size]="${target}:${ii}"
+#        else
+#            files[$size]="${target}${ii}"
+#        fi
     done
+
+    echo "${files[@]}"
+
 
     cd "/opt/"
     python /opt/newton.zip "${files[@]}"

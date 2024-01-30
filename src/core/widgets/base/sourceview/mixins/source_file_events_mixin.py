@@ -6,6 +6,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '4')
 from gi.repository import Gtk
+from gi.repository import GLib
 from gi.repository import Gio
 from gi.repository import GtkSource
 
@@ -79,7 +80,7 @@ class FileEventsMixin:
             self.update_labels(gfile)
             self._loading_file = False
 
-        self._file_loader.load_async(io_priority = 80,
+        self._file_loader.load_async(io_priority = GLib.PRIORITY_HIGH,
                             cancellable = None,
                             progress_callback = None,
                             progress_callback_data = None,
@@ -140,8 +141,9 @@ class FileEventsMixin:
         for provider in self._completion.get_providers():
             self._completion.remove_provider(provider)
             
-        uri    = self._current_file.get_uri()
-        buffer = self.get_buffer()
+        uri        = self._current_file.get_uri()
+        buffer     = self.get_buffer()
+        buffer.uri = uri
 
         event_system.emit("textDocument/didOpen", (self._current_filetype, uri,))
 
@@ -153,5 +155,3 @@ class FileEventsMixin:
         self._completion.add_provider(lsp_completion_provider)
 
         self.got_to_line(buffer, line)
-
-

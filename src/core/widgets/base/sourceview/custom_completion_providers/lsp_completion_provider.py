@@ -39,7 +39,13 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         if buffer.get_context_classes_at_iter(iter) != ['no-spell-check']:
             return False
 
-        event_system.emit("textDocument/completion", (self._source_view, context, self.do_populate))
+        ch = iter.get_char()
+        # NOTE: Look to re-add or apply supprting logic to use spaces
+        # As is it slows down the editor in certain contexts...
+        if not (ch in ('_', '.', ' ') or ch.isalnum()):
+        # if not (ch in ('_', '.') or ch.isalnum()):
+            return False
+
         return True
 
     def do_get_priority(self):
@@ -49,7 +55,9 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         return GtkSource.CompletionActivation.INTERACTIVE
 
     def do_populate(self, context, result = None):
+        result    = event_system.emit_and_await("textDocument/completion", (self._source_view,))
         proposals = []
+
         if result:
             if not result.items is None:
                 for item in result.items:
@@ -86,6 +94,5 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
 
         comp_item.set_icon( self.get_icon_for_type(item.kind) )
         comp_item.set_info(item.documentation)
-        
-        
+
         return comp_item
