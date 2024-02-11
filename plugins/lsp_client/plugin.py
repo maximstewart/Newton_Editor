@@ -53,17 +53,18 @@ class Plugin(PluginBase):
     def inner_subscribe_to_events(self):
         self._event_system.subscribe("shutting_down", self._shutting_down)
 
-        # self._event_system.subscribe("textDocument/didChange", self._buffer_changed)
-        self._event_system.subscribe("textDocument/didOpen", self.lsp_controller.do_open)
-        self._event_system.subscribe("textDocument/didSave", self.lsp_controller.do_save)
-        self._event_system.subscribe("textDocument/didClose", self.lsp_controller.do_close)
+        # self._event_system.subscribe("buffer_changed", self._buffer_changed)
+        self._event_system.subscribe("textDocument/didChange",  self._buffer_changed)
+        self._event_system.subscribe("textDocument/didOpen",    self.lsp_controller.do_open)
+        self._event_system.subscribe("textDocument/didSave",    self.lsp_controller.do_save)
+        self._event_system.subscribe("textDocument/didClose",   self.lsp_controller.do_close)
         self._event_system.subscribe("textDocument/definition", self._do_goto)
         self._event_system.subscribe("textDocument/completion", self._do_completion)
 
     def _shutting_down(self):
         self.lsp_controller._shutting_down()
 
-    def _buffer_changed(self, language_id, buffer):
+    def _buffer_changed(self, file_type, buffer):
         iter   = buffer.get_iter_at_mark( buffer.get_insert() )
         line   = iter.get_line()
         start  = iter.copy()
@@ -74,7 +75,8 @@ class Plugin(PluginBase):
         end.forward_to_line_end()
 
         text   = buffer.get_text(start, end, include_hidden_chars = False)
-        result = self.lsp_controller.do_change(buffer.uri, language_id, line, start, end, text)
+        result = self.lsp_controller.do_change(buffer.uri, buffer.language_id, line, start, end, text)
+
 
     def _do_completion(self, source_view):
         filepath  = source_view.get_current_file()

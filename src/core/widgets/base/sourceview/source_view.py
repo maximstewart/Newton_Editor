@@ -1,4 +1,5 @@
 # Python imports
+import threading
 
 # Lib imports
 import gi
@@ -33,6 +34,9 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self._current_filename: str  = ""
         self._current_filepath: str  = None
         self._current_filetype: str  = "buffer"
+        self._cut_buffer: str        = ""
+        self._timer: threading.Timer = None
+        self._idle_id: int           = None
 
         self._skip_file_load         = False
         self._ignore_internal_change = False
@@ -96,3 +100,19 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
 
     def _load_widgets(self):
         self._set_up_dnd()
+
+    def cancel_timer(self):
+        if self._timer:
+            self._timer.cancel()
+            GLib.idle_remove_by_data(self._idle_id)
+
+    def delay_cut_buffer_clear_glib(self):
+        self._idle_id = GLib.idle_add(self._clear_cut_buffer)
+
+    def clear_cut_buffer_delayed(self):
+        self._timer = threading.Timer(15, self.delay_cut_buffer_clear_glib, ())
+        self._timer.daemon = True
+        self._timer.start()
+
+    def _clear_cut_buffer(self):
+        self._cut_buffer = ""

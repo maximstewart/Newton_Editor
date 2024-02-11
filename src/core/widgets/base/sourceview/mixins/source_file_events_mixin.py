@@ -11,8 +11,8 @@ from gi.repository import Gio
 from gi.repository import GtkSource
 
 # Application imports
-from ..custom_completion_providers.lsp_completion_provider import LSPCompletionProvider
-
+# from ..custom_completion_providers.lsp_completion_provider import LSPCompletionProvider
+from ..custom_completion_providers.python_completion_provider import PythonCompletionProvider
 
 
 class FileEventsMixin:
@@ -140,18 +140,24 @@ class FileEventsMixin:
     def _document_loaded(self, line: int = 0):
         for provider in self._completion.get_providers():
             self._completion.remove_provider(provider)
-            
-        uri        = self._current_file.get_uri()
-        buffer     = self.get_buffer()
-        buffer.uri = uri
+
+        uri                = self._current_file.get_uri()
+        buffer             = self.get_buffer()
+        buffer.uri         = uri
+        buffer.language_id = self._current_filetype
 
         event_system.emit("textDocument/didOpen", (self._current_filetype, uri,))
 
         word_completion = GtkSource.CompletionWords.new("word_completion")
         word_completion.register(buffer)
         self._completion.add_provider(word_completion)
-        
-        lsp_completion_provider = LSPCompletionProvider(self)
-        self._completion.add_provider(lsp_completion_provider)
+
+        # lsp_completion_provider = LSPCompletionProvider(self)
+        # self._completion.add_provider(lsp_completion_provider)
+
+        # if self._current_filetype in ("python", "python3"):
+        #     py_lsp_completion_provider = PythonCompletionProvider(uri)
+        #     self._completion.add_provider(py_lsp_completion_provider)
 
         self.got_to_line(buffer, line)
+        event_system.emit("buffer_changed_first_load", (buffer, ))
