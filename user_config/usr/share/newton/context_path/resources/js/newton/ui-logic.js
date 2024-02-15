@@ -1,3 +1,30 @@
+
+const loadPreviewEditor = () => {
+    ace.require("ace/ext/language_tools");
+
+    previewEditor = ace.edit("preview-editor");
+    // Note:  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
+    previewEditor.setOptions({
+        printMarginColumn: 80,
+        enableBasicAutocompletion: true,
+        enableInlineAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true,
+        highlightActiveLine: true,
+        useSoftTabs: true,
+        tabSize: 4,
+        tooltipFollowsMouse: true,
+        useWrapMode: false,
+        scrollPastEnd: 0.5,
+        mergeUndoDeltas: false
+    });
+
+    // Note:  https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
+    previewEditor.commands.addCommands(editorCommands);
+
+    previewEditor.setTheme("ace/theme/one_dark");
+}
+
 const loadEditor = () => {
     ace.require("ace/ext/language_tools");
 
@@ -24,7 +51,7 @@ const loadEditor = () => {
     editor.setTheme("ace/theme/one_dark");
 }
 
-const loadInitialSessionTab = () => {
+const loadInitialSession = () => {
     newSession(null, editor.getSession());
 }
 
@@ -92,4 +119,84 @@ const saveSession = (fhash) => {
     let content = session.getValue();
 
     sendMessage("save", ftype, fhash, fpath, content);
+}
+
+
+
+
+const listOpenBuffers = () => {
+     $('#buffers-modal').modal("toggle");
+
+    let ulElm = document.getElementById('buffers-selection');
+    let keys  = Object.keys(aceSessions);
+
+    clearChildNodes(ulElm);
+    for (var i = 0; i < keys.length; i++) {
+        let session = aceSessions[keys[i]];
+        let liElm   = document.createElement("li");
+        let fname   = aceSessions[keys[i]]["fname"];
+        let fhash   = keys[i];
+
+        liElm.innerText = ( fname === "" ) ? "buffer" : fname;
+        liElm.classList.add("list-group-item");
+        liElm.setAttribute("fhash", fhash);
+
+        if (fhash === currentSession) {
+            previewSel  = liElm;
+            liElm.classList.add("bg-success");
+            liElm.classList.add("bg-info");
+        }
+
+
+        liElm.addEventListener("click", (elm) => {
+            previewSel.classList.remove("bg-info");
+
+            let fhash   = elm.target.getAttribute("fhash");
+            let ftype   = aceSessions[fhash]["ftype"];
+            let session = aceSessions[fhash]["session"];
+            previewSel  = elm.target;
+
+            previewEditor.setSession(session);
+
+            if (ftype !== "buffer") {
+                previewEditor.session.setMode("ace/mode/" + ftype);
+            }
+
+            previewSel.classList.add("bg-info");
+        })
+
+        liElm.addEventListener("dblclick", (elm) => {
+            let fhash   = elm.target.getAttribute("fhash");
+            let ftype   = aceSessions[fhash]["ftype"];
+            let session = aceSessions[fhash]["session"];
+            previewSel  = null;
+
+            setSession(ftype, fhash, session);
+            $('#buffers-modal').modal("toggle");
+        })
+
+        ulElm.appendChild(liElm);
+    }
+
+}
+
+
+const selectPriorPreview = () => {
+    let selectedElm = previewSel.previousElementSibling;
+    if ( !isNotNullOrUndefined(selectedElm) ) {
+        let childrenElms = previewSel.parentElement.children;
+        selectedElm = childrenElms[childrenElms.length - 1];
+    }
+
+    selectedElm.click();
+}
+
+const selectNextPreview = () => {
+    let selectedElm = previewSel.nextElementSibling;
+    if ( !isNotNullOrUndefined(selectedElm) ) {
+        let childrenElms = previewSel.parentElement.children;
+        selectedElm = childrenElms[0];
+    }
+
+    selectedElm.click();
 }

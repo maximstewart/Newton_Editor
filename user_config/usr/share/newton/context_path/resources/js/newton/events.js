@@ -1,8 +1,9 @@
 window.onload = (eve) => {
-    loadEditor();
-    loadInitialSessionTab();
-
     console.log("Window Loaded...");
+
+    loadEditor();
+    loadPreviewEditor();
+    loadInitialSession();
 }
 
 window.onerror = function(msg, url, line, col, error) {
@@ -17,3 +18,62 @@ window.onerror = function(msg, url, line, col, error) {
     // If you return true, then error alerts (like in older versions of Internet Explorer) will be suppressed.
     return suppressErrorAlert;
 };
+
+
+document.addEventListener("keyup", (eve) => {
+    switch (eve.key) {
+        case "ArrowUp":
+            break;
+        case "ArrowDown":
+            break;
+        case "ArrowLeft":
+            break;
+        case "ArrowRight":
+            break;
+        case "Enter":
+            if ( isNotNullOrUndefined(previewSel) ) {
+                let event = new MouseEvent('dblclick', {
+                    'view': window,
+                    'bubbles': true,
+                    'cancelable': true
+                  });
+
+                previewSel.dispatchEvent(event);
+            }
+        case "Control":
+            isControlDown = false;
+        case "b":
+            if (isControlDown) {
+                $('#buffers-modal').modal("toggle");
+            }
+            break;
+        default:
+            break
+    }
+});
+
+
+document.addEventListener("keydown", (eve) => {
+    switch (eve.key) {
+        case "ArrowUp":
+            if ( isNotNullOrUndefined(previewSel) ) {
+                eve.preventDefault();
+                selectPriorPreview();
+            }
+            break;
+        case "ArrowDown":
+            if ( isNotNullOrUndefined(previewSel) ) {
+                eve.preventDefault();
+                selectNextPreview();
+            }
+            break;
+        case "ArrowLeft":
+            break;
+        case "ArrowRight":
+            break;
+        case "Control":
+            isControlDown = true;
+        default:
+            break
+    }
+});

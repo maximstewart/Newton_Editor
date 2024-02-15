@@ -31,12 +31,14 @@ class BaseController(SignalsMixins, BaseControllerData):
         if len(messages) > 0:
             settings_manager.set_is_starting_with_file(True)
 
+
         self.setup_controller_data()
 
         self._setup_styling()
         self._setup_signals()
         self._subscribe_to_events()
         self._load_controllers()
+
 
         if args.no_plugins == "false":
             self.plugins.launch_plugins()
@@ -50,8 +52,8 @@ class BaseController(SignalsMixins, BaseControllerData):
 
     def _setup_signals(self):
         self.window.connect("focus-out-event", self.unset_keys_and_data)
-        self.window.connect("key-press-event", self.on_global_key_press_controller)
-        self.window.connect("key-release-event", self.on_global_key_release_controller)
+        # self.window.connect("key-press-event", self.on_global_key_press_controller)
+        # self.window.connect("key-release-event", self.on_global_key_release_controller)
 
     def _subscribe_to_events(self):
         event_system.subscribe("shutting_down", lambda: print("Shutting down..."))

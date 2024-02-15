@@ -1,5 +1,10 @@
 /* IDs */
 
+#editor,
+#preview-editor {
+    background-color: #00000000;
+}
+
 #editor {
     background-color: #00000000;
     margin: 0;
@@ -28,8 +33,30 @@
 }
 
 
+#preview-editor {
+    height: -webkit-fill-available;
+    width: -webkit-fill-available;
+    max-height: calc(100% - 200px);
+}
+
+#buffers-selection {
+    max-height: 565px;
+    min-height: 565px;
+    overflow-y: auto;
+}
+
 
 /* CLASSES */
+
+.max-height-800 {
+    max-height: 800px;
+}
+
+
+.margin-bottom-neg-200 {
+    margin-bottom: -200px;
+}
+
 .ace_status-indicator {
     color: gray;
     position: absolute;

@@ -14,16 +14,49 @@
 </head>
 <body>
 
-    <div class="container editor-container">
-        <div class="row">
-            <div class="col">
-                <pre id="editor"></pre>
+
+    <div id="alerts-container" class="container-fluid">
+        <div class="row page-alert-zone-container">
+            <div id="page-alert-zone" class="col">
             </div>
         </div>
     </div>
 
+
+    <pre id="editor"></pre>
+
+    <!-- Buffers modal -->
+    <div class="modal fade" id="buffers-modal" tabindex="-1" role="dialog" data-bs-theme="dark">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Buffers:</h3>
+                </div>
+
+                <div class="modal-body margin-bottom-neg-200">
+                    <div class="row">
+                        <div class="col max-height-600 noselect">
+                            <ul id="buffers-selection" class="list-group scroller">
+                            </ul>
+                            <input id="buffer-search" class="form-control mr-sm-2" type="search" placeholder="Search..." aria-label="Search" />
+                        </div>
+                        <div class="col max-height-800">
+                            <pre id="preview-editor"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-danger btn-sm">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <!-- For internal scripts... -->
-    <!--  <script src="js/libs/jquery-3.7.1.min.js"></script>  -->
+      <script src="resources/js/libs/jquery-3.7.1.min.js"></script>  
 
     <!-- For Bootstrap... -->
     <script src="resources/js/libs/bootstrap5/bootstrap.bundle.min.js"></script>

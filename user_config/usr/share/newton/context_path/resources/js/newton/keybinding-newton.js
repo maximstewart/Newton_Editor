@@ -18,6 +18,13 @@ const editorCommands = [
             })
         }
     }, {
+        name: "listBuffers",
+        bindKey: {win: "ctrl-b", mac: "ctrl-b"},
+        exec: function(editor) {
+            listOpenBuffers();
+        },
+        readOnly: true
+    }, {
         name: "saveSession",
         bindKey: {win: "ctrl-s", mac: "ctrl-s"},
         exec: function(editor) {

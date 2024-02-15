@@ -84,10 +84,10 @@ class FilesController:
                 event_system.emit(f"close_tab_{event.originator}", (event.fhash))
             case "load_buffer":
                 self.load_buffer(event.fhash)
-                event_system.emit(f"add_tab_{event.originator}", (event.fhash, "buffer",))
+                # event_system.emit(f"add_tab_{event.originator}", (event.fhash, "buffer",))
             case "load_file":
                 content  = base64.b64decode( event.content.encode() ).decode("utf-8")
-                event_system.emit(f"add_tab_with_name_{event.originator}", (event.fhash, content,))
+                # event_system.emit(f"add_tab_with_name_{event.originator}", (event.fhash, content,))
             case _:
                 return
 
