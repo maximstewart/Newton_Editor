@@ -125,13 +125,12 @@ const saveSession = (fhash) => {
 
 
 const listOpenBuffers = () => {
-     $('#buffers-modal').modal("toggle");
+    $('#buffers-modal').modal("toggle");
 
     let ulElm = document.getElementById('buffers-selection');
     let keys  = Object.keys(aceSessions);
 
-    clearChildNodes(ulElm);
-    for (var i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
         let session = aceSessions[keys[i]];
         let liElm   = document.createElement("li");
         let fname   = aceSessions[keys[i]]["fname"];
@@ -148,13 +147,15 @@ const listOpenBuffers = () => {
         }
 
 
-        liElm.addEventListener("click", (elm) => {
+        liElm.addEventListener("click", (eve) => {
+            if ( !isNotNullOrUndefined(previewSel) ) return;
+
             previewSel.classList.remove("bg-info");
 
-            let fhash   = elm.target.getAttribute("fhash");
+            let fhash   = eve.target.getAttribute("fhash");
             let ftype   = aceSessions[fhash]["ftype"];
             let session = aceSessions[fhash]["session"];
-            previewSel  = elm.target;
+            previewSel  = eve.target;
 
             previewEditor.setSession(session);
 
@@ -165,19 +166,21 @@ const listOpenBuffers = () => {
             previewSel.classList.add("bg-info");
         })
 
-        liElm.addEventListener("dblclick", (elm) => {
-            let fhash   = elm.target.getAttribute("fhash");
+        liElm.addEventListener("dblclick", (eve) => {
+            let fhash   = eve.target.getAttribute("fhash");
             let ftype   = aceSessions[fhash]["ftype"];
             let session = aceSessions[fhash]["session"];
-            previewSel  = null;
 
+            clearChildNodes(previewSel.parentElement);
+
+            previewSel  = null;
             setSession(ftype, fhash, session);
             $('#buffers-modal').modal("toggle");
+            editor.focus();
         })
 
         ulElm.appendChild(liElm);
     }
-
 }
 
 

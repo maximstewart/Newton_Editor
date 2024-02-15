@@ -88,6 +88,8 @@ class FilesController:
             case "load_file":
                 content  = base64.b64decode( event.content.encode() ).decode("utf-8")
                 # event_system.emit(f"add_tab_with_name_{event.originator}", (event.fhash, content,))
+            case "open_file":
+                event_system.emit(f"open_files", (None, None, self.INDEX,))
             case _:
                 return
 

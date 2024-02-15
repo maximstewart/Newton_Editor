@@ -41,7 +41,7 @@ class OpenFileButton(Gtk.Button):
     def _load_widgets(self):
         ...
 
-    def _open_files(self, widget = None, eve = None):
+    def _open_files(self, widget = None, eve = None, widget_index = None):
         chooser = Gtk.FileChooserDialog("Open File...", None,
                                         Gtk.FileChooserAction.OPEN,
                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -54,11 +54,24 @@ class OpenFileButton(Gtk.Button):
             ...
 
         response = chooser.run()
-        if response == Gtk.ResponseType.OK:
-            filename = chooser.get_filename()
-            if filename:
-                path   = filename if os.path.isabs(filename) else os.path.abspath(filename)
-                _gfile = Gio.File.new_for_path(path)
-                event_system.emit("keyboard_open_file", (_gfile,))
+        if not response == Gtk.ResponseType.OK:
+            chooser.destroy()
+            return
+
+        filename = chooser.get_filename()
+        if not filename:
+            chooser.destroy()
+            return
+
+
+        path   = filename if os.path.isabs(filename) else os.path.abspath(filename)
+        _gfile = Gio.File.new_for_path(path)
+
+        event_system.emit(
+            f"set_pre_drop_dnd_{widget_index}" if widget_index else "keyboard_open_file",
+            (
+                [_gfile],
+            )
+        )
 
         chooser.destroy()

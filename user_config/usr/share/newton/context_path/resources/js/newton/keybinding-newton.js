@@ -18,10 +18,10 @@ const editorCommands = [
             })
         }
     }, {
-        name: "listBuffers",
-        bindKey: {win: "ctrl-b", mac: "ctrl-b"},
+        name: "openFile",
+        bindKey: {win: "ctrl-o", mac: "ctrl-o"},
         exec: function(editor) {
-            listOpenBuffers();
+            sendMessage("open_file", "", "", "", "");
         },
         readOnly: true
     }, {

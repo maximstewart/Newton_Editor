@@ -44,7 +44,14 @@ document.addEventListener("keyup", (eve) => {
             isControlDown = false;
         case "b":
             if (isControlDown) {
-                $('#buffers-modal').modal("toggle");
+                if ( isNotNullOrUndefined(previewSel) ) {
+                    clearChildNodes(previewSel.parentElement);
+                    $('#buffers-modal').modal("toggle");
+                    previewSel  = null;
+                    editor.focus();
+                } else {
+                    listOpenBuffers();
+                }
             }
             break;
         default:
