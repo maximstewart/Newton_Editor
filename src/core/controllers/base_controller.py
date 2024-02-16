@@ -10,17 +10,16 @@ from gi.repository import Gdk
 from gi.repository import GLib
 
 # Application imports
-from ..mixins.signals_mixins import SignalsMixins
+from libs.mixins.keyboard_signals_mixin import KeyboardSignalsMixin
 
 from ..containers.base_container import BaseContainer
-# from ..containers.core_widget import CoreWidget
 
 from .base_controller_data import BaseControllerData
 from .bridge_controller import BridgeController
 
 
 
-class BaseController(SignalsMixins, BaseControllerData):
+class BaseController(KeyboardSignalsMixin, BaseControllerData):
     def __init__(self, args, unknownargs):
         messages = []
         for arg in unknownargs + [args.new_tab,]:

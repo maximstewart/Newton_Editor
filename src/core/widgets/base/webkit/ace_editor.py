@@ -49,6 +49,10 @@ class AceEditor(WebKit2.WebView):
         event_system.subscribe(f"updated_session_{self.INDEX}", self.updated_session)
         event_system.subscribe(f"close_session_{self.INDEX}", self.close_session)
         event_system.subscribe(f"remove_session_{self.INDEX}", self.remove_session)
+        event_system.subscribe(f"keyboard_scale_up_text_{self.INDEX}", self.keyboard_scale_up_text)
+        event_system.subscribe(f"keyboard_scale_down_text_{self.INDEX}", self.keyboard_scale_down_text)
+        event_system.subscribe(f"toggle_highlight_line_{self.INDEX}", self.toggle_highlight_line)
+
         event_system.subscribe(f"ui_message_{self.INDEX}", self.ui_message)
 
     def _load_settings(self):
@@ -102,6 +106,18 @@ class AceEditor(WebKit2.WebView):
 
     def remove_session(self, fhash):
         command = f"removeSession('{fhash}')"
+        self.run_javascript(command, None, None)
+
+    def keyboard_scale_up_text(self):
+        command = "zoomIn()"
+        self.run_javascript(command, None, None)
+
+    def keyboard_scale_down_text(self):
+        command = "zoomOut()"
+        self.run_javascript(command, None, None)
+
+    def toggle_highlight_line(self):
+        command = "toggleLineHighlight()"
         self.run_javascript(command, None, None)
 
     def ui_message(self, message, mtype):

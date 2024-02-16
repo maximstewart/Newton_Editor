@@ -23,12 +23,16 @@ window.onerror = function(msg, url, line, col, error) {
 document.addEventListener("keyup", (eve) => {
     switch (eve.key) {
         case "ArrowUp":
+            setLabels();
             break;
         case "ArrowDown":
+            setLabels();
             break;
         case "ArrowLeft":
+            setLabels();
             break;
         case "ArrowRight":
+            setLabels();
             break;
         case "Enter":
             if ( isNotNullOrUndefined(previewSel) ) {
@@ -40,8 +44,10 @@ document.addEventListener("keyup", (eve) => {
 
                 previewSel.dispatchEvent(event);
             }
+            break
         case "Control":
             isControlDown = false;
+            break;
         case "b":
             if (isControlDown) {
                 if ( isNotNullOrUndefined(previewSel) ) {
@@ -55,6 +61,7 @@ document.addEventListener("keyup", (eve) => {
             }
             break;
         default:
+            setLabels();
             break
     }
 });
@@ -80,7 +87,18 @@ document.addEventListener("keydown", (eve) => {
             break;
         case "Control":
             isControlDown = true;
+            break;
         default:
             break
     }
 });
+
+
+// editor.session.selection.on('changeCursor', (eve) => {
+//     let ftype = aceSessions[fhash]["ftype"];
+//     let fpath = aceSessions[fhash]["fpath"];
+//     console.log(eve);
+
+//     // sendMessage("set_labels", ftype, "", fpath, "");
+// });
+

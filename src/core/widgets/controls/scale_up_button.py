@@ -20,7 +20,7 @@ class ScaleUpButton(Gtk.Button):
 
 
     def _setup_styling(self):
-        self.set_label("Zoom")
+        self.set_label("Zoom In")
         self.set_image( Gtk.Image.new_from_icon_name("gtk-zoom-in", 4) )
         self.set_always_show_image(True)
         self.set_image_position(1) # Left - 0, Right = 1

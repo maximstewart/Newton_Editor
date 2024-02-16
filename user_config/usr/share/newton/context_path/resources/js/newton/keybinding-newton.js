@@ -46,6 +46,13 @@ const editorCommands = [
         },
         readOnly: true
     }, {
+        name: "toggleLineHighlight",
+        bindKey: {win: "ctrl-h", mac: "ctrl-h"},
+        exec: function(editor) {
+            toggleLineHighlight();
+        },
+        readOnly: true
+    }, {
         name: "movelinesUp",
         bindKey: {win: "ctrl-up", mac: "ctrl-up"},
         exec: function(editor) {
@@ -57,6 +64,27 @@ const editorCommands = [
         bindKey: {win: "ctrl-down", mac: "ctrl-down"},
         exec: function(editor) {
             editor.execCommand("movelinesdown");
+        },
+        readOnly: true
+    }, {
+        name: "tgglTopMainMenubar",
+        bindKey: {win: "ctrl-0", mac: "ctrl-0"},
+        exec: function(editor) {
+            sendMessage("tggl_top_main_menubar", "", "", "", "");
+        },
+        readOnly: true
+    }, {
+        name: "zoomIn",
+        bindKey: {win: "ctrl-=", mac: "ctrl-="},
+        exec: function(editor) {
+            zoomIn();
+        },
+        readOnly: true
+    }, {
+        name: "zoomOut",
+        bindKey: {win: "ctrl--", mac: "ctrl--"},
+        exec: function(editor) {
+            zoomOut();
         },
         readOnly: true
     }, {

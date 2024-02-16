@@ -4,20 +4,7 @@ const loadPreviewEditor = () => {
 
     previewEditor = ace.edit("preview-editor");
     // Note:  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
-    previewEditor.setOptions({
-        printMarginColumn: 80,
-        enableBasicAutocompletion: true,
-        enableInlineAutocompletion: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: true,
-        highlightActiveLine: true,
-        useSoftTabs: true,
-        tabSize: 4,
-        tooltipFollowsMouse: true,
-        useWrapMode: false,
-        scrollPastEnd: 0.5,
-        mergeUndoDeltas: false
-    });
+    previewEditor.setOptions(editorOpts);
 
     // Note:  https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
     previewEditor.commands.addCommands(editorCommands);
@@ -30,32 +17,21 @@ const loadEditor = () => {
 
     editor = ace.edit("editor");
     // Note:  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
-    editor.setOptions({
-        printMarginColumn: 80,
-        enableBasicAutocompletion: true,
-        enableInlineAutocompletion: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: true,
-        highlightActiveLine: true,
-        useSoftTabs: true,
-        tabSize: 4,
-        tooltipFollowsMouse: true,
-        useWrapMode: false,
-        scrollPastEnd: 0.5,
-        mergeUndoDeltas: false
-    });
+    editor.setOptions(editorOpts);
 
     // Note:  https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
     editor.commands.addCommands(editorCommands);
 
     editor.setTheme("ace/theme/one_dark");
+    
+    editor.addEventListener("click", (eve) => {
+        setLabels();
+    });
 }
 
 const loadInitialSession = () => {
     newSession(null, editor.getSession());
 }
-
-
 
 const newSession = (eve = null, session = null) => {
     let ftype          = "buffer";
@@ -83,6 +59,8 @@ const setSession = (ftype, fhash, session) => {
     if (ftype !== "buffer") {
         editor.session.setMode("ace/mode/" + ftype);
     }
+
+    setLabels();
 }
 
 const updateSession = (fhash, ftype, fname, fpath) => {
@@ -203,3 +181,31 @@ const selectNextPreview = () => {
 
     selectedElm.click();
 }
+
+
+const setLabels = () => {
+        let ftype  = aceSessions[currentSession]["ftype"];
+        let fpath  = aceSessions[currentSession]["fpath"];
+        let cursor = editor.selection.getCursor();
+        let pos    = `${cursor.row + 1}:${cursor.column}`;
+
+        sendMessage("set_info_labels", ftype, "", fpath, pos);
+}
+
+
+
+const zoomIn = () => {
+    fontSize += 1;
+    document.getElementById('editor').style.fontSize = `${fontSize}px`;
+}
+
+const zoomOut = () => {
+    fontSize -= 1;
+    document.getElementById('editor').style.fontSize = `${fontSize}px`;
+}
+
+const toggleLineHighlight = () => {
+    highlightLine = !highlightLine;
+    editor.setHighlightActiveLine(highlightLine);
+}
+

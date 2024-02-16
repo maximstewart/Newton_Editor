@@ -6,7 +6,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from ..widgets.base.notebook.editor_notebook import EditorNotebook
 from ..widgets.base.webkit.editor import Editor
 
 
@@ -34,10 +33,7 @@ class EditorsPaned(Gtk.Paned):
 
     def _load_widgets(self):
         self.add1( Editor() )
-        self.add2( Editor() )
-
-        # self.add1( EditorNotebook() )
-        # self.add2( EditorNotebook() )
+        # self.add2( Editor() )
 
     def _update_paned_handle(self):
         rect = self.get_allocation()

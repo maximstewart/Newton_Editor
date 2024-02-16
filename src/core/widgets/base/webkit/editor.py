@@ -7,7 +7,6 @@ from gi.repository import Gtk
 
 # Application imports
 from ....controllers.files_controller import FilesController
-# from ...controls.tab_bar import TabBar
 from .fixed_box import FixedBox
 
 
@@ -44,5 +43,4 @@ class Editor(Gtk.Box):
         FilesController(self.INDEX)
 
     def _load_widgets(self):
-        # self.add( TabBar(self.INDEX) )
         self.add( FixedBox(self.INDEX) )

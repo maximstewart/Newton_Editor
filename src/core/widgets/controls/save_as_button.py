@@ -25,6 +25,7 @@ class SaveAsButton(Gtk.Button):
         self.set_always_show_image(True)
         self.set_image_position(1) # Left - 0, Right = 1
         self.set_hexpand(False)
+        self.set_sensitive(False)
 
     def _setup_signals(self):
         self.connect("released", self._emit_save_as_eve)

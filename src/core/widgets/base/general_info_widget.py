@@ -35,7 +35,7 @@ class GeneralInfoWidget:
         ...
 
     def _subscribe_to_events(self):
-        event_system.subscribe("set_bottom_labels", self.set_bottom_labels)
+        event_system.subscribe("set_info_labels", self.set_info_labels)
         event_system.subscribe("set_path_label", self._set_path_label)
         event_system.subscribe("set_encoding_label", self._set_encoding_label)
         event_system.subscribe("set_line_char_label", self._set_line_char_label)
@@ -63,7 +63,7 @@ class GeneralInfoWidget:
         builder.get_object("core_widget").add(self.bottom_status_info)
 
 
-    def set_bottom_labels(self, path = None, line_char = None, file_type = None, encoding_type = None):
+    def set_info_labels(self, path = None, line_char = None, file_type = None, encoding_type = None):
         self._set_path_label(path)
         self._set_line_char_label(line_char)
         self._set_file_type_label(file_type)

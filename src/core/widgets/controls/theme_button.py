@@ -73,6 +73,7 @@ class ThemeButton(Gtk.Button):
         self.set_image_position(1) # Left - 0, Right = 1
         self.set_margin_left(5)
         # self.set_margin_right(5)
+        self.set_sensitive(False)
 
     def _setup_signals(self):
         self.connect("clicked", self._show_popover)
