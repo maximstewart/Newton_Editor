@@ -48,8 +48,6 @@ class BridgeController:
                     event_system.emit("post_file_to_ipc", file)
             case "save":
                 event_system.emit(f"handle_file_event_{event.originator}", (event,))
-            case "close":
-                event_system.emit(f"handle_file_event_{event.originator}", (event,))
             case "load_buffer":
                 event_system.emit(f"handle_file_event_{event.originator}", (event,))
             case "load_file":

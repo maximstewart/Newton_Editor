@@ -23,7 +23,7 @@ const loadEditor = () => {
     editor.commands.addCommands(editorCommands);
 
     editor.setTheme("ace/theme/one_dark");
-    
+
     editor.addEventListener("click", (eve) => {
         setLabels();
     });
@@ -31,6 +31,10 @@ const loadEditor = () => {
 
 const loadInitialSession = () => {
     newSession(null, editor.getSession());
+}
+
+const loadStartingFiles = () => {
+    sendMessage("load_starting_files");
 }
 
 const newSession = (eve = null, session = null) => {
@@ -69,12 +73,27 @@ const updateSession = (fhash, ftype, fname, fpath) => {
     aceSessions[fhash]["fpath"] = fpath;
 }
 
-const closeSession = (fhash) => {
-    let ftype = aceSessions["ftype"];
-    let fpath = aceSessions["fpath"];
+const closeSession = () => {
+    let keys  = Object.keys(aceSessions);
+    if (keys.length === 1) {
+        const msg = "Can't close last open buffer...";
+        displayMessage(msg, "warning", 3);
+        return;
+    }
 
-    delete aceSessions[fhash];
-    sendMessage("close", ftype, fhash, fpath, "");
+    let index = keys.indexOf(currentSession);
+    let fhash = keys[index + 1];
+    if ( !isNotNullOrUndefined(fhash) ) {
+        fhash = keys[index - 1];
+    }
+
+    let ftype   = aceSessions[fhash]["ftype"];
+    let session = aceSessions[fhash]["session"];
+
+    delete aceSessions[currentSession]["session"];
+    delete aceSessions[currentSession];
+
+    setSession(ftype, fhash, session);
 }
 
 const removeSession = (fhash) => {
@@ -138,7 +157,7 @@ const listOpenBuffers = () => {
             previewEditor.setSession(session);
 
             if (ftype !== "buffer") {
-                previewEditor.session.setMode("ace/mode/" + ftype);
+                previewEditor.session.setMode(`ace/mode/${ftype}`);
             }
 
             previewSel.classList.add("bg-info");
@@ -208,4 +227,3 @@ const toggleLineHighlight = () => {
     highlightLine = !highlightLine;
     editor.setHighlightActiveLine(highlightLine);
 }
-

@@ -4,6 +4,7 @@ window.onload = (eve) => {
     loadEditor();
     loadPreviewEditor();
     loadInitialSession();
+    loadStartingFiles();
 }
 
 window.onerror = function(msg, url, line, col, error) {

@@ -62,7 +62,6 @@ class FilesController:
         except:
             fpath = path
 
-        print(fpath)
         gfile = Gio.File.new_for_path(fpath)
 
         try:
@@ -80,8 +79,6 @@ class FilesController:
                 if ftype and fname and fpath:
                     event_system.emit(f"update_tab_{event.originator}", (event.fhash, fname,))
                     event_system.emit(f"updated_session_{event.originator}", (event.fhash, ftype, fname, fpath))
-            case "close":
-                event_system.emit(f"close_tab_{event.originator}", (event.fhash))
             case "load_buffer":
                 self.load_buffer(event.fhash)
                 # event_system.emit(f"add_tab_{event.originator}", (event.fhash, "buffer",))

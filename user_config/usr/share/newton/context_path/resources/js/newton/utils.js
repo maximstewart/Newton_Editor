@@ -27,7 +27,13 @@ const displayMessage = (message, type, timeout, msgWindow = "page-alert-zone") =
     }
 }
 
-const sendMessage = (topic, ftype, fhash, fpath, content) => {
+const sendMessage = (topic = null, ftype = "", fhash = "", fpath = "", content = "") => {
+    if ( !isNotNullOrUndefined(topic) ) {
+        const msg = "No 'topic' passed  in 'sendMessage' method...";
+        displayMessage(msg, "danger");
+        return;
+    }
+
     const messageBody = {
         "topic": topic,
         "ftype": ftype,
