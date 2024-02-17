@@ -94,12 +94,3 @@ document.addEventListener("keydown", (eve) => {
     }
 });
 
-
-// editor.session.selection.on('changeCursor', (eve) => {
-//     let ftype = aceSessions[fhash]["ftype"];
-//     let fpath = aceSessions[fhash]["fpath"];
-//     console.log(eve);
-
-//     // sendMessage("set_labels", ftype, "", fpath, "");
-// });
-

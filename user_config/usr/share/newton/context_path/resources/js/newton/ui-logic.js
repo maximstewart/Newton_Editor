@@ -76,7 +76,7 @@ const updateSession = (fhash, ftype, fname, fpath) => {
 const closeSession = () => {
     let keys  = Object.keys(aceSessions);
     if (keys.length === 1) {
-        const msg = "Can't close last open buffer...";
+        const msg = "Can't close last buffer...";
         displayMessage(msg, "warning", 3);
         return;
     }
@@ -138,9 +138,12 @@ const listOpenBuffers = () => {
         liElm.setAttribute("fhash", fhash);
 
         if (fhash === currentSession) {
+            let fpath   = aceSessions[fhash]["fpath"];
             previewSel  = liElm;
+
             liElm.classList.add("bg-success");
             liElm.classList.add("bg-info");
+            document.getElementById("preview-path").innerText = fpath;
         }
 
 
@@ -152,6 +155,7 @@ const listOpenBuffers = () => {
             let fhash   = eve.target.getAttribute("fhash");
             let ftype   = aceSessions[fhash]["ftype"];
             let session = aceSessions[fhash]["session"];
+            let fpath   = aceSessions[fhash]["fpath"];
             previewSel  = eve.target;
 
             previewEditor.setSession(session);
@@ -160,6 +164,7 @@ const listOpenBuffers = () => {
                 previewEditor.session.setMode(`ace/mode/${ftype}`);
             }
 
+            document.getElementById("preview-path").innerText = fpath;
             previewSel.classList.add("bg-info");
         })
 

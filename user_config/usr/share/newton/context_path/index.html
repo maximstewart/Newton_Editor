@@ -26,7 +26,9 @@
     <pre id="editor"></pre>
 
     <!-- Buffers modal -->
-    <div class="modal" id="buffers-modal" tabindex="-1" role="dialog" data-bs-theme="dark">
+    <div class="modal" id="buffers-modal" tabindex="-1" role="dialog"
+        data-bs-theme="dark" data-bs-keyboard="false" data-bs-backdrop="static"
+        >
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -47,6 +49,7 @@
                 </div>
 
                 <div class="modal-footer">
+                    <span id="preview-path" class="mx-auto"></span>
                 </div>
             </div>
         </div>
