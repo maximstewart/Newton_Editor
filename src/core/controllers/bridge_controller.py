@@ -54,6 +54,12 @@ class BridgeController:
                 event_system.emit(f"handle_file_event_{event.originator}", (event,))
             case "open_file":
                 event_system.emit(f"handle_file_event_{event.originator}", (event,))
+            case "tggl_search_replace":
+                event_system.emit(f"tggl_search_replace")
+            case "find_entry":
+                event_system.emit(f"find_entry_{event.originator}")
+            case "replace_entry":
+                event_system.emit(f"replace_entry_{event.originator}")
             case "tggl_top_main_menubar":
                 event_system.emit("tggl_top_main_menubar")
             case "set_info_labels":

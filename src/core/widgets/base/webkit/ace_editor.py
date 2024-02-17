@@ -53,7 +53,8 @@ class AceEditor(WebKit2.WebView):
         event_system.subscribe(f"keyboard_scale_up_text_{self.INDEX}", self.keyboard_scale_up_text)
         event_system.subscribe(f"keyboard_scale_down_text_{self.INDEX}", self.keyboard_scale_down_text)
         event_system.subscribe(f"toggle_highlight_line_{self.INDEX}", self.toggle_highlight_line)
-
+        event_system.subscribe(f"find_entry_{self.INDEX}", self.find_entry)
+        event_system.subscribe(f"replace_entry_{self.INDEX}", self.replace_entry)
         event_system.subscribe(f"ui_message_{self.INDEX}", self.ui_message)
 
     def _load_settings(self):
@@ -123,6 +124,18 @@ class AceEditor(WebKit2.WebView):
 
     def ui_message(self, message, mtype):
         command = f"displayMessage('{message}', '{mtype}', '3')"
+        self.run_javascript(command, None, None)
+
+    def find_entry(self, query):
+        command = f"findEntry('{query}')"
+        self.run_javascript(command, None, None)
+
+    def replace_entry(self, fromStr, toStr):
+        command = f"replaceEntry('{fromStr}', '{toStr}')"
+        self.run_javascript(command, None, None)
+
+    def replace_all(self, fromStr, toStr):
+        command = f"replaceAll('{fromStr}', '{toStr}')"
         self.run_javascript(command, None, None)
 
     def run_javascript(self, script, cancellable, callback):
