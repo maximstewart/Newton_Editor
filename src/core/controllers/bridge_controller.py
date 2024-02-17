@@ -10,7 +10,6 @@ import base64
 class BridgeController:
     def __init__(self):
 
-        self.opened_files = {}
         self.originator   = -1
 
         self._setup_signals()
@@ -44,6 +43,9 @@ class BridgeController:
         self.originator = event.originator
 
         match event.topic:
+            case "load_starting_files":
+                for file in settings_manager.get_starting_files():
+                    event_system.emit("post_file_to_ipc", file)
             case "save":
                 event_system.emit(f"handle_file_event_{event.originator}", (event,))
             case "close":

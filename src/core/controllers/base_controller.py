@@ -1,5 +1,4 @@
 # Python imports
-import os
 
 # Lib imports
 import gi
@@ -21,15 +20,7 @@ from .bridge_controller import BridgeController
 
 class BaseController(KeyboardSignalsMixin, BaseControllerData):
     def __init__(self, args, unknownargs):
-        messages = []
-        for arg in unknownargs + [args.new_tab,]:
-            # NOTE: If passing line number with file split against :
-            if os.path.isfile(arg.replace("file://", "").split(":")[0]):
-                messages.append(f"FILE|{arg.replace('file://', '')}")
-
-        if len(messages) > 0:
-            settings_manager.set_is_starting_with_file(True)
-
+        self.collect_files_dirs(args, unknownargs)
 
         self.setup_controller_data()
 
@@ -38,12 +29,8 @@ class BaseController(KeyboardSignalsMixin, BaseControllerData):
         self._subscribe_to_events()
         self._load_controllers()
 
-
         if args.no_plugins == "false":
             self.plugins.launch_plugins()
-
-        for message in messages:
-            event_system.emit("post_file_to_ipc", message)
 
 
     def _setup_styling(self):

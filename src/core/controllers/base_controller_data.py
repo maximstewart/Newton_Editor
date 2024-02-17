@@ -26,6 +26,20 @@ class BaseControllerData:
         self.load_glade_file()
         self.plugins     = PluginsController()
 
+    def collect_files_dirs(self, args, unknownargs):
+        files = []
+        for arg in unknownargs + [args.new_tab,]:
+            if os.path.isdir( arg.replace("file://", "") ):
+                files.append( f"DIR|{arg.replace('file://', '')}" )
+
+            # NOTE: If passing line number with file split against :
+            if os.path.isfile( arg.replace("file://", "").split(":")[0] ):
+                files.append( f"FILE|{arg.replace('file://', '')}" )
+
+        if len(files) > 0:
+            settings_manager.set_is_starting_with_file(True)
+            settings_manager.set_starting_files(files)
+
     def set_active_src_view(self, source_view):
         if self.active_src_view:
             old_notebook = self.active_src_view.get_parent().get_parent()
