@@ -18,12 +18,21 @@ const editorCommands = [
             })
         }
     }, {
+        name: "search",
+        bindKey: {win: "ctrl-f", mac: "ctrl-f"},
+        exec: function(editor) {
+            sendMessage("tggl_search_replace", "", "", "", "");
+        },
+        readOnly: true
+    }, {
         name: "openFile",
         bindKey: {win: "ctrl-o", mac: "ctrl-o"},
         exec: function(editor) {
-            sendMessage("open_file", "", "", "", "");
+            fpath = aceSessions[currentSession]["fpath"]
+            sendMessage("open_file", "", "", fpath, "");
         },
         readOnly: true
+
     }, {
         name: "saveSession",
         bindKey: {win: "ctrl-s", mac: "ctrl-s"},

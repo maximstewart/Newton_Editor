@@ -86,7 +86,14 @@ class FilesController:
                 content  = base64.b64decode( event.content.encode() ).decode("utf-8")
                 # event_system.emit(f"add_tab_with_name_{event.originator}", (event.fhash, content,))
             case "open_file":
-                event_system.emit(f"open_files", (None, None, self.INDEX,))
+                _gfiles = event_system.emit_and_await(f"open_files", (None, None, event.fpath,))
+                if _gfiles:
+                    event_system.emit(
+                        f"set_pre_drop_dnd_{self.INDEX}",
+                        (
+                            _gfiles,
+                        )
+                    )
             case _:
                 return
 

@@ -69,64 +69,70 @@ class Plugin(StylingMixin, ReplaceMixin, PluginBase):
 
     def subscribe_to_events(self):
         self._event_system.subscribe("tggl_search_replace", self._tggl_search_replace)
-        self._event_system.subscribe("set_active_src_view", self._set_active_src_view)
+        # self._event_system.subscribe("set_active_src_view", self._set_active_src_view)
 
-    def _set_active_src_view(self, source_view):
-        self._active_src_view = source_view
-        self._buffer          = self._active_src_view.get_buffer()
-        self._tag_table       = self._buffer.get_tag_table()
-        self.search_for_string(self._find_entry)
+    # def _set_active_src_view(self, source_view):
+    #     self._active_src_view = source_view
+    #     self._buffer          = self._active_src_view.get_buffer()
+    #     self._tag_table       = self._buffer.get_tag_table()
+    #     self.search_for_string(self._find_entry)
 
     def _show_search_replace(self, widget = None, eve = None):
         self._search_replace_dialog.popup()
 
     def _tggl_search_replace(self, widget = None, eve = None):
         is_visible = self._search_replace_dialog.is_visible()
-        buffer     = self._active_src_view.get_buffer()
-        data       = None
-
-        if buffer.get_has_selection():
-            start, end = buffer.get_selection_bounds()
-            data       = buffer.get_text(start, end, include_hidden_chars = False)
-
-        if data:
-            self._find_entry.set_text(data)
-
         if not is_visible:
             self._search_replace_dialog.popup();
             self._find_entry.grab_focus()
-        elif not data and is_visible:
-            self._search_replace_dialog.popdown()
-            self._find_entry.set_text("")
         else:
-            self._find_entry.grab_focus()
+            self._search_replace_dialog.popdown();
+    
+        # buffer     = self._active_src_view.get_buffer()
+        # data       = None
+
+        # if buffer.get_has_selection():
+        #     start, end = buffer.get_selection_bounds()
+        #     data       = buffer.get_text(start, end, include_hidden_chars = False)
+
+        # if data:
+        #     self._find_entry.set_text(data)
+
+        # if not is_visible:
+        #     self._search_replace_dialog.popup();
+        #     self._find_entry.grab_focus()
+        # elif not data and is_visible:
+        #     self._search_replace_dialog.popdown()
+        #     self._find_entry.set_text("")
+        # else:
+        #     self._find_entry.grab_focus()
 
 
-    def get_search_tag(self, buffer):
-        tag_table  = buffer.get_tag_table()
-        search_tag = tag_table.lookup(self.search_tag)
-        if not search_tag:
-            search_tag = buffer.create_tag(self.search_tag, background = self.highlight_color, foreground = self.text_color)
+    # def get_search_tag(self, buffer):
+    #     tag_table  = buffer.get_tag_table()
+    #     search_tag = tag_table.lookup(self.search_tag)
+    #     if not search_tag:
+    #         search_tag = buffer.create_tag(self.search_tag, background = self.highlight_color, foreground = self.text_color)
 
-        buffer.remove_tag_by_name(self.search_tag, buffer.get_start_iter(), buffer.get_end_iter())
-        return search_tag
+    #     buffer.remove_tag_by_name(self.search_tag, buffer.get_start_iter(), buffer.get_end_iter())
+    #     return search_tag
 
 
-    def cancel_timer(self):
-        if self.timer:
-            self.timer.cancel()
-            GLib.idle_remove_by_data(None)
+    # def cancel_timer(self):
+    #     if self.timer:
+    #         self.timer.cancel()
+    #         GLib.idle_remove_by_data(None)
 
-    def delay_search_glib(self):
-        GLib.idle_add(self._do_highlight)
+    # def delay_search_glib(self):
+    #     GLib.idle_add(self._do_highlight)
 
-    def delay_search(self):
-        wait_time = self.search_time / len(self.find_text)
-        wait_time = max(wait_time, 0.05)
+    # def delay_search(self):
+    #     wait_time = self.search_time / len(self.find_text)
+    #     wait_time = max(wait_time, 0.05)
 
-        self.timer = threading.Timer(wait_time, self.delay_search_glib)
-        self.timer.daemon = True
-        self.timer.start()
+    #     self.timer = threading.Timer(wait_time, self.delay_search_glib)
+    #     self.timer.daemon = True
+    #     self.timer.start()
 
 
     def on_enter_search(self, widget, eve):
@@ -138,84 +144,133 @@ class Plugin(StylingMixin, ReplaceMixin, PluginBase):
             self.find_next(widget)
 
     def search_for_string(self, widget):
-        self.cancel_timer()
+        # query = self._find_entry.get_text()
+        query = widget.get_text()
 
-        self.find_text = widget.get_text()
-        if len(self.find_text) > 0 and len(self.find_text) < 5:
-            self.delay_search()
-        else:
-            self._do_highlight(self.find_text)
+        if not query: return
+
+        isBackwwards    = True
+        isWrap          = True
+        isCaseSensitive = self.use_case_sensitive
+        useWholeWord    = self.use_whole_word_search
+        useRegExp       = self.use_regex
+        # self.search_only_in_selection
+
+        self._event_system.emit(
+            "find_entry",
+            (
+                query,
+                isBackwwards,
+                isWrap,
+                isCaseSensitive,
+                useWholeWord,
+                useRegExp,
+            )
+        )
 
 
-    def _do_highlight(self, query = None):
-        query      = self.find_text if not query else query
-        buffer     = self._active_src_view.get_buffer()
-        # Also clears tag from buffer so if no query we're clean in ui
-        search_tag = self.get_search_tag(buffer)
+    # def search_for_string(self, widget):
+    #     self.cancel_timer()
 
-        self.update_style(1)
-        if not query:
-            self._find_status_lbl.set_label(f"Find in current buffer")
-            self.update_style(0)
-            return
+    #     self.find_text = widget.get_text()
+    #     if len(self.find_text) > 0 and len(self.find_text) < 5:
+    #         self.delay_search()
+    #     else:
+    #         self._do_highlight(self.find_text)
 
-        start_itr  = buffer.get_start_iter()
-        end_itr    = buffer.get_end_iter()
 
-        results, total_count = self.search(start_itr, query)
-        self._update_status_lbl(total_count, query)
-        for start, end in results:
-            buffer.apply_tag(search_tag, start, end)
+    # def _do_highlight(self, query = None):
+    #     query      = self.find_text if not query else query
+    #     buffer     = self._active_src_view.get_buffer()
+    #     # Also clears tag from buffer so if no query we're clean in ui
+    #     search_tag = self.get_search_tag(buffer)
 
-    def search(self, start_itr = None, query = None, limit = None):
-        if not start_itr or not query: return None, None
+    #     self.update_style(1)
+    #     if not query:
+    #         self._find_status_lbl.set_label(f"Find in current buffer")
+    #         self.update_style(0)
+    #         return
 
-        flags = Gtk.TextSearchFlags.VISIBLE_ONLY | Gtk.TextSearchFlags.TEXT_ONLY
-        if not self.use_case_sensitive:
-            flags = flags | Gtk.TextSearchFlags.CASE_INSENSITIVE
+    #     start_itr  = buffer.get_start_iter()
+    #     end_itr    = buffer.get_end_iter()
 
-        if self.search_only_in_selection and self._buffer.get_has_selection():
-            start_itr, limit = self._buffer.get_selection_bounds()
+    #     results, total_count = self.search(start_itr, query)
+    #     self._update_status_lbl(total_count, query)
+    #     for start, end in results:
+    #         buffer.apply_tag(search_tag, start, end)
 
-        _results = []
-        while True:
-            result = start_itr.forward_search(query, flags, limit)
-            if not result: break
+    # def search(self, start_itr = None, query = None, limit = None):
+    #     if not start_itr or not query: return None, None
 
-            _results.append(result)
-            start_itr = result[1]
+    #     flags = Gtk.TextSearchFlags.VISIBLE_ONLY | Gtk.TextSearchFlags.TEXT_ONLY
+    #     if not self.use_case_sensitive:
+    #         flags = flags | Gtk.TextSearchFlags.CASE_INSENSITIVE
 
-        results = self.apply_filters(_results, query)
-        return results, len(results)
+    #     if self.search_only_in_selection and self._buffer.get_has_selection():
+    #         start_itr, limit = self._buffer.get_selection_bounds()
 
-    def apply_filters(self, _results, query):
-        results = []
-        for start, end in _results:
-            text = self._buffer.get_slice(start, end, include_hidden_chars = False)
-            if self.use_whole_word_search:
-                if not self.is_whole_word(start, end):
-                    continue
+    #     _results = []
+    #     while True:
+    #         result = start_itr.forward_search(query, flags, limit)
+    #         if not result: break
 
-            results.append([start, end])
+    #         _results.append(result)
+    #         start_itr = result[1]
 
-        return results
+    #     results = self.apply_filters(_results, query)
+    #     return results, len(results)
+
+    # def apply_filters(self, _results, query):
+    #     results = []
+    #     for start, end in _results:
+    #         text = self._buffer.get_slice(start, end, include_hidden_chars = False)
+    #         if self.use_whole_word_search:
+    #             if not self.is_whole_word(start, end):
+    #                 continue
+
+    #         results.append([start, end])
+
+    #     return results
 
     def find_next(self, widget, eve = None, use_data = None):
-        mark = self._buffer.get_insert()
-        iter = self._buffer.get_iter_at_mark(mark)
-        iter.forward_line()
+        self._event_system.emit("find_next_entry")
 
-        search_tag     = self._tag_table.lookup(self.search_tag)
-        next_tag_found = iter.forward_to_tag_toggle(search_tag)
-        if not next_tag_found:
-            self._buffer.place_cursor( self._buffer.get_start_iter() )
-            mark = self._buffer.get_insert()
-            iter = self._buffer.get_iter_at_mark(mark)
-            iter.forward_to_tag_toggle(search_tag)
+    def find_prior(self, widget, eve = None, use_data = None):
+        self._event_system.emit("find_prior_entry")
 
-        self._buffer.place_cursor(iter)
-        self._active_src_view.scroll_to_mark( self._buffer.get_insert(), 0.0, True, 0.0, 0.0 )
+    # def find_next(self, widget, eve = None, use_data = None):
+    #     mark = self._buffer.get_insert()
+    #     iter = self._buffer.get_iter_at_mark(mark)
+    #     iter.forward_line()
+
+    #     search_tag     = self._tag_table.lookup(self.search_tag)
+    #     next_tag_found = iter.forward_to_tag_toggle(search_tag)
+    #     if not next_tag_found:
+    #         self._buffer.place_cursor( self._buffer.get_start_iter() )
+    #         mark = self._buffer.get_insert()
+    #         iter = self._buffer.get_iter_at_mark(mark)
+    #         iter.forward_to_tag_toggle(search_tag)
+
+    #     self._buffer.place_cursor(iter)
+    #     self._active_src_view.scroll_to_mark( self._buffer.get_insert(), 0.0, True, 0.0, 0.0 )
 
 
     def find_all(self, widget):
         ...
+
+
+    def replace(self, widget):
+        fromStr = self._find_entry.get_text()
+        toStr   = self._replace_entry.get_text()
+        if not fromStr or not toStr: return
+
+        self._event_system.emit("replace_entry", (fromStr, toStr))
+
+
+    def replace_all(self, widget):
+        fromStr = self._find_entry.get_text()
+        toStr   = self._replace_entry.get_text()
+        if not fromStr or not toStr: return
+
+        self._event_system.emit("replace_all", (fromStr, toStr))
+

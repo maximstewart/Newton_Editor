@@ -24,6 +24,10 @@ class BridgeController:
         event_system.subscribe(f"keyboard_open_file", self.keyboard_open_file)
         event_system.subscribe(f"keyboard_scale_up_text", self.keyboard_scale_up_text)
         event_system.subscribe(f"keyboard_scale_down_text", self.keyboard_scale_down_text)
+        event_system.subscribe(f"find_entry", self.find_entry)
+        event_system.subscribe(f"find_next_entry", self.find_next_entry)
+        event_system.subscribe(f"find_previous_entry", self.find_previous_entry)
+        event_system.subscribe(f"replace_entry", self.replace_entry)
         event_system.subscribe(f"toggle_highlight_line", self.toggle_highlight_line)
 
     def keyboard_open_file(self, gfiles):
@@ -37,6 +41,33 @@ class BridgeController:
 
     def toggle_highlight_line(self):
         event_system.emit(f"toggle_highlight_line_{self.originator}")
+
+    def find_entry(self, query, isBackwwards, isWrap, isCaseSensitive,
+                                                        useWholeWord,
+                                                        useRegExp):
+        event_system.emit(
+            f"find_entry_{self.originator}",
+            (
+                query,
+                isBackwwards,
+                isWrap,
+                isCaseSensitive,
+                useWholeWord,
+                useRegExp
+            )
+        )
+
+    def find_next_entry(self):
+        event_system.emit(f"find_next_entry_{self.originator}")
+
+    def find_previous_entry(self):
+        event_system.emit(f"find_previous_entry_{self.originator}")
+
+    def replace_entry(self, fromStr, toStr):
+        event_system.emit(f"replace_entry_{self.originator}", (fromStr, toStr,))
+
+    def replace_all(self, fromStr, toStr):
+        event_system.emit(f"replace_all_{self.originator}", (fromStr, toStr,))
 
 
     def handle_bridge_event(self, event):
@@ -56,10 +87,6 @@ class BridgeController:
                 event_system.emit(f"handle_file_event_{event.originator}", (event,))
             case "tggl_search_replace":
                 event_system.emit(f"tggl_search_replace")
-            case "find_entry":
-                event_system.emit(f"find_entry_{event.originator}")
-            case "replace_entry":
-                event_system.emit(f"replace_entry_{event.originator}")
             case "tggl_top_main_menubar":
                 event_system.emit("tggl_top_main_menubar")
             case "set_info_labels":
