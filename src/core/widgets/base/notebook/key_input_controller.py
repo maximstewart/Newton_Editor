@@ -51,7 +51,10 @@ class KeyInputController:
                     self._create_view()
                 if keyname == "o":
                     page_num, container, source_view = self.get_active_view()
-                    event_system.emit("open_files", (source_view,))
+                    file    = source_view.get_current_file()
+                    _gfiles = event_system.emit_and_await("open_files", (source_view, None, file if file else None))
+
+                    event_system.emit("keyboard_open_file", (_gfiles,))
 
                 return True
 

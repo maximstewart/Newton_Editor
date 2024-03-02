@@ -129,11 +129,12 @@ class EditorNotebook(EditorControllerMixin, Gtk.Notebook):
 
         self.create_view(None, None, gfile, line)
 
-    def _keyboard_open_file(self, gfile):
+    def _keyboard_open_file(self, gfiles = []):
         if not self.is_editor_focused: # TODO: Find way to converge this
             return
 
-        self.open_file(gfile)
+        for gfile in gfiles:
+            self.open_file(gfile)
 
     def _keyboard_scale_up_text(self):
         self.action_controller("scale_up_text")

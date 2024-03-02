@@ -41,24 +41,45 @@ class OpenFileButton(Gtk.Button):
     def _load_widgets(self):
         ...
 
-    def _open_files(self, widget = None, eve = None):
-        chooser = Gtk.FileChooserDialog("Open File...", None,
+    def _open_files(self, widget = None, eve = None, gfile = None):
+        start_dir = None
+        _gfiles   = []
+
+        if gfile and gfile.query_exists():
+            start_dir = gfile.get_parent()
+
+        chooser = Gtk.FileChooserDialog("Open File(s)...", None,
                                         Gtk.FileChooserAction.OPEN,
-                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                         Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
- 
+                                        (
+                                            Gtk.STOCK_CANCEL,
+                                            Gtk.ResponseType.CANCEL,
+                                            Gtk.STOCK_OPEN,
+                                            Gtk.ResponseType.OK
+                                        )
+        )
+
+        chooser.set_select_multiple(True)
+
         try:
-            folder = widget.get_current_file().get_parent()
-            chooser.set_current_folder( folder.get_uri() )
+            folder = widget.get_current_file().get_parent() if not start_dir else start_dir
+            chooser.set_current_folder( folder.get_path() )
         except Exception as e:
             ...
 
         response = chooser.run()
-        if response == Gtk.ResponseType.OK:
-            filename = chooser.get_filename()
-            if filename:
-                path   = filename if os.path.isabs(filename) else os.path.abspath(filename)
-                _gfile = Gio.File.new_for_path(path)
-                event_system.emit("keyboard_open_file", (_gfile,))
+        if not response == Gtk.ResponseType.OK:
+            chooser.destroy()
+            return _gfiles
+
+        filenames = chooser.get_filenames()
+        if not filenames:
+            chooser.destroy()
+            return _gfiles
+
+        for file in filenames:
+            path    = file if os.path.isabs(file) else os.path.abspath(file)
+            _gfiles.append( Gio.File.new_for_path(path) )
 
         chooser.destroy()
+
+        return _gfiles
