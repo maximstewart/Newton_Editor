@@ -81,7 +81,7 @@ class KeyInputController:
 
                     return True
 
-            if keyname in ["z", "y", "m", "s", "h", "g", "equal", "minus", "Up", "Down"]:
+            if keyname in ["z", "y", "m", "s", "h", "g", "d", "k", "u", "equal", "minus", "Up", "Down"]:
                 if keyname == "z":
                     self.keyboard_undo()
                 if keyname == "y":
@@ -94,6 +94,12 @@ class KeyInputController:
                     self.toggle_highlight_line()
                 if keyname == "g":
                     self.go_to_call()
+                if keyname == "d":
+                    self.duplicate_line()
+                if keyname == "k":
+                    self.cut_to_buffer()
+                if keyname == "u":
+                    self.paste_cut_buffer()
 
                 if keyname == "equal":
                     self.scale_up_text()

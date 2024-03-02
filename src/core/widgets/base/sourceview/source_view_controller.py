@@ -34,6 +34,57 @@ class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
 
         event_system.emit("textDocument/definition", (self.get_filetype(), uri, line, offset,))
 
+    def duplicate_line(self, buffer = None):
+        buffer     = self.get_buffer() if not buffer else buffer
+        itr        = buffer.get_iter_at_mark( buffer.get_insert() )
+        start_itr  = itr.copy()
+        end_itr    = itr.copy()
+        start_line = itr.get_line() + 1
+        start_char = itr.get_line_offset()
+
+        start_itr.backward_visible_line()
+        start_itr.forward_line()
+        end_itr.forward_line()
+        end_itr.backward_char()
+
+        line_str     = buffer.get_slice(start_itr, end_itr, True)
+
+        end_itr.forward_char()
+        buffer.insert(end_itr, f"{line_str}\n", -1)
+
+        new_itr      = buffer.get_iter_at_line_offset(start_line, start_char)
+        buffer.place_cursor(new_itr)
+
+    def cut_to_buffer(self, buffer = None):
+        self.cancel_timer()
+
+        buffer     = self.get_buffer() if not buffer else buffer
+        itr        = buffer.get_iter_at_mark( buffer.get_insert() )
+        start_itr  = itr.copy()
+        end_itr    = itr.copy()
+        start_line = itr.get_line() + 1
+        start_char = itr.get_line_offset()
+
+        start_itr.backward_visible_line()
+        start_itr.forward_line()
+        end_itr.forward_line()
+
+        line_str     = buffer.get_slice(start_itr, end_itr, True)
+        self._cut_buffer += f"{line_str}"
+        buffer.delete(start_itr, end_itr)
+
+        self.clear_cut_buffer_delayed()
+
+    def paste_cut_buffer(self, buffer = None):
+        self.cancel_timer()
+
+        buffer     = self.get_buffer() if not buffer else buffer
+        itr        = buffer.get_iter_at_mark( buffer.get_insert() )
+        insert_itr = itr.copy()
+
+        buffer.insert(insert_itr, self._cut_buffer, -1)
+
+        self.clear_cut_buffer_delayed()
 
     def update_cursor_position(self, buffer = None):
         buffer = self.get_buffer() if not buffer else buffer
@@ -117,22 +168,67 @@ class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
         buffer.redo()
 
     def keyboard_move_lines_up(self):
-        buffer = self.get_buffer()
+        buffer           = self.get_buffer()
 
         self.begin_user_action(buffer)
 
+        had_selection = buffer.get_has_selection()
+        itr           = buffer.get_iter_at_mark( buffer.get_insert() )
+        line          = itr.get_line() - 1
+        line_index    = itr.get_line_index()
+        selection_bounds = None
+
+        if had_selection:
+            selection_bounds = buffer.get_selection_bounds()
+            sbounds_start    = selection_bounds[0].get_line_offset()
+            sbounds_end      = selection_bounds[1].get_line_offset()
+
         self.emit("move-lines", *(False,))
-        # unindent_lines
-        # self.emit("move-words", *(self, 4,))
+        if not had_selection:
+            self.emit("select-all", *(False,))
+            line_itr  = buffer.get_iter_at_line_offset(line, line_index)
+            self.get_buffer().place_cursor(line_itr)
+        else:
+            buffer    = self.get_buffer()
+            sbounds   = buffer.get_selection_bounds()
+            start_itr = buffer.get_iter_at_line_offset( sbounds[0].get_line(), sbounds_start)
+            end_itr   = buffer.get_iter_at_line_offset( sbounds[1].get_line() - 1, sbounds_end)
+
+            self.emit("select-all", *(False,))
+            buffer.select_range(start_itr, end_itr)
 
         self.end_user_action(buffer)
 
     def keyboard_move_lines_down(self):
-        buffer = self.get_buffer()
+        buffer           = self.get_buffer()
 
         self.begin_user_action(buffer)
 
+        had_selection    = buffer.get_has_selection()
+        itr              = buffer.get_iter_at_mark( buffer.get_insert() )
+        line             = itr.get_line() + 1
+        line_index       = itr.get_line_index()
+        selection_bounds = None
+        sbounds_start    = None
+        sbounds_end      = None
+
+        if had_selection:
+            selection_bounds = buffer.get_selection_bounds()
+            sbounds_start    = selection_bounds[0].get_line_offset()
+            sbounds_end      = selection_bounds[1].get_line_offset()
+
         self.emit("move-lines", *(True,))
-        # self.emit("move-words", *(self, -4,))
+        if not had_selection:
+            self.emit("select-all", *(False,))
+            line_itr  = buffer.get_iter_at_line_offset(line, line_index)
+            self.get_buffer().place_cursor(line_itr)
+        else:
+            buffer    = self.get_buffer()
+            sbounds   = buffer.get_selection_bounds()
+            start_itr = buffer.get_iter_at_line_offset( sbounds[0].get_line(), sbounds_start)
+            end_itr   = buffer.get_iter_at_line_offset( sbounds[1].get_line() - 1, sbounds_end)
+
+            self.emit("select-all", *(False,))
+            buffer.select_range(start_itr, end_itr)
 
         self.end_user_action(buffer)

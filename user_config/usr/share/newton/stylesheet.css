@@ -81,6 +81,11 @@ notebook > stack > scrolledwindow > textview {
     color: rgba(255, 255, 255, 1);
 }
 
+textview {
+	padding-bottom: 50em;
+}
+
+
 /* any popover */
 popover {
     background: rgba(39, 43, 52, 0.86);

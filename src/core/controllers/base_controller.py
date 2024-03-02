@@ -10,13 +10,14 @@ from gi.repository import Gdk
 from gi.repository import GLib
 
 # Application imports
-from .controller_data import ControllerData
-from .containers.core_widget import CoreWidget
-from .mixins.signals_mixins import SignalsMixins
+from ..mixins.signals_mixins import SignalsMixins
+from ..containers.base_container import BaseContainer
+
+from .base_controller_data import BaseControllerData
 
 
 
-class Controller(SignalsMixins, ControllerData):
+class BaseController(SignalsMixins, BaseControllerData):
     def __init__(self, args, unknownargs):
         messages = []
         for arg in unknownargs + [args.new_tab,]:
@@ -60,7 +61,7 @@ class Controller(SignalsMixins, ControllerData):
         self.builder.expose_object("main_window", self.window)
 
         settings_manager.set_builder(self.builder)
-        self.core_widget = CoreWidget()
+        self.core_widget = BaseContainer()
 
         settings_manager.register_signals_to_builder([self, self.core_widget])
 
