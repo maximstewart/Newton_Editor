@@ -1,3 +1,0 @@
-"""
-    SourceView Module
-"""

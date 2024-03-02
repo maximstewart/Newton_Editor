@@ -1,3 +1,0 @@
-"""
-    Widgets.Base Module
-"""

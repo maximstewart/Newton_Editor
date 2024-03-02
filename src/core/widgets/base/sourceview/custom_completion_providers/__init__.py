@@ -1,3 +1,0 @@
-"""
-    Custom Completion Providers Module
-"""

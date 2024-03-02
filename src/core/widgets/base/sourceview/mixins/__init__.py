@@ -1,3 +1,0 @@
-"""
-    SourceView Mixins Module
-"""
