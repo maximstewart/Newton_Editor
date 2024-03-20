@@ -1,0 +1,13 @@
+{
+    "manifest": {
+        "name": "Markdown Preview",
+        "author": "ITDominator",
+        "version": "0.0.1",
+        "support": "",
+        "requests": {
+            "pass_events": "true",
+            "pass_ui_objects": ["separator_right"],
+            "bind_keys": ["Markdown Preview||tggle_markdown_preview:<Shift><Control>m"]
+        }
+    }
+}
