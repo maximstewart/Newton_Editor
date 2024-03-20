@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Newton
+GenericName=Text editor and mini IDE
+Comment=General purpose text editor and IDE
+Exec=/bin/newton %F
+Icon=/usr/share/newton/icons/newton.png
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;Utility;TextEditor;Development;
+MimeType=text/plain;text/py;text/js;text/java;text/cpp;text/sh;text/html;text/json;
+Terminal=false

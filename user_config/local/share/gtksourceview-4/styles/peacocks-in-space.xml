@@ -1,0 +1,123 @@
+<style-scheme name="Peacocks In Space" id="peacocks-in-space" version="1.0">
+    <author> ITDominator</author>
+    <description>An attempted clone of Dayle Rees' Peacocks In Space theme.</description>
+
+    <style name="current-line"	background="#2b303b" />
+    <style name="current-line-number"	background="#f7b83d" />
+    <style name="draw-spaces"	foreground="#babdb6" />
+    <style name="background-pattern"	background="#6e7a94" />
+    <style name="bracket-match"	foreground="#white" background="#gray" />
+    <style name="bracket-mismatch"	foreground="#white" background="#FF5D38" />
+    <style name="right-margin"	foreground="#dee3ec" background="#454a54" />
+    <style name="search-match"	background="#E6DB74" />
+    <style name="def:comment"	foreground="#8998b9" />
+    <style name="def:shebang"	foreground="#00a8c6" bold="true" />
+    <style name="def:doc-comment-element"	italic="true" />
+    <style name="def:constant"	foreground="#E6DB74" />
+    <style name="def:special-char"	foreground="#26A6A6" />
+    <style name="def:identifier"	foreground="#FF5D38" />
+    <style name="def:statement"	foreground="#26A6A6" bold="true" />
+    <style name="def:type"	foreground="#E6DB74" bold="true" />
+    <style name="def:preprocessor"	foreground="#8998b9" />
+    <style name="def:error"	background="#FF5D38" bold="true" />
+    <style name="def:warning"	background="#f7b83d" />
+    <style name="def:note"	foreground="#00a8c6" background="#yellow" bold="true" />
+    <style name="def:underlined"	italic="true" underline="true" />
+    <style name="diff:added-line"	foreground="#008B8B" />
+    <style name="diff:removed-line"	foreground="#6A5ACD" />
+    <style name="diff:changed-line"	foreground="#8998b9" />
+    <style name="diff:special-case"	foreground="#E6DB74" />
+    <style name="diff:location"	foreground="#26A6A6" bold="true" />
+    <style name="diff:diff-file"	foreground="#E6DB74" bold="true" />
+    <style name="xml:tags"	foreground="#00a8c6" />
+    <style name="xml:attribute-name"	foreground="#ff5d38" />
+    <style name="xml:namespace"	foreground="#E6DB74" bold="true" />
+    <style name="js:object"	foreground="#2E8B57" bold="true" />
+    <style name="js:constructors"	foreground="#008B8B" />
+    <style name="latex:display-math"	foreground="#6A5ACD" />
+    <style name="latex:command"	foreground="#2E8B57" bold="true" />
+    <style name="latex:include"	foreground="#8998b9" />
+    <style name="sh:variable"	foreground="#6A5ACD" />
+    <style name="Others"	foreground="#2E8B57" bold="true" />
+    <style name="Others 2"	foreground="#008B8B" />
+    <style name="Others 3"	foreground="#6A5ACD" />
+    <style name="python:builtin-object"	foreground="#00a8c6" />
+    <style name="python:class-name"	foreground="#ff5d38" />
+    <style name="python:function-name"	foreground="#e6db74" />
+    <style name="python:keyword"	foreground="#00a8c6" />
+    <style name="python:special-variable"	/>
+    <style name="python:boolean"	foreground="#ff5d38" />
+    <style name="python:complex"	foreground="#ff5d38" />
+    <style name="python:format"	foreground="#bf3f3f" />
+    <style name="python:builtin-constant"	foreground="#ff5d38" />
+    <style name="python:builtin-function"	foreground="#e6db74" />
+    <style name="python:module-handler"	foreground="#00a8c6" />
+    <style name="python:escaped-char"	foreground="#ff5d38" />
+    <style name="reserved"	foreground="#ff5d38" />
+    <style name="operator"	foreground="#00a8c6" />
+    <style name="keyword"	foreground="#00a8c6" />
+    <style name="line-numbers"	foreground="#ffffff" />
+    <style name="python3:function-name"	foreground="#e6db74" />
+    <style name="text"	/>
+    <style name="emphasis"	/>
+    <style name="function"	foreground="#e6db74" />
+    <style name="selection-unfocused"	background="#ff7800" />
+    <style name="html:attrib-name"	foreground="#ff5d38" />
+    <style name="html:dtd"	/>
+    <style name="html:attrib-value"	foreground="#e6db74" />
+    <style name="xml:element-name"	foreground="#00a8c6" />
+    <style name="xml:attribute-value"	foreground="#e6db74" />
+    <style name="html:comment"	foreground="#8998b9" />
+    <style name="xml:comment"	foreground="#8998b9" />
+    <style name="python3:builtin-function"	foreground="#ff5d38" />
+    <style name="python3:builtin-object"	foreground="#ff5d38" />
+    <style name="python3:class-name"	foreground="#ff5d38" />
+    <style name="python3:builtin-constant"	foreground="#ff5d38" />
+    <style name="python3:complex"	foreground="#e6db74" />
+    <style name="python3:escaped-char"	foreground="#ff5d38" />
+    <style name="python3:decimal"	/>
+    <style name="python3:format"	/>
+    <style name="python3:base-n-integer"	/>
+    <style name="php:comment"	foreground="#8998b9" />
+    <style name="php:string"	foreground="#e6db74" />
+    <style name="json:keyname"	foreground="#ff5d38" />
+    <style name="json:string"	foreground="#e6db74" />
+    <style name="json:null-value"	foreground="#ff5d38" />
+    <style name="json:float"	foreground="#e6db74" />
+    <style name="json:boolean"	foreground="#ff5d38" />
+    <style name="java:reserved"	foreground="#ff5d38" />
+    <style name="js:function-expression"	/>
+    <style name="js:identifier"	/>
+    <style name="js:object-literal"	/>
+    <style name="js:expression-statement"	foreground="#e6db74" />
+    <style name="js:expression"	/>
+    <style name="js:label-statement"	/>
+    <style name="js:variable-declaration"	/>
+    <style name="js:rest-syntax"	/>
+    <style name="js:regex-group"	/>
+    <style name="js:keyword"	foreground="#00a8c6" />
+    <style name="js:grouping-operator"	foreground="#ed333b" />
+    <style name="js:grouping"	foreground="#2ec27e" />
+    <style name="js:escape"	foreground="#ff5d38" />
+    <style name="js:directive"	/>
+    <style name="js:class-expression"	/>
+    <style name="js:built-in-property"	/>
+    <style name="js:built-in-object"	/>
+    <style name="js:built-in-method"	/>
+    <style name="js:built-in-function"	/>
+    <style name="js:built-in-constructor"	/>
+    <style name="js:block-statement"	/>
+    <style name="js:ternary-operator"	foreground="#00a8c6" />
+    <style name="js:throw-statement"	foreground="#00a8c6" />
+    <style name="js:try-catch-statement"	foreground="#00a8c6" />
+    <style name="js:spread-syntax"	/>
+    <style name="js:switch-statement"	foreground="#00a8c6" />
+    <style name="python3:keyword"	foreground="#00a8c6" />
+    <style name="python3:module-handler"	foreground="#00a8c6" />
+    <style name="python3:method-calls"	foreground="#e6db74" />
+    <style name="java:keyword"	foreground="#8998b9" />
+    <style name="method-calls"	foreground="#e6db74" />
+    <style name="xml:processing-instruction"	/>
+    <style name="xml:cdata-delim"	foreground="#8998b9" />
+    <style name="gdscript:method-calls"	foreground="#e6db74" />
+</style-scheme>
