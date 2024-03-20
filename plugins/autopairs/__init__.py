@@ -1,3 +1,0 @@
-"""
-    Pligin Module
-"""
