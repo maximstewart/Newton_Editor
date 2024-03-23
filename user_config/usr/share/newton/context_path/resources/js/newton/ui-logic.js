@@ -73,26 +73,37 @@ const setSession = (ftype, fhash, session) => {
                         !function () {
                             importScripts("${await importScriptFromNetwork(baseLink + "/service-manager.js")}");
                             let manager = new ServiceManager(self);
-    
-                            manager.registerService("python", {
+
+                            /* Works but isn't websocket */
+                            // manager.registerService("python", {
+                            //     module: () => {
+                            //         importScripts("${await importScriptFromNetwork(baseLink + "/python-service.js")}");
+                            //         return {PythonService};
+                            //     },
+                            //     className: "PythonService",
+                            //     modes: "python|python3",
+                            // });
+
+                            /* Works and is websocket */
+                            manager.registerServer("python", {
                                 module: () => {
-                                    importScripts("${await importScriptFromNetwork(baseLink + "/python-service.js")}");
-                                    return {PythonService};
+                                    importScripts("${await importScriptFromNetwork(baseLink + "/language-client.js")}");
+                                    return {LanguageClient};
                                 },
-                                className: "PythonService",
                                 modes: "python|python3",
+                                type: "socket", // "socket|worker"
+                                socket: new WebSocket("ws://127.0.0.1:3030/python"),
+                                initializationOptions: {}
                             });
-                            
+
                         }()
                     `;
     
-                    let worker = new Worker(createBlobURL(createScriptBlob(workerString)));
+                    let worker   = new Worker(createBlobURL(createScriptBlob(workerString)));
                     let provider = LanguageProvider.create(worker);
                     provider.registerEditor(editor);
                 }
             );
-
-            //provider.registerEditor(editor);
         }
     }
 
