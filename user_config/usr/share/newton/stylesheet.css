@@ -1,4 +1,4 @@
-/* ----  make most desired things base transparent  ---- */
+/* ----  Make most desired things base transparent  ---- */
 popover,
 popover > box
 .main-window > box,
@@ -80,6 +80,11 @@ notebook > stack > scrolledwindow > textview {
     background: rgba(39, 43, 52, 0.64);
     color: rgba(255, 255, 255, 1);
 }
+
+textview {
+	padding-bottom: 50em;
+}
+
 
 /* any popover */
 popover {
