@@ -94,6 +94,19 @@ class FilesController:
                             _gfiles,
                         )
                     )
+            case "load_javascript":
+                gfile = Gio.File.new_for_uri(event.fpath)
+
+                result,   \
+                data,     \
+                etag_out  = gfile.load_contents(None)
+
+                if result:
+                    content = base64.b64encode( data ).decode("utf-8")
+                    event_system.emit(
+                        f"send_script_data_{self.INDEX}",
+                        (gfile.get_basename(), content,)
+                    )
             case _:
                 return
 

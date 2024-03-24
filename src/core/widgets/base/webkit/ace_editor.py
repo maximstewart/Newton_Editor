@@ -1,5 +1,6 @@
 # Python imports
 import json
+import traceback
 
 # Lib imports
 import gi
@@ -45,6 +46,7 @@ class AceEditor(WebKit2.WebView):
 
     def _subscribe_to_events(self):
         event_system.subscribe(f"load_file_{self.INDEX}", self.load_file)
+        event_system.subscribe(f"send_script_data_{self.INDEX}", self.send_script_data)
         event_system.subscribe(f"new_session_{self.INDEX}", self.new_session)
         event_system.subscribe(f"switch_session_{self.INDEX}", self.switch_session)
         event_system.subscribe(f"updated_session_{self.INDEX}", self.updated_session)
@@ -87,10 +89,14 @@ class AceEditor(WebKit2.WebView):
             event.originator = self.INDEX
             event_system.emit("handle_bridge_event", (event,))
         except Exception as e:
-            logger.info(e)
+            logger.info(traceback.format_exc())
 
     def load_file(self, ftype: str, fname: str, fpath: str, content: str, line: int = 0):
         command = f"loadFile('{ftype}', '{fname}', '{fpath}', '{content}', '{line}')"
+        self.run_javascript(command, None, None)
+
+    def send_script_data(self, fname, content):
+        command = f"importScriptFromBackendResponse('{fname}','{content}')"
         self.run_javascript(command, None, None)
 
     def new_session(self):
