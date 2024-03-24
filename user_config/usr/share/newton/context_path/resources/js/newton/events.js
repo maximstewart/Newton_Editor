@@ -1,10 +1,26 @@
 window.onload = (eve) => {
     console.log("Window Loaded...");
 
+    console.log("Loading LSP client files...");
+    loadLSPClientJSFiles();
+
+    console.log("Loading editor...");
     loadEditor();
     loadPreviewEditor();
     loadInitialSession();
     loadStartingFiles();
+}
+
+
+const loadLSPClientJSFiles = () => {
+    const baseLink = `${window.location.href}resources/js/libs/ace_editor/lsp`;
+
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/ace-linters.js`, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/service-manager.js`, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/language-client.js`, content = "");
+
+    // Note: If using builtin services tghan connecting to a socket.
+    // sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/python-service.js`, content = "");
 }
 
 window.onerror = function(msg, url, line, col, error) {
@@ -93,4 +109,3 @@ document.addEventListener("keydown", (eve) => {
             break
     }
 });
-

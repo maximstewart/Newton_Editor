@@ -17,17 +17,14 @@ const editorOpts   = {
         mergeUndoDeltas: false
     }
 
+const scriptBlobURLs = {};
 
-let PythonMode     = null;
-//let PythonMode = ace.require("ace/mode/python").Mode;
-
-
-let editor         = null;
-let previewEditor  = null;
-let aceSessions    = {};
-let currentSession = null;
-let previewSel     = null;
-let fontSize       = 12;
-let highlightLine  = true;
-let isControlDown  = false;
-let queryMarkers   = [];
+let editor           = null;
+let previewEditor    = null;
+let aceSessions      = {};
+let currentSession   = null;
+let previewSel       = null;
+let fontSize         = 12;
+let highlightLine    = true;
+let isControlDown    = false;
+let queryMarkers     = [];
