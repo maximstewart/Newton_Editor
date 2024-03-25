@@ -76,7 +76,7 @@ class FilesController:
                 content             = base64.b64decode( event.content.encode() ).decode("utf-8")
                 ftype, fname, fpath = self.save_session(event.ftype, event.fpath, content)
 
-                if ftype and fname and fpath:
+                if ftype == "buffer" and fname and fpath:
                     event_system.emit(f"update_tab_{event.originator}", (event.fhash, fname,))
                     event_system.emit(f"updated_session_{event.originator}", (event.fhash, ftype, fname, fpath))
             case "load_buffer":
@@ -124,7 +124,7 @@ class FilesController:
             info  = gfile.query_info("standard::*", 0, cancellable = None)
             ftype = info.get_content_type().replace("x-", "").split("/")[1]
 
-            return ftype, gfile.get_basename(), gfile.get_path()
+        return ftype, gfile.get_basename(), gfile.get_path()
 
     def update_session(self, fhash, gfile):
         info  = gfile.query_info("standard::*", 0, cancellable = None)
