@@ -78,35 +78,8 @@ const importScriptFromNetwork = async (url) => {
 
 }
 
-const importScriptFromScriptStr = async (scriptStr) => {
-    // Create a Blob with the text content and MIME type "text/javascript".
-    const blob = createScriptBlob(scriptStr);
-
-    // Create an object URL from the Blob.
-    return createBlobURL(blob);
-}
-
-const importScriptFromBackendResponse = async (scriptName, dataStr) => {
-    backendResponse = atob(dataStr);
-    scriptBlobURLs[scriptName] = await importScriptFromScriptStr(backendResponse);
-}
-const importJavaScriptFileFromBlobURL = async (objectURL) => {
-    // Create a new script element and set its src attribute to the object URL.
-    const scriptElement = document.createElement("script");
-    scriptElement.src = objectURL;
-
-    // Add a listener to revoke the object URL when the script has loaded.
-    // scriptElement.addEventListener("load", () => {
-    //     URL.revokeObjectURL(objectURL);
-    // });
-
-    // Append the script element to the document to execute the JavaScript code.
-    document.body.appendChild(scriptElement);
-}
-
-
 const importJavaScriptFile = async (url) => {
-    const objectURL = importScriptFromNetwork(url);
+    const objectURL = await importScriptFromNetwork(url);
 
     // Create a new script element and set its src attribute to the object URL.
     const scriptElement = document.createElement("script");
@@ -119,4 +92,32 @@ const importJavaScriptFile = async (url) => {
 
     // Append the script element to the document to execute the JavaScript code.
     document.body.appendChild(scriptElement);
+}
+
+const importJavaScriptFileFromBlobURL = async (objectURL) => {
+    // Create a new script element and set its src attribute to the object URL.
+    const scriptElement = document.createElement("script");
+    scriptElement.src = objectURL;
+
+    // Add a listener to revoke the object URL when the script has loaded.
+    scriptElement.addEventListener("load", () => {
+        console.log("Loaded script...");
+        // URL.revokeObjectURL(objectURL);
+    });
+
+    // Append the script element to the document to execute the JavaScript code.
+    document.body.appendChild(scriptElement);
+}
+
+const importScriptFromScriptStr = async (scriptStr) => {
+    // Create a Blob with the text content and MIME type "text/javascript".
+    const blob = createScriptBlob(scriptStr);
+
+    // Create an object URL from the Blob.
+    return createBlobURL(blob);
+}
+
+const importScriptFromBackendResponse = async (scriptName, dataStr) => {
+    backendResponse = atob(dataStr);
+    scriptBlobURLs[scriptName] = await importScriptFromScriptStr(backendResponse);
 }

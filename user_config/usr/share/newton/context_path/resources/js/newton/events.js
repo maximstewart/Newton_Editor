@@ -16,6 +16,7 @@ const loadLSPClientJSFiles = () => {
     const baseLink = `${window.location.href}resources/js/libs/ace_editor/lsp`;
 
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/ace-linters.js`, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/base-service.js`, content = "");
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/service-manager.js`, content = "");
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/language-client.js`, content = "");
 

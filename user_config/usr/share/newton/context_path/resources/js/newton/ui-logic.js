@@ -67,27 +67,27 @@ const setSession = async (ftype, fhash, session) => {
 
         if (ftype === "python") {
             // const baseLink = "http://0.0.0.0:4880";
-            //importJavaScriptFile(baseLink + "/ace-linters.js").then(
-            // importScripts("${await importScriptFromNetwork(baseLink + "/service-manager.js")}");
-            // importScripts("${await importScriptFromNetwork(baseLink + "/python-service.js")}");
-            // importScripts("${await importScriptFromNetwork(baseLink + "/language-client.js")}");
 
+            // importJavaScriptFile(baseLink + "/ace-linters.js").then(
             importJavaScriptFileFromBlobURL( scriptBlobURLs["ace-linters.js"] ).then(
                 async () => {
+                    /* Works but isn't websocket */
+                    // manager.registerService("python", {
+                    //     module: () => {
+                    //         importScripts( "${ scriptBlobURLs["python-service.js"] }" );
+                    //         return {PythonService};
+                    //     },
+                    //     className: "PythonService",
+                    //     modes: "python|python3",
+                    // });
+
+                    // importScripts("${await importScriptFromNetwork(baseLink + "/service-manager.js")}");
+                    // importScripts("${await importScriptFromNetwork(baseLink + "/python-service.js")}");
+                    // importScripts("${await importScriptFromNetwork(baseLink + "/language-client.js")}");
                     let workerString = `
                         !function () {
                             importScripts( "${ scriptBlobURLs["service-manager.js"] }" );
                             let manager = new ServiceManager(self);
-
-                            /* Works but isn't websocket */
-                            // manager.registerService("python", {
-                            //     module: () => {
-                            //         importScripts( "${ scriptBlobURLs["python-service.js"] }" );
-                            //         return {PythonService};
-                            //     },
-                            //     className: "PythonService",
-                            //     modes: "python|python3",
-                            // });
 
                             /* Works and is websocket */
                             manager.registerServer("python", {
@@ -109,12 +109,19 @@ const setSession = async (ftype, fhash, session) => {
                         }()
                     `;
 
-                    let worker   = new Worker(createBlobURL(createScriptBlob(workerString)));
+                    let worker   = new Worker(
+                        createBlobURL(
+                            createScriptBlob(workerString)
+                        )
+                    );
+
                     let provider = LanguageProvider.create(worker);
                     provider.registerEditor(editor);
 
                 }
-            );
+            ).catch((e) => {
+                console.log(e);
+            });
 
         }
     }
