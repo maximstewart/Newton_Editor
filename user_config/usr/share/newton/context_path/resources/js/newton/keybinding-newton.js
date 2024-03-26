@@ -17,6 +17,14 @@ const editorCommands = [
                 editor.showKeyboardShortcuts();
             })
         }
+
+
+    }, {
+        name: "showLSPManager",
+        bindKey: {win: "ctrl-m", mac: "command-m"},
+        exec: function(editor) {
+            $('#lsp-modal').modal("toggle");
+        }
     }, {
         name: "search",
         bindKey: {win: "ctrl-f", mac: "ctrl-f"},

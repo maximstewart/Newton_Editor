@@ -101,8 +101,7 @@ const importJavaScriptFileFromBlobURL = async (objectURL) => {
 
     // Add a listener to revoke the object URL when the script has loaded.
     scriptElement.addEventListener("load", () => {
-        console.log("Loaded script...");
-        // URL.revokeObjectURL(objectURL);
+        URL.revokeObjectURL(objectURL);
     });
 
     // Append the script element to the document to execute the JavaScript code.

@@ -6,12 +6,22 @@
     },
     "python": {
         "info": "https://github.com/python-lsp/python-lsp-server",
-        "command": ["pylsp"],
-        "initialization_options": {}
+        "command": "pylsp --ws --port 3030",
+        "socket": "ws://127.0.0.1:3030/python",
+        "initialization_options": {
+            "pylsp.plugins.rope_autoimport.enabled": true,
+            "pylsp.plugins.rope_completion.enabled": true,
+            "pylsp.plugins.rope_completion.eager": true,
+            "pylsp.plugins.jedi_completion.fuzzy": true,
+            "pylsp.plugins.jedi.extra_paths": [
+                "/home/abaddon/Portable_Apps/py-venvs/lsp_bridge-venv/venv/lib/python3.10/site-packages/gi-stubs"
+            ]
+        }
     },
     "python3": {
         "info": "https://pypi.org/project/jedi-language-server/",
-        "command": ["jedi-language-server"],
+        "command": "jedi-language-server",
+        "socket": "ws://127.0.0.1:3030/python",
         "initialization_options": {
             "jediSettings": {
                 "autoImportModules": [],
@@ -25,8 +35,8 @@
             },
             "markupKindPreferred": "markdown",
             "workspace": {
-                "extraPaths": [],
-                "environmentPath": "/path/to/venv/bin/python",
+                "extraPaths": ["/home/abaddon/Portable_Apps/py-venvs/gtk-apps-venv/venv/lib/python3.10/site-packages/gi"],
+                "environmentPath": "/home/abaddon/Portable_Apps/py-venvs/gtk-apps-venv/venv/bin/python",
                 "symbols": {
                     "ignoreFolders": [".nox", ".tox", ".venv", "__pycache__", "venv"],
                     "maxSymbols": 20

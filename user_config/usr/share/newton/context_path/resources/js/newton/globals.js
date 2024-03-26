@@ -18,6 +18,9 @@ const editorOpts   = {
     }
 
 const scriptBlobURLs = {};
+const baseLSPLink    = "http://0.0.0.0:4880";
+let lspProvider      = null;
+
 
 let editor           = null;
 let previewEditor    = null;
