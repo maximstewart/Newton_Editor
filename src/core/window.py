@@ -90,7 +90,7 @@ class Window(Gtk.ApplicationWindow):
         if visual != None and screen.is_composited() and settings.config.make_transparent == 0:
             self.set_visual(visual)
             self.set_app_paintable(True)
-            self.connect("draw", self._area_draw)
+            # self.connect("draw", self._area_draw)
 
         # bind css file
         cssProvider  = Gtk.CssProvider()
