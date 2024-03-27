@@ -13,16 +13,14 @@ window.onload = (eve) => {
 
 
 const loadLSPClientJSFiles = () => {
-    const baseLink = `${window.location.href}resources/js/libs/ace_editor/lsp`;
-
-    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/../lsp_servers_config.json`, content = "");
-    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/ace-linters.js`, content = "");
-    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/base-service.js`, content = "");
-    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/service-manager.js`, content = "");
-    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/language-client.js`, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = LSP_SERVER_CONFG, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/ace-linters.js`, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/base-service.js`, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/service-manager.js`, content = "");
+    sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/language-client.js`, content = "");
 
     // Note: If using builtin services tghan connecting to a socket.
-    // sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${baseLink}/python-service.js`, content = "");
+    // sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/python-service.js`, content = "");
 }
 
 window.onerror = function(msg, url, line, col, error) {

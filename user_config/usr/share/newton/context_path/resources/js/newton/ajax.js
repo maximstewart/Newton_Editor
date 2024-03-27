@@ -31,9 +31,9 @@ const doAjax = (actionPath, data, action) => {
 const formatURL = (basePath) => {
     url = window.location.href;
     if ( url.endsWith('/') )
-        return url + basePath;
+        return `${url}${basePath}`;
     else
-        return url + '/' + basePath;
+        return `${url}/${basePath}`;
 }
 
 const fetchData = async (url) => {
@@ -117,6 +117,10 @@ const importScriptFromScriptStr = async (scriptStr) => {
 }
 
 const importScriptFromBackendResponse = async (scriptName, dataStr) => {
-    backendResponse = atob(dataStr);
-    scriptBlobURLs[scriptName] = await importScriptFromScriptStr(backendResponse);
+    scriptStr = atob(dataStr);
+    SCRIPT_BLOB_URLs[scriptName] = await importScriptFromScriptStr(scriptStr);
+
+    if (scriptName === "lsp_servers_config.json") {
+        lspServersConfig = JSON.parse(scriptStr);
+    }
 }

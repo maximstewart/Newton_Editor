@@ -3,7 +3,7 @@ const loadPreviewEditor = () => {
 
     previewEditor = ace.edit("preview-editor");
     // Note:  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
-    previewEditor.setOptions(editorOpts);
+    previewEditor.setOptions(EDITOR_OPTS);
 
     // Note:  https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
     previewEditor.commands.addCommands(editorCommands);
@@ -18,7 +18,7 @@ const loadEditor = () => {
 
     editor = ace.edit("editor");
     // Note:  https://github.com/ajaxorg/ace/wiki/Configuring-Ace
-    editor.setOptions(editorOpts);
+    editor.setOptions(EDITOR_OPTS);
 
     // Note:  https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
     editor.commands.addCommands(editorCommands);

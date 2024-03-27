@@ -2,7 +2,7 @@ const messenger  = (window.webkit) ? window.webkit.messageHandlers : (message) =
     console.log("Message: " + message);
 };
 
-const editorOpts   = {
+const EDITOR_OPTS   = {
         printMarginColumn: 80,
         enableBasicAutocompletion: true,
         enableInlineAutocompletion: true,
@@ -17,9 +17,13 @@ const editorOpts   = {
         mergeUndoDeltas: false
     }
 
-const scriptBlobURLs = {};
-const baseLSPLink    = "http://0.0.0.0:4880";
+const BASE_LINK        = `${window.location.href}resources/js/libs/ace_editor/lsp`;
+const LSP_SERVER_CONFG = `${window.location.href}../lsp_servers_config.json`;
+const BASE_LSP_LINK    = "http://0.0.0.0:4880";
+
+const SCRIPT_BLOB_URLs = {};
 let lspProvider      = null;
+let lspServersConfig = null;
 
 
 let editor           = null;
