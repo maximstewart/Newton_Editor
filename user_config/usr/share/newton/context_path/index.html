@@ -63,26 +63,59 @@
                     <h3>LSPs:</h3>
                 </div>
 
-                <div class="modal-body margin-bottom-neg-200">
+                <div class="modal-body">
                     <div class="row">
                         <div class="col max-height-600 noselect">
-                            <ul id="lsp-selection" class="list-group scroller">
-                            </ul>
-                            <button onclick="loadPythonLSPFromBlobURLs()">Load LSP Client</button>
+                            <div id="lsp-settings" class="list-group scroller">
+                            </div>
+
                             <input id="lsp-search" class="form-control mr-sm-2" type="search" placeholder="Search..." aria-label="Search" />
-                        </div>
-                        <div class="col max-height-800">
-                            <pre id="preview-editor"></pre>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
+                            <button onclick="loadPythonLSPFromBlobURLs()">Load LSP Client</button>
                 </div>
             </div>
         </div>
     </div>
 
+
+
+
+    <!-- Template Tags... -->
+    <template id="input-list-template">
+        <style>
+            ul, li {
+                list-style: none;
+            }
+
+            ul {
+                padding: 5px;
+            }
+
+            .selected {
+                background-color: rgba(255, 255, 255, 0.64);
+            }
+        </style>
+        <section>
+            <hr/>
+            <h2 id="title"></h2>
+            <ul id="input-list">
+            </ul>
+        </section>
+    </template>
+    <template id="input-list-item-template">
+        <style>
+            li {
+            }
+        </style>
+        <li id="input-list-item">
+            <label id="title"></label>
+            <input id="input-entry" />
+        </li>
+    </template>
 
 
 
@@ -111,6 +144,7 @@
 
     <!-- For Application... -->
     <script src="resources/js/newton/globals.js"></script>
+    <script src="resources/js/newton/components.js"></script>
     <script src="resources/js/newton/lsp-manager.js"></script>
     <script src="resources/js/newton/utils.js"></script>
     <script src="resources/js/newton/post-ajax.js"></script>

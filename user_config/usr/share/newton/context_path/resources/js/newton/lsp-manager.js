@@ -86,3 +86,73 @@ const loadPythonLSPFromNetwork = () => {
     });
 
 }
+
+
+const loadSettingsFileToUI = async () => {
+    let languages = Object.keys(lspServersConfig);
+
+    for (let i = 0; i < languages.length; i++) {
+        let lang = languages[i];
+        let elm  = document.createElement("input-list");
+
+        elm.setTitle(lang);
+        lspSettingsUI.appendChild( elm );
+
+        generateElement(lang, elm, lspServersConfig[lang]);
+    }
+
+}
+
+
+const saveSettingsFileFromUI = () => {
+
+}
+
+
+const generateElement = (parent, elm, config) => {
+    const proto = Object.getPrototypeOf(config)
+
+    switch (proto) {
+        case String.prototype:
+            let inputElm = document.createElement("input-list-item");
+            inputElm.setTitle(parent);
+            inputElm.setText(config);
+            elm.append(inputElm);
+
+            break;
+        case Array.prototype:
+            let inputListElm = document.createElement("input-list");
+            for (var i = 0; i < config.length; i++) {
+                let inputElm = document.createElement("input-list-item");
+                inputElm.setText( config[i] );
+                inputListElm.append(inputElm);
+            }
+            elm.append(inputListElm);
+
+            break;
+        case Boolean.prototype:
+
+            break;
+        case Map.prototype:
+
+            break;
+        default:
+            if ( isDict(config) ) {
+                let keys = Object.keys(config);
+
+                for (let i = 0; i < keys.length; i++) {
+                    let key = keys[i];
+                    generateElement(key, elm, config[key] );
+                }
+
+                break;
+            }
+
+            console.log("No generatable HTML type...")
+    }
+
+}
+
+const isDict = (dict) => {
+    return typeof dict === "object" && !Array.isArray(dict);
+};

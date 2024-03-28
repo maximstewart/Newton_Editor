@@ -18,12 +18,13 @@ const EDITOR_OPTS   = {
     }
 
 const BASE_LINK        = `${window.location.href}resources/js/libs/ace_editor/lsp`;
-const LSP_SERVER_CONFG = `${window.location.href}../lsp_servers_config.json`;
+const LSP_SERVER_CONFG = `${window.location.href}../lsp-servers-config.json`;
 const BASE_LSP_LINK    = "http://0.0.0.0:4880";
 
 const SCRIPT_BLOB_URLs = {};
-let lspProvider      = null;
-let lspServersConfig = null;
+let lspProvider        = null;
+let lspServersConfig   = null;
+let lspSettingsUI      = document.getElementById('lsp-settings');
 
 
 let editor           = null;

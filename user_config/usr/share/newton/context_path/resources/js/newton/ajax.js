@@ -120,7 +120,9 @@ const importScriptFromBackendResponse = async (scriptName, dataStr) => {
     scriptStr = atob(dataStr);
     SCRIPT_BLOB_URLs[scriptName] = await importScriptFromScriptStr(scriptStr);
 
-    if (scriptName === "lsp_servers_config.json") {
+    // TODO: Look to move this out of here as soon as can determin how.
+    if (scriptName === "lsp-servers-config.json") {
         lspServersConfig = JSON.parse(scriptStr);
+        loadSettingsFileToUI();
     }
 }

@@ -1,6 +1,9 @@
 window.onload = (eve) => {
     console.log("Window Loaded...");
 
+    console.log("Defining custom elements...");
+    defineCustomElements();
+
     console.log("Loading LSP client files...");
     loadLSPClientJSFiles();
 
@@ -11,6 +14,11 @@ window.onload = (eve) => {
     loadStartingFiles();
 }
 
+
+const defineCustomElements = () => {
+    customElements.define("input-list", InputList, { extends: 'ul' });
+    customElements.define("input-list-item", InputListItem, { extends: 'li' });
+}
 
 const loadLSPClientJSFiles = () => {
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = LSP_SERVER_CONFG, content = "");

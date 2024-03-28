@@ -1,7 +1,8 @@
 {
     "sh": {
         "info": "",
-        "command": [],
+        "command": "",
+        "socket": "ws://127.0.0.1:3030/shell",
         "initialization_options": {}
     },
     "python": {
@@ -46,17 +47,20 @@
     },
     "c": {
         "info": "https://clangd.llvm.org/",
-        "command": ["/usr/bin/clangd"],
+        "command": "/usr/bin/clangd",
+        "socket": "ws://127.0.0.1:3030/c",
         "initialization_options": {}
     },
     "cpp": {
         "info": "https://clangd.llvm.org/",
-        "command": ["/usr/bin/clangd"],
+        "command": "/usr/bin/clangd",
+        "socket": "ws://127.0.0.1:3030/cpp",
         "initialization_options": {}
     },
     "java": {
         "info": "https://download.eclipse.org/jdtls/",
-        "command": ["java-language-server"],
+        "command": "java-language-server",
+        "socket": "ws://127.0.0.1:3030/java",
         "initialization_options": {}
     }
 }
