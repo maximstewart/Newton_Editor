@@ -27,8 +27,7 @@
 
     <!-- Buffers modal -->
     <div class="modal" id="buffers-modal" tabindex="-1" role="dialog"
-        data-bs-theme="dark" data-bs-keyboard="false" data-bs-backdrop="static"
-        >
+        data-bs-theme="dark" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -75,7 +74,7 @@
                 </div>
 
                 <div class="modal-footer">
-                            <button onclick="loadPythonLSPFromBlobURLs()">Load LSP Client</button>
+                    <button onclick="loadPythonLSPFromBlobURLs()">Load LSP Client</button>
                 </div>
             </div>
         </div>
@@ -85,6 +84,16 @@
 
 
     <!-- Template Tags... -->
+    <template id="lsp-config-template">
+        <style>
+        </style>
+        <section>
+            <div id="lsp-config" class="row">
+                <hr/>
+                <h2 id="title"></h2>
+            </div>
+        </section>
+    </template>
     <template id="input-list-template">
         <style>
             ul, li {
@@ -100,15 +109,15 @@
             }
         </style>
         <section>
-            <hr/>
-            <h2 id="title"></h2>
+            <h1 id="title"></h1>
             <ul id="input-list">
             </ul>
         </section>
     </template>
     <template id="input-list-item-template">
         <style>
-            li {
+            ul, li {
+                list-style: none;
             }
         </style>
         <li id="input-list-item">

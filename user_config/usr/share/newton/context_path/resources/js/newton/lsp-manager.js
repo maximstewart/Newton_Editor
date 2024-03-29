@@ -89,17 +89,20 @@ const loadPythonLSPFromNetwork = () => {
 
 
 const loadSettingsFileToUI = async () => {
-    let languages = Object.keys(lspServersConfig);
+    generateElement(lspServersConfig);
 
-    for (let i = 0; i < languages.length; i++) {
-        let lang = languages[i];
-        let elm  = document.createElement("input-list");
+    // let config = lspServersConfig;
+    // let keys = Object.keys(lspServersConfig);
 
-        elm.setTitle(lang);
-        lspSettingsUI.appendChild( elm );
+    // for (let i = 0; i < languages.length; i++) {
+    //     let elm  = document.createElement("lsp-config");
+    //     let lang = languages[i];
 
-        generateElement(lang, elm, lspServersConfig[lang]);
-    }
+    //     elm.setTitle(lang);
+    //     lspSettingsUI.appendChild( elm );
+
+    //     generateElement(lang, elm, lspServersConfig[lang]);
+    // }
 
 }
 
@@ -109,25 +112,21 @@ const saveSettingsFileFromUI = () => {
 }
 
 
-const generateElement = (parent, elm, config) => {
+const generateElement = (config = {}, parent = "", elm = null) => {
     const proto = Object.getPrototypeOf(config)
+    console.log(config, parent, elm);
 
     switch (proto) {
         case String.prototype:
-            let inputElm = document.createElement("input-list-item");
-            inputElm.setTitle(parent);
-            inputElm.setText(config);
-            elm.append(inputElm);
+            handleString(config, elm);
+
+            // lspSettingsUI.appendChild( target );
 
             break;
         case Array.prototype:
-            let inputListElm = document.createElement("input-list");
-            for (var i = 0; i < config.length; i++) {
-                let inputElm = document.createElement("input-list-item");
-                inputElm.setText( config[i] );
-                inputListElm.append(inputElm);
-            }
-            elm.append(inputListElm);
+            handleList(config, elm);
+
+            // lspSettingsUI.appendChild( target );
 
             break;
         case Boolean.prototype:
@@ -138,12 +137,20 @@ const generateElement = (parent, elm, config) => {
             break;
         default:
             if ( isDict(config) ) {
-                let keys = Object.keys(config);
+                if (parent === "" && elm === null) {
+                    handleRoot(config);
+                    // let elm  = document.createElement("lsp-config");
+                    // let lang = languages[i];
 
-                for (let i = 0; i < keys.length; i++) {
-                    let key = keys[i];
-                    generateElement(key, elm, config[key] );
+                    break;
                 }
+
+                handleDictionary(config, elm);
+
+                // target = handleDictionary(config, elm);
+                // lspSettingsUI.appendChild( target );
+                // let elm  = document.createElement("lsp-config");
+                // let lang = languages[i];
 
                 break;
             }
@@ -153,6 +160,54 @@ const generateElement = (parent, elm, config) => {
 
 }
 
-const isDict = (dict) => {
-    return typeof dict === "object" && !Array.isArray(dict);
-};
+
+
+
+const handleRoot = (config) => {
+    let keys = Object.keys(config);
+
+    for (let i = 0; i < keys.length; i++) {
+        let elm = document.createElement("lsp-config");
+        let key = keys[i];
+
+        elm.setTitle(key);
+        lspSettingsUI.appendChild( elm );
+
+        generateElement(config[key], key, elm);
+    }
+
+}
+
+
+const handleDictionary = (config, elm) => {
+    let keys = Object.keys(config);
+
+    for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+
+        generateElement(config[key], key, elm);
+    }
+}
+
+const handleList = (config, elm) => {
+    let listElm = document.createElement("input-list");
+
+    for (var i = 0; i < config.length; i++) {
+        let inputElm = document.createElement("input-list-item");
+        inputElm.setText( config[i] );
+        listElm.append(inputElm);
+    }
+
+    elm.append(listElm);
+
+    return elm;
+}
+
+const handleString = (config, elm) => {
+    console.log(config, elm);
+    let inputElm = document.createElement("input-list-item");
+
+    inputElm.setTitle(parent);
+    inputElm.setText(config);
+    elm.append(inputElm);
+}

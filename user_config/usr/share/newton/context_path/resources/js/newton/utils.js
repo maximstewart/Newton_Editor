@@ -45,7 +45,9 @@ const sendMessage = (topic = null, ftype = "", fhash = "", fpath = "", content =
     messenger.backend.postMessage( JSON.stringify(messageBody) );
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const sleep  = ms => new Promise(r => setTimeout(r, ms));
+const isDict = (dict) => { return typeof dict === "object" && !Array.isArray(dict); };
+
 
 const getSHA256Hash = async (input) => {
     let textAsBuffer = new TextEncoder().encode(input);

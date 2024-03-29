@@ -16,6 +16,7 @@ window.onload = (eve) => {
 
 
 const defineCustomElements = () => {
+    customElements.define("lsp-config", LspConfig, { extends: 'div' });
     customElements.define("input-list", InputList, { extends: 'ul' });
     customElements.define("input-list-item", InputListItem, { extends: 'li' });
 }

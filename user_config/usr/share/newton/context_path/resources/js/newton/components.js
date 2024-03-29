@@ -1,3 +1,38 @@
+class LspConfigContainer extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    loadShaddowRoot(tag = "lsp-config-template") {
+        let template = document.getElementById(tag);
+        let templateContent = template.content;
+
+        const shadowRoot = this.attachShadow({ mode: "open" });
+        shadowRoot.appendChild( templateContent.cloneNode(true) );
+    }
+
+    setTitle(title = "[NO TITLE]") {
+        this.shadowRoot.getElementById("title").innerText = title;
+    }
+
+    append(elm = null) {
+        if (!elm) return;
+        this.shadowRoot.getElementById("lsp-config").appendChild(elm);
+    }
+
+    remove(elm = null) {
+        if (!elm) return;
+        this.shadowRoot.getElementById("lsp-config").remove(elm);
+    }
+
+    serialize() {
+        let tags = this.shadowRoot.children;
+        for (var i = 0; i < tags.length; i++) {
+            data = tags[i].serialize();
+        }
+    }
+}
+
 class InputListContainer extends HTMLElement {
     constructor() {
         super();
@@ -10,11 +45,11 @@ class InputListContainer extends HTMLElement {
         const shadowRoot = this.attachShadow({ mode: "open" });
         shadowRoot.appendChild( templateContent.cloneNode(true) );
     }
-    
+
     setTitle(title = "[NO TITLE]") {
         this.shadowRoot.getElementById("title").innerText = title;
     }
-    
+
     append(elm = null) {
         if (!elm) return;
         this.shadowRoot.getElementById("input-list").appendChild(elm);
@@ -32,6 +67,7 @@ class InputListContainer extends HTMLElement {
         }
     }
 }
+
 
 class InputListItemContainer extends HTMLElement {
     constructor() {
@@ -71,6 +107,13 @@ class InputListItemContainer extends HTMLElement {
     }
 }
 
+
+class LspConfig extends LspConfigContainer {
+    constructor() {
+        super();
+        this.loadShaddowRoot();
+    }
+}
 
 class InputList extends InputListContainer {
     constructor() {
