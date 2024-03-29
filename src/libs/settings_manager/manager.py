@@ -138,6 +138,7 @@ class SettingsManager(StartCheckMixin, Singleton):
 
     def is_trace_debug(self)       -> str:   return self._trace_debug
     def is_debug(self)             -> str:   return self._debug
+    def is_launch_inspector(self)  -> str:   return self._run_inspector
     def is_starting_with_file(self) -> bool: return self._passed_in_file
 
     def call_method(self, target_class = None, _method_name = None, data = None):
@@ -158,6 +159,9 @@ class SettingsManager(StartCheckMixin, Singleton):
 
     def set_debug(self, debug):
         self._debug = debug
+
+    def set_launch_inspector(self, launch):
+        self._run_inspector = launch
 
     def set_is_starting_with_file(self, is_passed_in_file: False):
         self._passed_in_file = is_passed_in_file

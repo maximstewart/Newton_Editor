@@ -27,7 +27,8 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser()
         # Add long and short arguments
         parser.add_argument("--debug", "-d", default="false", help="Do extra console messaging.")
-        parser.add_argument("--trace-debug", "-td", default="false", help="Disable saves, ignore IPC lock, do extra console messaging.")
+        parser.add_argument("--trace-debug", "-td", default="false", help="Disable saves, ignore IPC lock, do extra console messaging; launch debug views.")
+        parser.add_argument("--launch-inspector", "-li", default="false", help="Launch webkit debugging toopls.")
         parser.add_argument("--no-plugins", "-np", default="false", help="Do not load plugins.")
         parser.add_argument("--new-tab", "-t", default="", help="Open a file into new tab.")
         parser.add_argument("--new-window", "-w", default="", help="Open a file into a new window.")
@@ -40,6 +41,9 @@ if __name__ == "__main__":
 
         if args.trace_debug == "true":
             settings_manager.set_trace_debug(True)
+
+        if args.launch_inspector == "true":
+            settings_manager.set_launch_inspector(True)
 
         settings_manager.do_dirty_start_check()
         Application(args, unknownargs)

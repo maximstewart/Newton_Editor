@@ -27,12 +27,11 @@ class AceEditor(WebKit2.WebView):
         self._setup_styling()
         self._setup_signals()
         self._subscribe_to_events()
-        self._load_view()
         self._setup_content_manager()
 
         self.show_all()
 
-        if settings_manager.is_debug():
+        if settings_manager.is_debug() or settings_manager.is_launch_inspector():
             inspector = self.get_inspector()
             inspector.show()
 
@@ -42,7 +41,11 @@ class AceEditor(WebKit2.WebView):
         self.set_background_color( Gdk.RGBA(0, 0, 0, 0.0) )
 
     def _setup_signals(self):
-        ...
+        self._map_eve_id = self.connect("map", self._on_map_eve)
+
+    def _on_map_eve(self, widget):
+        self.disconnect(self._map_eve_id)
+        self._load_view()
 
     def _subscribe_to_events(self):
         event_system.subscribe(f"load_file_{self.INDEX}", self.load_file)
