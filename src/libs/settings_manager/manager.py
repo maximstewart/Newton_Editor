@@ -90,6 +90,7 @@ class SettingsManager(StartCheckMixin, Singleton):
 
         self._trace_debug       = False
         self._debug             = False
+        self._run_inspector     = False
         self._dirty_start       = False
         self._passed_in_file    = False
         self._starting_files    = []
