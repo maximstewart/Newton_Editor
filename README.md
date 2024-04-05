@@ -12,6 +12,12 @@ This is currently very much a WIP effort with two branches to take note of. The 
 * release/newton-with-gtksource
 * release/newton-with-webkit2 
 
+# LSP
+Add lsp-ws-proxy somewhere in $PATH and make executable. Download from:
+
+* https://github.com/qualified/lsp-ws-proxy
+
+
 # Images
 * GtkSource.View
 ![1 Newton default view. ](images/pic1.png)

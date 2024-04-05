@@ -1,14 +1,16 @@
 {
     "sh": {
         "info": "",
+        "alt-command": "",
         "command": "",
-        "socket": "ws://127.0.0.1:3030/shell",
+        "socket": "ws://127.0.0.1:3030/?name=shell",
         "initialization_options": {}
     },
     "python": {
         "info": "https://github.com/python-lsp/python-lsp-server",
-        "command": "pylsp --ws --port 3030",
-        "socket": "ws://127.0.0.1:3030/python",
+        "alt-command": "pylsp --ws --port 3030",
+        "command": "lsp-ws-proxy --listen 3030 -- pylsp",
+        "socket": "ws://127.0.0.1:3030/?name=pylsp",
         "initialization_options": {
             "pylsp.plugins.rope_autoimport.enabled": true,
             "pylsp.plugins.rope_completion.enabled": true,
@@ -21,8 +23,9 @@
     },
     "python3": {
         "info": "https://pypi.org/project/jedi-language-server/",
-        "command": "jedi-language-server",
-        "socket": "ws://127.0.0.1:3030/python",
+        "alt-command": "jedi-language-server",
+        "command": "lsp-ws-proxy --listen 3030 -- jedi-language-server",
+        "socket": "ws://127.0.0.1:3030/?name=jedi-language-server",
         "initialization_options": {
             "jediSettings": {
                 "autoImportModules": [],
@@ -47,20 +50,23 @@
     },
     "c": {
         "info": "https://clangd.llvm.org/",
-        "command": "/usr/bin/clangd",
-        "socket": "ws://127.0.0.1:3030/c",
+        "alt-command": "clangd",
+        "command": "lsp-ws-proxy --listen 3030 -- clangd",
+        "socket": "ws://127.0.0.1:3030/?name=clangd",
         "initialization_options": {}
     },
     "cpp": {
         "info": "https://clangd.llvm.org/",
-        "command": "/usr/bin/clangd",
-        "socket": "ws://127.0.0.1:3030/cpp",
+        "alt-command": "clangd",
+        "command": "lsp-ws-proxy --listen 3030 -- clangd",
+        "socket": "ws://127.0.0.1:3030/?name=clangd",
         "initialization_options": {}
     },
     "java": {
         "info": "https://download.eclipse.org/jdtls/",
-        "command": "java-language-server",
-        "socket": "ws://127.0.0.1:3030/java",
+        "alt-command": "java-language-server",
+        "command": "lsp-ws-proxy --listen 3030 -- java-language-server",
+        "socket": "ws://127.0.0.1:3030/?name=java-language-server",
         "initialization_options": {}
     }
 }
