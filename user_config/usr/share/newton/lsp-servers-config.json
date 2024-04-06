@@ -4,14 +4,14 @@
         "alt-command": "",
         "command": "",
         "socket": "ws://127.0.0.1:3030/?name=shell",
-        "initialization_options": {}
+        "initialization-options": {}
     },
     "python": {
         "info": "https://github.com/python-lsp/python-lsp-server",
         "alt-command": "pylsp --ws --port 3030",
         "command": "lsp-ws-proxy --listen 3030 -- pylsp",
         "socket": "ws://127.0.0.1:3030/?name=pylsp",
-        "initialization_options": {
+        "initialization-options": {
             "pylsp.plugins.rope_autoimport.enabled": true,
             "pylsp.plugins.rope_completion.enabled": true,
             "pylsp.plugins.rope_completion.eager": true,
@@ -26,7 +26,7 @@
         "alt-command": "jedi-language-server",
         "command": "lsp-ws-proxy --listen 3030 -- jedi-language-server",
         "socket": "ws://127.0.0.1:3030/?name=jedi-language-server",
-        "initialization_options": {
+        "initialization-options": {
             "jediSettings": {
                 "autoImportModules": [],
                 "caseInsensitiveCompletion": true,
@@ -53,20 +53,20 @@
         "alt-command": "clangd",
         "command": "lsp-ws-proxy --listen 3030 -- clangd",
         "socket": "ws://127.0.0.1:3030/?name=clangd",
-        "initialization_options": {}
+        "initialization-options": {}
     },
     "cpp": {
         "info": "https://clangd.llvm.org/",
         "alt-command": "clangd",
         "command": "lsp-ws-proxy --listen 3030 -- clangd",
         "socket": "ws://127.0.0.1:3030/?name=clangd",
-        "initialization_options": {}
+        "initialization-options": {}
     },
     "java": {
         "info": "https://download.eclipse.org/jdtls/",
         "alt-command": "java-language-server",
         "command": "lsp-ws-proxy --listen 3030 -- java-language-server",
         "socket": "ws://127.0.0.1:3030/?name=java-language-server",
-        "initialization_options": {}
+        "initialization-options": {}
     }
 }

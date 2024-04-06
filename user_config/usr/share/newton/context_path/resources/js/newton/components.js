@@ -33,6 +33,41 @@ class LspConfigContainer extends HTMLElement {
     }
 }
 
+class InputDictContainer extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    loadShaddowRoot(tag = "input-dict-template") {
+        let template = document.getElementById(tag);
+        let templateContent = template.content;
+
+        const shadowRoot = this.attachShadow({ mode: "open" });
+        shadowRoot.appendChild( templateContent.cloneNode(true) );
+    }
+
+    setTitle(title = "[NO TITLE]") {
+        this.shadowRoot.getElementById("title").innerText = title;
+    }
+
+    append(elm = null) {
+        if (!elm) return;
+        this.shadowRoot.getElementById("input-dict").appendChild(elm);
+    }
+
+    remove(elm = null) {
+        if (!elm) return;
+        this.shadowRoot.getElementById("input-dict").remove(elm);
+    }
+
+    serialize() {
+        let tags = this.shadowRoot.children;
+        for (var i = 0; i < tags.length; i++) {
+            data = tags[i].serialize();
+        }
+    }
+}
+
 class InputListContainer extends HTMLElement {
     constructor() {
         super();
@@ -68,7 +103,6 @@ class InputListContainer extends HTMLElement {
     }
 }
 
-
 class InputListItemContainer extends HTMLElement {
     constructor() {
         super();
@@ -84,7 +118,6 @@ class InputListItemContainer extends HTMLElement {
 
     setTitle(textStr = "") {
         if (Object.getPrototypeOf(textStr) !== String.prototype) return;
-
         this.shadowRoot.getElementById("title").innerText = textStr;
     }
 
@@ -94,7 +127,6 @@ class InputListItemContainer extends HTMLElement {
 
     setText(textStr = "") {
         if (Object.getPrototypeOf(textStr) !== String.prototype) return;
-
         this.shadowRoot.getElementById("input-entry").value = textStr;
     }
 
@@ -107,8 +139,53 @@ class InputListItemContainer extends HTMLElement {
     }
 }
 
+class InputCheckboxContainer extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    loadShaddowRoot(tag = "input-checkbox-template") {
+        let template = document.getElementById(tag);
+        let templateContent = template.content;
+
+        const shadowRoot = this.attachShadow({ mode: "open" });
+        shadowRoot.appendChild( templateContent.cloneNode(true) );
+    }
+
+    setTitle(textStr = "") {
+        if (Object.getPrototypeOf(textStr) !== String.prototype) return;
+        this.shadowRoot.getElementById("title").innerText = textStr;
+    }
+
+    toggle() {
+        let elm = this.shadowRoot.getElementById("input-checkbox");
+        elm.checked = !elm.checked;
+    }
+
+    on() {
+        let elm = this.shadowRoot.getElementById("input-checkbox").checked = true;
+    }
+
+    off() {
+        let elm = this.shadowRoot.getElementById("input-checkbox").checked = false;
+    }
+
+    serialize() {
+        return this.shadowRoot.getElementById("input-checkbox").value;
+    }
+}
+
+
+
 
 class LspConfig extends LspConfigContainer {
+    constructor() {
+        super();
+        this.loadShaddowRoot();
+    }
+}
+
+class InputDict extends InputDictContainer {
     constructor() {
         super();
         this.loadShaddowRoot();
@@ -123,6 +200,13 @@ class InputList extends InputListContainer {
 }
 
 class InputListItem extends InputListItemContainer {
+    constructor() {
+        super();
+        this.loadShaddowRoot();
+    }
+}
+
+class InputCheckbox extends InputCheckboxContainer {
     constructor() {
         super();
         this.loadShaddowRoot();
