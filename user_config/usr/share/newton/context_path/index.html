@@ -23,7 +23,20 @@
     </div>
 
 
+    <p id="top-gutter"
+        class="fixed-top"
+        data-toggle="popover"
+        data-placement="bottom">
+    </p>
+
     <pre id="editor"></pre>
+
+    <p id="bottom-gutter"
+        class="fixed-bottom"
+        data-toggle="popover"
+        data-placement="top">
+    </p>
+
 
     <!-- Buffers modal -->
     <div class="modal" id="buffers-modal" tabindex="-1" role="dialog"
@@ -85,6 +98,85 @@
 
 
     <!-- Template Tags... -->
+    <template id="search-replace-template">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="resources/css/libs/bootstrap5/bootstrap.min.css">
+        <link rel="stylesheet" href="resources/css/libs/bootstrap-icons/bootstrap-icons.css">
+
+        <!-- Site CSS -->
+        <!--  <link rel="stylesheet" href="resources/css/newton/context-menu.css">  -->
+        <link rel="stylesheet" href="resources/css/newton/main.css">
+        <link rel="stylesheet" href="resources/css/newton/overrides.css">
+
+        <style>
+        </style>
+        <section>
+            <div id="search-replace" class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col col-3">
+                            <label id="find-status-lbl">Find in Current Buffer</label>
+                        </div>
+
+                        <div class="col col-4">
+                            <label id="find-options-lbl">Finding with Options: Case Insensitive</label>
+                        </div>
+
+                        <div class="col col-5 line-height-32px">
+                            <button title="Close Panel" class="float-end" onclick="hideSearchReplace()">X</button>
+                            <button title="Whole Word" class="float-end">
+                                <img src="resources/imgs/whole-word.png" />
+                            </button>
+                            <button title="Only In Selection" class="float-end">
+                                <img src="resources/imgs/only-in-selection.png" />
+                            </button>
+                            <button title="Match Case" class="float-end">Aa</button>
+
+
+                            <button title="Use Regex" class="float-end">.*</button>
+                        </div>
+                    </div>
+
+                    <div class="margin-tb-1em"></div>
+
+                    <div class="row">
+                        <div class="col">
+
+                            <div class="row">
+                                <div class="col">
+                                    <input id="find-entry" class="sr-input-expand" type="search"
+                                        title="Find in current buffer"
+                                        placeholder="Find in current buffer"
+                                    />
+                                </div>
+                                <div class="col col-auto">
+                                    <button class="float-end width-8em">Find All</button>
+                                    <button class="float-end width-8em">Find</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="margin-tb-1em"></div>
+
+                    <div class="row">
+                        <div class="col">
+                            <input id="replace-entry" class="sr-input-expand" type="search"
+                                title="Replace in current buffer"
+                                placeholder="Replace in current buffer"
+                            />
+                        </div>
+                        <div class="col col-auto">
+                            <button class="float-end width-8em">Replace All</button>
+                            <button class="float-end width-8em">Replace</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+
     <template id="lsp-config-template">
         <style>
         </style>

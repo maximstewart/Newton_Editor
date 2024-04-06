@@ -29,7 +29,9 @@ const editorCommands = [
         name: "search",
         bindKey: {win: "ctrl-f", mac: "ctrl-f"},
         exec: function(editor) {
-            sendMessage("tggl_search_replace", "", "", "", "");
+            // let selectedStr = session.doc.getTextRange(editor.getSelectionRange());
+            $('#bottom-gutter').popover('toggle')
+            // sendMessage("tggl_search_replace", "", "", "", selectedStr);
         },
         readOnly: true
     }, {

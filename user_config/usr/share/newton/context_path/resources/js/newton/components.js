@@ -175,6 +175,29 @@ class InputCheckboxContainer extends HTMLElement {
     }
 }
 
+class SearchReplaceContainer extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    loadShaddowRoot(tag = "search-replace-template") {
+        let template = document.getElementById(tag);
+        let templateContent = template.content;
+
+        const shadowRoot = this.attachShadow({ mode: "open" });
+        shadowRoot.appendChild( templateContent.cloneNode(true) );
+    }
+
+    loadSignals() {
+        let elm = this.shadowRoot.getElementById("find-entry");
+
+        elm.addEventListener("keyup", (eve) => {
+            findEntry(eve.value);
+        });
+    }
+
+}
+
 
 
 
@@ -210,5 +233,14 @@ class InputCheckbox extends InputCheckboxContainer {
     constructor() {
         super();
         this.loadShaddowRoot();
+    }
+}
+
+class SearchReplace extends SearchReplaceContainer {
+    constructor() {
+        super();
+
+        this.loadShaddowRoot();
+        this.loadSignals();
     }
 }

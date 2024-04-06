@@ -297,3 +297,11 @@ const toggleLineHighlight = () => {
     highlightLine = !highlightLine;
     editor.setHighlightActiveLine(highlightLine);
 }
+
+
+
+
+//
+const hideSearchReplace = () => {
+    $('#bottom-gutter').popover('hide')
+}

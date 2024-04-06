@@ -45,8 +45,42 @@
     overflow-y: auto;
 }
 
+#bottom-gutter {
+    /*position: fixed;*/
+    bottom: 0px;
+}
+
 
 /* CLASSES */
+.popover * {
+    background: rgba(0, 0, 0, 0.0);
+    color: rgba(255, 255, 255, 1);
+}
+
+.popover {
+    background: rgba(39, 43, 52, 0.64);
+    max-width: 80%;
+    width: 80%;
+    transform: translate(0px, 0px) !important;
+    margin: auto 12% !important;
+}
+
+.sr-input-expand {
+    width: 100%;
+}
+
+.line-height-32px {
+    line-height: 32px;
+}
+
+.margin-tb-1em {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.width-8em {
+    width: 8em;
+}
 
 .max-height-800 {
     max-height: 800px;

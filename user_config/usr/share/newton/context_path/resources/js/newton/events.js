@@ -9,6 +9,7 @@ window.onload = (eve) => {
 
     console.log("Loading editor...");
     loadEditor();
+    loadSearchFind();
     loadPreviewEditor();
     loadInitialSession();
     loadStartingFiles();
@@ -21,6 +22,7 @@ const defineCustomElements = () => {
     customElements.define("input-list", InputList, { extends: 'ul' });
     customElements.define("input-list-item", InputListItem, { extends: 'li' });
     customElements.define("input-checkbox", InputCheckbox, { extends: 'input' });
+    customElements.define("search-replace", SearchReplace, { extends: 'div' });
 }
 
 const loadLSPClientJSFiles = () => {
@@ -32,6 +34,12 @@ const loadLSPClientJSFiles = () => {
 
     // Note: If using builtin services tghan connecting to a socket.
     // sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/python-service.js`, content = "");
+}
+
+const loadSearchFind = () => {
+    let elm = document.createElement("search-replace");
+    let options = {container: "html", content: elm, html: true};
+    $('#bottom-gutter').popover(options);
 }
 
 window.onerror = function(msg, url, line, col, error) {
