@@ -37,8 +37,8 @@ const loadLSPClientJSFiles = () => {
 }
 
 const loadSearchFind = () => {
-    let elm = document.createElement("search-replace");
-    let options = {container: "html", content: elm, html: true};
+    searchReplace = document.createElement("search-replace");
+    let options   = {container: "html", content: searchReplace, html: true};
     $('#bottom-gutter').popover(options);
 }
 
@@ -57,6 +57,11 @@ window.onerror = function(msg, url, line, col, error) {
 
 
 document.addEventListener("keyup", (eve) => {
+    if (blockHigherNewtonEvePropigation) {
+        blockHigherNewtonEvePropigation = false;
+        return;
+    }
+
     switch (eve.key) {
         case "ArrowUp":
             setLabels();
@@ -96,6 +101,11 @@ document.addEventListener("keyup", (eve) => {
                 }
             }
             break;
+        case "f":
+            if (searchReplace.showing) {
+                searchReplace.toggleShow();
+            }
+            break
         default:
             setLabels();
             break
@@ -104,6 +114,8 @@ document.addEventListener("keyup", (eve) => {
 
 
 document.addEventListener("keydown", (eve) => {
+    if (blockHigherNewtonEvePropigation) return;
+
     switch (eve.key) {
         case "ArrowUp":
             if ( isNotNullOrUndefined(previewSel) ) {

@@ -123,17 +123,15 @@
                         </div>
 
                         <div class="col col-5 line-height-32px">
-                            <button title="Close Panel" class="float-end" onclick="hideSearchReplace()">X</button>
-                            <button title="Whole Word" class="float-end">
+                            <button title="Close Panel" class="float-end btn btn-sm btn-dark" onclick="hideSearchReplace()">X</button>
+                            <button id="whole-word-btn" title="Whole Word" class="float-end btn btn-sm btn-dark">
                                 <img src="resources/imgs/whole-word.png" />
                             </button>
-                            <button title="Only In Selection" class="float-end">
+                            <button id="only-in-selection-btn" title="Only In Selection" class="float-end btn btn-sm btn-dark">
                                 <img src="resources/imgs/only-in-selection.png" />
                             </button>
-                            <button title="Match Case" class="float-end">Aa</button>
-
-
-                            <button title="Use Regex" class="float-end">.*</button>
+                            <button id="match-case-btn" title="Match Case" class="float-end btn btn-sm btn-dark">Aa</button>
+                            <button id="use-regex-btn" title="Use Regex" class="float-end btn btn-sm btn-dark" btn>.*</button>
                         </div>
                     </div>
 
@@ -141,34 +139,43 @@
 
                     <div class="row">
                         <div class="col">
-
                             <div class="row">
                                 <div class="col">
-                                    <input id="find-entry" class="sr-input-expand" type="search"
-                                        title="Find in current buffer"
-                                        placeholder="Find in current buffer"
-                                    />
+                                    <div class="input-group-sm mb-3">
+                                        <input id="find-entry"
+                                            class="form-control"
+                                            type="search"
+                                            placeholder="Find in current buffer"
+                                            aria-label="Find in current buffer"
+                                        />
+                                    </div>
                                 </div>
                                 <div class="col col-auto">
-                                    <button class="float-end width-8em">Find All</button>
-                                    <button class="float-end width-8em">Find</button>
+                                    <button id="find-btn"  class="width-8em btn btn-sm btn-dark">Find</button>
+                                    <button id="find-all-btn" class="width-8em btn btn-sm btn-dark">Find All</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="margin-tb-1em"></div>
-
                     <div class="row">
                         <div class="col">
-                            <input id="replace-entry" class="sr-input-expand" type="search"
-                                title="Replace in current buffer"
-                                placeholder="Replace in current buffer"
-                            />
-                        </div>
-                        <div class="col col-auto">
-                            <button class="float-end width-8em">Replace All</button>
-                            <button class="float-end width-8em">Replace</button>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="input-group-sm mb-3">
+                                        <input id="replace-entry"
+                                            class="form-control"
+                                            type="search"
+                                            title="Replace in current buffer"
+                                            placeholder="Replace in current buffer"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col col-auto">
+                                    <button id="replace-btn" class="width-8em btn btn-sm btn-dark">Replace</button>
+                                    <button id="replace-all-btn" class="width-8em btn btn-sm btn-dark">Replace All</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

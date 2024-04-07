@@ -2,6 +2,7 @@ const messenger  = (window.webkit) ? window.webkit.messageHandlers : (message) =
     console.log("Message: " + message);
 };
 
+
 const EDITOR_OPTS   = {
         printMarginColumn: 80,
         enableBasicAutocompletion: true,
@@ -17,6 +18,7 @@ const EDITOR_OPTS   = {
         mergeUndoDeltas: false
     }
 
+
 const BASE_LINK        = `${window.location.href}resources/js/libs/ace_editor/lsp`;
 const LSP_SERVER_CONFG = `${window.location.href}../lsp-servers-config.json`;
 const BASE_LSP_LINK    = "http://0.0.0.0:4880";
@@ -27,6 +29,7 @@ let lspServersConfig   = null;
 let lspSettingsUI      = document.getElementById('lsp-settings');
 
 
+let searchReplace    = null;
 let editor           = null;
 let previewEditor    = null;
 let aceSessions      = {};
@@ -36,3 +39,6 @@ let fontSize         = 12;
 let highlightLine    = true;
 let isControlDown    = false;
 let queryMarkers     = [];
+
+
+let blockHigherNewtonEvePropigation = false;

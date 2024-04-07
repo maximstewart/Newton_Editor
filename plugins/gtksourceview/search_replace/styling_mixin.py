@@ -63,4 +63,4 @@ class StylingMixin:
         plural = "s" if total_count > 1 else ""
 
         if total_count == 0: self.update_style(2)
-        self._find_status_lbl.set_label(f"{count} results{plural} found for '{query}'")
+        self._find_status_lbl.set_label(f"{count} result{plural} found for '{query}'")

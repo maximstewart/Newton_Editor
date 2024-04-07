@@ -172,6 +172,26 @@
     font-size: initial;
 }
 
+
+.searching,
+.search-success,
+.search-fail {
+    border-style: solid;
+    color: rgba(125, 125, 125, 1) !important;
+}
+
+.searching      {
+    border-color: rgba(0, 225, 225, 0.64) !important;
+}
+.search-success {
+    background: rgba(136, 204, 39, 0.12) !important;
+    border-color: rgba(136, 204, 39, 1) !important;
+}
+.search-fail    {
+    background: rgba(170, 18, 18, 0.12) !important;
+    border-color: rgba(200, 18, 18, 1) !important;
+}
+
 /* Other message text colors */
 .error   { color: rgb(170, 18, 18); }
 .warning { color: rgb(255, 168, 0); }

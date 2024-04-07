@@ -221,40 +221,6 @@ const setLabels = () => {
 }
 
 
-const findEntry = (query = null, isBackwwards = true, isWrap = true,
-                                                        isCaseSensitive = false,
-                                                        useWholeWord = false,
-                                                        useRegExp = false,
-                                                        range = null) => {
-    // if ( isNotNullOrUndefined(queryMarkers) ) {
-    //     for (let i = 0; i < queryMarkers.length; i++) {
-    //         delete queryMarkers[i];
-    //     }
-    // }
-
-    // let result = editor.find(query, {
-    //     backwards: isBackwwards === "True" ? true : false,
-    //     wrap: isWrap === "True" ? true : false,
-    //     caseSensitive: isCaseSensitive === "True" ? true : false,
-    //     wholeWord: useWholeWord === "True" ? true : false,
-    //     regExp: useRegExp === "True" ? true : false,
-    //     range: range === "True" ? true : false
-    // });
-
-    let result = editor.findAll(query, {
-        caseSensitive: isCaseSensitive === "True" ? true : false,
-        wholeWord: useWholeWord === "True" ? true : false,
-        regExp: useRegExp === "True" ? true : false,
-    });
-
-    console.log(result)
-    // if ( isNotNullOrUndefined(result) ) {
-    //     for (let i = 0; i < result.length; i++) {
-    //         loadMarker( result[i] );
-    //     }
-    // }
-}
-
 
 const loadMarker = (r) => {
     var range = new Range(rowStart, columnStart, rowEnd, columnEnd);
@@ -264,6 +230,9 @@ const loadMarker = (r) => {
 }
 
 
+const findAllEntries = (query) => {
+    editor.findAll();
+}
 
 const findNextEntry = (query) => {
     editor.findNext();
