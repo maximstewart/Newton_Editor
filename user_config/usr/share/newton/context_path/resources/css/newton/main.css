@@ -26,13 +26,6 @@
     color: gray;
 }
 
-
-#ace_settingsmenu, #kbshortcutmenu, controls {
-    background-color: #00000000;
-    color: #ffffff;
-}
-
-
 #preview-editor {
     height: -webkit-fill-available;
     width: -webkit-fill-available;
