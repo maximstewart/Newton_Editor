@@ -4,19 +4,25 @@ const messenger  = (window.webkit) ? window.webkit.messageHandlers : (message) =
 
 
 const EDITOR_OPTS   = {
-        printMarginColumn: 80,
-        enableBasicAutocompletion: true,
-        enableInlineAutocompletion: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: true,
-        highlightActiveLine: true,
-        useSoftTabs: true,
-        tabSize: 4,
-        tooltipFollowsMouse: true,
-        useWrapMode: false,
-        scrollPastEnd: 0.5,
-        mergeUndoDeltas: false
-    }
+    printMarginColumn: 80,
+    enableBasicAutocompletion: true,
+    enableInlineAutocompletion: true,
+    enableSnippets: true,
+    enableLiveAutocompletion: true,
+    liveAutocompletionDelay: 10,
+    liveAutocompletionThreshold: 2,
+    highlightActiveLine: true,
+    tabSize: 4,
+    useSoftTabs: true,
+    useElasticTabstops: true,
+    tooltipFollowsMouse: true,
+    useWrapMode: false,
+    scrollPastEnd: 0.5,
+    mergeUndoDeltas: false,
+    showGutter: true,
+    customScrollbar: true,
+    navigateWithinSoftTabs: true
+};
 
 
 const BASE_LINK        = `${window.location.href}resources/js/libs/ace_editor/lsp`;
@@ -42,3 +48,10 @@ let queryMarkers     = [];
 
 
 let blockHigherNewtonEvePropigation = false;
+
+
+const QueryState = {
+    Searching: 0,
+    SearchSuccess: 1,
+    SearchFail: 2
+};

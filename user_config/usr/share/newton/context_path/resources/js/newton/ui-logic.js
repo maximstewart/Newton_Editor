@@ -15,6 +15,7 @@ const loadPreviewEditor = () => {
 const loadEditor = () => {
     ace.require("ace/ext/language_tools");
     ace.require("ace-linters/language-client");
+    ace.require("ace/ext/elastic_tabstops_lite");
 
     editor = ace.edit("editor");
     // Note:  https://github.com/ajaxorg/ace/wiki/Configuring-Ace

@@ -17,8 +17,12 @@ const editorCommands = [
                 editor.showKeyboardShortcuts();
             })
         }
-
-
+    }, {
+        name: "openCommandPalette2",
+        bindKey: {linux: "Command-Shift-/|F1", win: "Ctrl-Shift-/|F1"},
+        exec: function(editor) {
+            editor.execCommand("openCommandPalette");
+        }
     }, {
         name: "showLSPManager",
         bindKey: {win: "ctrl-m", mac: "command-m"},
@@ -41,7 +45,6 @@ const editorCommands = [
             sendMessage("open_file", "", "", fpath, "");
         },
         readOnly: true
-
     }, {
         name: "saveSession",
         bindKey: {win: "ctrl-s", mac: "ctrl-s"},
@@ -68,6 +71,13 @@ const editorCommands = [
         bindKey: {win: "ctrl-h", mac: "ctrl-h"},
         exec: function(editor) {
             toggleLineHighlight();
+        },
+        readOnly: true
+    }, {
+        name: "gotoDefinition",
+        bindKey: {win: "ctrl-g", mac: "ctrl-g"},
+        exec: function(editor) {
+            console.log("Goto stub...");
         },
         readOnly: true
     }, {
@@ -120,6 +130,5 @@ const editorCommands = [
         },
         readOnly: true
     }
-
 
 ];

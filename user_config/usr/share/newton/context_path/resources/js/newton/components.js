@@ -175,12 +175,6 @@ class InputCheckboxContainer extends HTMLElement {
     }
 }
 
-const QueryState = {
-    Searching: 0,
-    SearchSuccess: 1,
-    SearchFail: 2
-}
-
 
 class SearchReplaceContainer extends HTMLElement {
     constructor() {
@@ -204,11 +198,11 @@ class SearchReplaceContainer extends HTMLElement {
 
         let elm = this.shadowRoot.getElementById("find-entry");
 
-        elm.addEventListener("keyup", (eve) => {
+        elm.addEventListener("keydown", (eve) => {
             if (eve.key === "Enter") {
                 let elm = this.shadowRoot.getElementById("find-btn");
                 elm.click();
-                return
+                return;
             }
 
             let elm = this.shadowRoot.getElementById("find-all-btn");
@@ -249,7 +243,7 @@ class SearchReplaceContainer extends HTMLElement {
                 elm.classList.add("btn-dark");
             } else {
                 elm.classList.add("btn-info");
-                elm.classList.remove("btn-dark")
+                elm.classList.remove("btn-dark");
             }
 
             this.setFindOptionsLbl();
@@ -291,7 +285,7 @@ class SearchReplaceContainer extends HTMLElement {
         editor.findNext();
     }
 
-    findAllEntries(query = null, isBackwwards = true, isWrap = true, range = null) {
+    findAllEntries(query = null, isBackwwards = false, isWrap = true, range = null) {
         this.updateStyle(QueryState.SearchSuccess);
         if (query === "") {
             this.shadowRoot.getElementById("find-status-lbl").innerText = "Find in current buffer";
@@ -302,8 +296,8 @@ class SearchReplaceContainer extends HTMLElement {
         }
 
         let totalCount = editor.findAll(query, {
-            backwards: isBackwwards === "True" ? true : false,
-            wrap: isWrap === "True" ? true : false,
+            backwards: isBackwwards,
+            wrap: isWrap,
             caseSensitive: this.isMatchCase(),
             wholeWord: this.isUseWholeWord(),
             regExp: this.isUseRegex(),
@@ -332,10 +326,10 @@ class SearchReplaceContainer extends HTMLElement {
         }
     }
 
-    findEntry(query = null, isBackwwards = true, isWrap = true, range = null) {
+    findEntry(query = null, isBackwwards = false, isWrap = true, range = null) {
         let result = editor.find(query, {
-            backwards: isBackwwards === "True" ? true : false,
-            wrap: isWrap === "True" ? true : false,
+            backwards: isBackwwards,
+            wrap: isWrap,
             caseSensitive: this.isMatchCase(),
             wholeWord: this.isUseWholeWord(),
             regExp: this.isUseRegex(),
@@ -379,9 +373,9 @@ class SearchReplaceContainer extends HTMLElement {
     updateStyle(state) {
         let elm = this.shadowRoot.getElementById("find-entry");
 
-        elm.classList.remove("searching")
-        elm.classList.remove("search-success")
-        elm.classList.remove("search-fail")
+        elm.classList.remove("searching");
+        elm.classList.remove("search-success");
+        elm.classList.remove("search-fail");
 
         if (state === 0)
             elm.classList.add("searching");
