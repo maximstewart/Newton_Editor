@@ -204,11 +204,14 @@ class SearchReplaceContainer extends HTMLElement {
                 elm.click();
                 return;
             }
-
-            let elm = this.shadowRoot.getElementById("find-all-btn");
-            elm.click();
         });
 
+        elm.addEventListener("keyup", (eve) => {
+            if (eve.key !== "Enter") {
+                let elm = this.shadowRoot.getElementById("find-all-btn");
+                elm.click();
+            }
+        });
 
         elm = this.shadowRoot.getElementById("find-btn");
         elm.addEventListener("click", (eve) => {

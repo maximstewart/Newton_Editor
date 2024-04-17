@@ -26,13 +26,15 @@ const defineCustomElements = () => {
 }
 
 const loadLSPClientJSFiles = () => {
+    // sendMessage(topic = "load_json", ftype = "", fhash = "", fpath = LSP_SERVER_CONFG, content = "");
+    // TODO: convert to using similar call to above and remove if check in the ajax file
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = LSP_SERVER_CONFG, content = "");
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/ace-linters.js`, content = "");
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/base-service.js`, content = "");
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/service-manager.js`, content = "");
     sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/language-client.js`, content = "");
 
-    // Note: If using builtin services tghan connecting to a socket.
+    // Note: If using builtin services than connecting to a socket.
     // sendMessage(topic = "load_javascript", ftype = "", fhash = "", fpath = `${BASE_LINK}/python-service.js`, content = "");
 }
 

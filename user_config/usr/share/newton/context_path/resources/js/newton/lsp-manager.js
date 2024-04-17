@@ -127,6 +127,9 @@ const generateElement = (config = {}, parent = "", elm = null) => {
             handleBoolean(config, parent, elm);
 
             break;
+        case Number.prototype:
+            console.log("Number generatable HTML type stub...");
+            break;
         case Map.prototype:
             console.log("Map generatable HTML type stub...");
 
@@ -139,6 +142,7 @@ const generateElement = (config = {}, parent = "", elm = null) => {
             }
 
             console.log("No generatable HTML type...");
+            console.log(`config: ${config}\nparent: ${parent}\nelm: ${elm}`);
     }
 
 }
