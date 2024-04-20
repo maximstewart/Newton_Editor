@@ -11,7 +11,8 @@
         <!--  <link rel="stylesheet" href="resources/css/newton/context-menu.css">  -->
         <link rel="stylesheet" href="resources/css/newton/main.css"/>
         <link rel="stylesheet" href="resources/css/newton/overrides.css"/>
-        <link rel="stylesheet" href="resources/css/newton/ace-overrides.css"/>
+        <!--<link rel="stylesheet" href="resources/css/newton/ace-overrides.css"/>
+        <!--<link rel="stylesheet" href="resources/css/newton/monaco-overrides.css"/>-->
 </head>
 <body>
 
@@ -267,10 +268,29 @@
 
     <!-- For internal scripts... -->
     <script src="resources/js/libs/jquery-3.7.1.min.js"></script>
-    <!-- <script src="resources/js/libs/require.js"></script>  -->
 
     <!-- For Bootstrap... -->
     <script src="resources/js/libs/bootstrap5/bootstrap.bundle.min.js"></script>
+
+    <!-- For Monaco Editor... -->
+	<!--<script>-->
+	<!--	var require = { paths: { vs: 'resources/js/libs/monaco-editor/min/vs' } };-->
+	<!--</script>-->
+	<!--<script src="resources/js/libs/monaco-editor/min/vs/loader.js"></script>-->
+	<!--<script src="resources/js/libs/monaco-editor/min/vs/editor/editor.main.nls.js"></script>-->
+	<!--<script src="resources/js/libs/monaco-editor/min/vs/editor/editor.main.js"></script>-->
+
+    <!-- For Application... -->
+    <!--<script src="resources/js/newton/monaco/globals.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/components.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/lsp-manager.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/utils.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/post-ajax.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/ajax.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/keybinding-newton.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/ui-logic.js"></script>-->
+    <!--<script src="resources/js/newton/monaco/events.js"></script>-->
+
 
     <!-- For Ace Editor... -->
     <!-- https://ace.c9.io/#nav=howto  -->
@@ -285,14 +305,14 @@
     <script src="resources/js/libs/ace_editor/lsp/language-client.js"></script>
 
     <!-- For Application... -->
-    <script src="resources/js/newton/globals.js"></script>
-    <script src="resources/js/newton/components.js"></script>
-    <script src="resources/js/newton/lsp-manager.js"></script>
-    <script src="resources/js/newton/utils.js"></script>
-    <script src="resources/js/newton/post-ajax.js"></script>
-    <script src="resources/js/newton/ajax.js"></script>
-    <script src="resources/js/newton/keybinding-newton.js"></script>
-    <script src="resources/js/newton/ui-logic.js"></script>
-    <script src="resources/js/newton/events.js"></script>
+    <script src="resources/js/newton/ace/globals.js"></script>
+    <script src="resources/js/newton/ace/components.js"></script>
+    <script src="resources/js/newton/ace/lsp-manager.js"></script>
+    <script src="resources/js/newton/ace/utils.js"></script>
+    <script src="resources/js/newton/ace/post-ajax.js"></script>
+    <script src="resources/js/newton/ace/ajax.js"></script>
+    <script src="resources/js/newton/ace/keybinding-newton.js"></script>
+    <script src="resources/js/newton/ace/ui-logic.js"></script>
+    <script src="resources/js/newton/ace/events.js"></script>
 </body>
 </html>

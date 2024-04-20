@@ -21,7 +21,7 @@
             ]
         }
     },
-    "python_bad_config": {
+    "python_alt_config": {
         "info": "https://github.com/python-lsp/python-lsp-server",
         "alt-command": "pylsp --ws --port 3030",
         "command": "lsp-ws-proxy --listen 3030 -- pylsp",
