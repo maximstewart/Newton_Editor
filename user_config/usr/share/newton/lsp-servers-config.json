@@ -91,6 +91,13 @@
         "socket": "ws://127.0.0.1:3030/?name=java-language-server",
         "initialization-options": {}
     },
+    "lua": {
+        "info": "https://github.com/LuaLS/lua-language-server",
+        "alt-command": "lua-language-server",
+        "command": "lsp-ws-proxy --listen 3030 -- lua-language-server",
+        "socket": "ws://127.0.0.1:3030/?name=gopls",
+        "initialization-options": {}
+    },
     "go": {
         "info": "https://pkg.go.dev/golang.org/x/tools/gopls#section-readme",
         "alt-command": "gopls",
