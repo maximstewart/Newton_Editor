@@ -1,0 +1,14 @@
+{
+    "manifest": {
+        "name": "LSP Manager",
+        "author": "ITDominator",
+        "version": "0.0.1",
+        "credit": "",
+        "support": "",
+        "requests": {
+            "pass_events": "true",
+            "pass_ui_objects": ["separator_right"],
+            "bind_keys": ["LSP Manager Toggle||tggl_lsp_window:<Control>l"]
+        }
+    }
+}
