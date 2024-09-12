@@ -13,6 +13,11 @@ from .source_view_events import SourceViewEvents
 
 
 class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
+    def get_text(self):
+        buffer = self.get_buffer()
+        start_itr, end_itr = buffer.get_bounds()
+        return buffer.get_text(start_itr, end_itr, True)
+
     def get_current_file(self):
         return self._current_file
 

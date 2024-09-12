@@ -146,7 +146,7 @@ class FileEventsMixin:
         buffer.uri         = uri
         buffer.language_id = self._current_filetype
 
-        event_system.emit("textDocument/didOpen", (self._current_filetype, uri,))
+        event_system.emit("textDocument/didOpen", (self._current_filetype, uri, self.get_text()))
 
         word_completion = GtkSource.CompletionWords.new("word_completion")
         word_completion.register(buffer)
