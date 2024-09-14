@@ -1,4 +1,5 @@
 # Python imports
+import signal
 import subprocess
 import json
 
@@ -9,7 +10,7 @@ from gi.repository import Gtk
 
 # Application imports
 from plugins.plugin_base import PluginBase
-from .websockets.sync.client import connect 
+from .client_ipc import ClientIPC
 
 
 
@@ -90,7 +91,27 @@ class Plugin(PluginBase):
 
     def start_lsp_manager(self, button):
         if self.lsp_manager_proc: return
-        self.lsp_manager_proc = subprocess.Popen(["lsp-manager"])
+        self.lsp_manager_proc = subprocess.Popen(["python", "/opt/lsp-manager.zip"])
+        # self.lsp_manager_proc = subprocess.Popen(["lsp-manager"])
+        self._load_client_ipc_server()
+
+    def _load_client_ipc_server(self):
+        self.client_ipc = ClientIPC()
+        self._ipc_realization_check(self.client_ipc)
+
+        if not self.client_ipc.is_ipc_alive:
+            raise AppLaunchException(f"LSP IPC Server Already Exists...")
+
+    def _ipc_realization_check(self, ipc_server):
+        try:
+            ipc_server.create_ipc_listener()
+        except Exception:
+            ipc_server.send_test_ipc_message()
+
+        try:
+            ipc_server.create_ipc_listener()
+        except Exception as e:
+            ...
 
     def stop_lsp_manager(self, button = None):
         if not self.lsp_manager_proc: return
@@ -99,6 +120,7 @@ class Plugin(PluginBase):
             return
 
         self.lsp_manager_proc.terminate()
+        self.client_ipc.is_ipc_alive = False
         self.lsp_manager_proc = None
 
     def _lsp_did_open(self, language_id, uri, text):
@@ -122,11 +144,12 @@ class Plugin(PluginBase):
     def _lsp_did_close(self):
         if not self.lsp_manager_proc: return
 
-    def _lsp_did_change(self, language_id, buffer):
+    def _lsp_did_change(self, language_id, uri, buffer):
         if not self.lsp_manager_proc: return
 
         iter   = buffer.get_iter_at_mark( buffer.get_insert() )
         line   = iter.get_line()
+        column = iter.get_line_offset()
         start  = iter.copy()
         end    = iter.copy()
 
@@ -139,9 +162,9 @@ class Plugin(PluginBase):
             "method": "textDocument/didChange",
             "language_id": language_id,
             "uri": uri,
-            "text": text
-            "line": -1,
-            "column": -1,
+            "text": text,
+            "line": line,
+            "column": column,
             "char": ""
         }
 
@@ -190,11 +213,5 @@ class Plugin(PluginBase):
 
         self.send_message(data)
 
-
     def send_message(self, data: dict):
-        with connect(f"ws://{ self.ws_config['host'] }:{ self.ws_config['port'] }") as websocket:
-            websocket.send(
-                json.dumps(data)
-            )
-            message = websocket.recv()
-            print(f"Received: {message}")
+        self.client_ipc.send_manager_ipc_message( json.dumps(data) )
