@@ -58,6 +58,8 @@ class EditorNotebook(EditorControllerMixin, Gtk.Notebook):
         self.connect("key-release-event", self._key_release_event)
 
     def _subscribe_to_events(self):
+        event_system.subscribe("handle-lsp-message", self._handle_lsp_message)
+
         event_system.subscribe("create_view", self._create_view)
         event_system.subscribe("set_buffer_style", self.action_controller)
         event_system.subscribe("set_buffer_language", self.action_controller)

@@ -3,6 +3,7 @@
 # Lib imports
 
 # Application imports
+from libs.dto.lsp_message_structs import LSPResponseTypes, LSPResponseRequest, LSPResponseNotification
 from .key_input_controller import KeyInputController
 from .editor_events import EditorEventsMixin
 
@@ -31,3 +32,11 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
             self.set_buffer_language(source_view, query)
         if action == "set_buffer_style":
             self.set_buffer_style(source_view, query)
+
+    def _handle_lsp_message(self, message: dict or LSPResponseTypes):
+        if isinstance(message, dict):
+            ...
+        if isinstance(message, LSPResponseRequest):
+            ...
+        if isinstance(message, LSPResponseNotification):
+            ...
