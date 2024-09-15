@@ -24,6 +24,9 @@ class SourceViewControllerMixin(KeyInputController, SourceViewEvents):
     def get_filetype(self):
         return self._current_filetype
 
+    def get_version_id(self):
+        return self._version_id
+
     def set_buffer_language(self, buffer, language = "python3"):
         buffer.set_language( self._language_manager.get_language(language) )
 

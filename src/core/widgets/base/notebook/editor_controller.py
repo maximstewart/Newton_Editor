@@ -48,6 +48,8 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
             keys = message.result.keys()
             if "items" in keys:
                 self.handle_completion(message.result["items"])
+            if "result" in keys:
+                ...
 
         if isinstance(message, LSPResponseNotification):
             if message.method == "textDocument/publshDiagnostics":

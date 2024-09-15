@@ -96,8 +96,8 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         buffer.connect('insert-text', self._insert_text)
         buffer.connect('modified-changed', self._buffer_modified_changed)
 
-    def _show_completion(self):
-        event_system.emit("textDocument/completion", (self, ))
+    def _show_completion(self, source_view):
+        event_system.emit("textDocument/completion", (source_view, ))
 
     def _subscribe_to_events(self):
         ...
