@@ -81,7 +81,6 @@ class ClientIPC:
                     lsp_response = None
                     keys         = None
 
-                    logger.debug(data_str)
                     try:
                         lsp_response = json.loads(data_str)
                         keys         = lsp_response.keys()

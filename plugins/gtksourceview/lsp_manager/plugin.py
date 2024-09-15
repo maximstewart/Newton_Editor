@@ -235,7 +235,7 @@ class Plugin(PluginBase):
             "method": "textDocument/completion",
             "language_id": source_view.get_filetype(),
             "uri": uri,
-            "version": buffer.version_id,
+            "version": source_view.get_version_id(),
             "text": "",
             "line": line,
             "column": column,
