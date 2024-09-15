@@ -37,6 +37,7 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self._cut_buffer: str        = ""
         self._timer: threading.Timer = None
         self._idle_id: int           = None
+        self._version_id: int        = 1
 
         self._skip_file_load         = False
         self._ignore_internal_change = False
@@ -87,6 +88,7 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self.connect("key-release-event", self._key_release_event)
         self.connect("button-press-event", self._button_press_event)
         self.connect("scroll-event", self._scroll_event)
+        self.connect("show-completion", self._show_completion)
 
         buffer = self.get_buffer()
         buffer.connect('changed', self._is_modified)
@@ -94,6 +96,8 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         buffer.connect('insert-text', self._insert_text)
         buffer.connect('modified-changed', self._buffer_modified_changed)
 
+    def _show_completion(self):
+        event_system.emit("textDocument/completion", (self, ))
 
     def _subscribe_to_events(self):
         ...

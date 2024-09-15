@@ -31,6 +31,7 @@ class FileEventsMixin:
     def save_file(self):
         self._skip_file_load = True
         gfile = event_system.emit_and_await("save_file_dialog", (self._current_filename, self._current_file)) if not self._current_file else self._current_file
+        event_system.emit("textDocument/didSave", (self._current_file.get_uri(), self.get_text()))
 
         if not gfile:
             self._skip_file_load = False

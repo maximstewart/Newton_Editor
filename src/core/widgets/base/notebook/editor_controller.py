@@ -34,9 +34,64 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
             self.set_buffer_style(source_view, query)
 
     def _handle_lsp_message(self, message: dict or LSPResponseTypes):
+        if not self.is_editor_focused: return # TODO: Find way to converge this
+        page_num, container, source_view = self.get_active_view()
+        page_num  = None
+        container = None
+
+        # logger.debug( repr(message) )
+
         if isinstance(message, dict):
             ...
+
         if isinstance(message, LSPResponseRequest):
-            ...
+            keys = message.result.keys()
+            if "items" in keys:
+                self.handle_completion(message.result["items"])
+
         if isinstance(message, LSPResponseNotification):
-            ...
+            if message.method == "textDocument/publshDiagnostics":
+                logger.info( repr(message) )
+                ...
+
+        source_view = None
+
+
+	# export const Text = 1;
+	# export const Method = 2;
+	# export const Function = 3;
+	# export const Constructor = 4;
+	# export const Field = 5;
+	# export const Variable = 6;
+	# export const Class = 7;
+	# export const Interface = 8;
+	# export const Module = 9;
+	# export const Property = 10;
+	# export const Unit = 11;
+	# export const Value = 12;
+	# export const Enum = 13;
+	# export const Keyword = 14;
+	# export const Snippet = 15;
+	# export const Color = 16;
+	# export const File = 17;
+	# export const Reference = 18;
+	# export const Folder = 19;
+	# export const EnumMember = 20;
+	# export const Constant = 21;
+	# export const Struct = 22;
+	# export const Event = 23;
+	# export const Operator = 24;
+	# export const TypeParameter = 25;
+
+    def handle_completion(self, items):
+        print()
+        print()
+        print()
+        print(len(items))
+        print()
+        print()
+        print()
+        for item in items:
+            if item["kind"] in [2, 3, 4, 5, 6, 7, 8, 10, 15]:
+                # print(item)
+                ...
