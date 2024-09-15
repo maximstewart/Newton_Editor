@@ -53,7 +53,6 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
 
         if isinstance(message, LSPResponseNotification):
             if message.method == "textDocument/publshDiagnostics":
-                logger.info( repr(message) )
                 ...
 
         source_view = None
