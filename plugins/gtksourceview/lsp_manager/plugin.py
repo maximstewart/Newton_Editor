@@ -41,7 +41,7 @@ class Plugin(PluginBase):
         box2            = Gtk.Box()
         start_btn       = Gtk.Button(label = "Start LSP Manager")
         stop_btn        = Gtk.Button(label = "Stop LSP Manager")
-        pid_label       = Gtk.Label(label = "LSP PID: ")
+        pid_label       = Gtk.Label(label  = "LSP PID: ")
 
         box1.set_orientation( Gtk.Orientation.VERTICAL )
 
@@ -83,8 +83,8 @@ class Plugin(PluginBase):
         self._event_system.subscribe("shutting_down", self._shutting_down)
 
         self._event_system.subscribe("textDocument/didOpen",    self._lsp_did_open)
-        # self._event_system.subscribe("textDocument/didSave",    self._lsp_did_save)
-        # self._event_system.subscribe("textDocument/didClose",   self._lsp_did_close)
+        self._event_system.subscribe("textDocument/didSave",    self._lsp_did_save)
+        self._event_system.subscribe("textDocument/didClose",   self._lsp_did_close)
         self._event_system.subscribe("textDocument/didChange",  self._lsp_did_change)
         self._event_system.subscribe("textDocument/definition", self._lsp_goto)
         self._event_system.subscribe("textDocument/completion", self._lsp_completion)
@@ -97,6 +97,7 @@ class Plugin(PluginBase):
 
     def _load_client_ipc_server(self):
         self.client_ipc = ClientIPC()
+        self.client_ipc.set_event_system(self._event_system)
         self._ipc_realization_check(self.client_ipc)
 
         if not self.client_ipc.is_ipc_alive:
@@ -123,13 +124,14 @@ class Plugin(PluginBase):
         self.client_ipc.is_ipc_alive = False
         self.lsp_manager_proc = None
 
-    def _lsp_did_open(self, language_id, uri, text):
+    def _lsp_did_open(self, language_id: str, uri: str, text: str):
         if not self.lsp_manager_proc: return
 
         data = {
             "method": "textDocument/didOpen",
             "language_id": language_id,
             "uri": uri,
+            "version": -1,
             "text": text,
             "line": -1,
             "column": -1,
@@ -138,13 +140,39 @@ class Plugin(PluginBase):
 
         self.send_message(data)
 
-    def _lsp_did_save(self):
+    def _lsp_did_save(self, uri: str, text: str):
         if not self.lsp_manager_proc: return
 
-    def _lsp_did_close(self):
+        data = {
+            "method": "textDocument/didSave",
+            "language_id": "",
+            "uri": uri,
+            "version": -1,
+            "text": text,
+            "line": -1,
+            "column": -1,
+            "char": ""
+        }
+
+        self.send_message(data)
+
+    def _lsp_did_close(self, uri: str):
         if not self.lsp_manager_proc: return
 
-    def _lsp_did_change(self, language_id, uri, buffer):
+        data = {
+            "method": "textDocument/didClose",
+            "language_id": "",
+            "uri": uri,
+            "version": -1,
+            "text": "",
+            "line": -1,
+            "column": -1,
+            "char": ""
+        }
+
+        self.send_message(data)
+
+    def _lsp_did_change(self, language_id: str, uri: str, buffer):
         if not self.lsp_manager_proc: return
 
         iter   = buffer.get_iter_at_mark( buffer.get_insert() )
@@ -162,6 +190,7 @@ class Plugin(PluginBase):
             "method": "textDocument/didChange",
             "language_id": language_id,
             "uri": uri,
+            "version": buffer.version_id,
             "text": text,
             "line": line,
             "column": column,
@@ -170,13 +199,14 @@ class Plugin(PluginBase):
 
         self.send_message(data)
 
-    def _lsp_goto(self, language_id, uri, line, column):
+    def _lsp_goto(self, language_id: str, uri: str, line: int, column: int):
         if not self.lsp_manager_proc: return
 
         data = {
             "method": "textDocument/definition",
             "language_id": language_id,
             "uri": uri,
+            "version": -1,
             "text": "",
             "line": line,
             "column": column,
@@ -205,6 +235,7 @@ class Plugin(PluginBase):
             "method": "textDocument/completion",
             "language_id": source_view.get_filetype(),
             "uri": uri,
+            "version": buffer.version_id,
             "text": "",
             "line": line,
             "column": column,

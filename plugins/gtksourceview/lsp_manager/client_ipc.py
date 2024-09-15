@@ -24,6 +24,7 @@ class ClientIPC:
         self._ipc_authkey         = b'' + bytes(f'lsp-client-endpoint-ipc', 'utf-8')
         self._manager_ipc_authkey = b'' + bytes(f'lsp-manager-endpoint-ipc', 'utf-8')
         self._ipc_timeout     = 15.0
+        self._event_system    = None
 
         if conn_type == "socket":
             self._ipc_address         = f'/tmp/lsp-client-endpoint-ipc.sock'
@@ -36,6 +37,9 @@ class ClientIPC:
         elif conn_type == "local_network_unsecured":
             self._ipc_authkey = None
 
+
+    def set_event_system(self, event_system):
+        self._event_system = event_system
 
     def create_ipc_listener(self) -> None:
         if self._conn_type == "socket":
@@ -68,27 +72,27 @@ class ClientIPC:
     def _handle_ipc_message(self, conn, start_time) -> None:
         while self.is_ipc_alive:
             msg = conn.recv()
-            logger.debug(msg)
 
             if "MANAGER|" in msg:
                 data = msg.split("MANAGER|")[1].strip()
+
                 if data:
                     data_str     = base64.b64decode(data.encode("utf-8")).decode("utf-8")
                     lsp_response = None
                     keys         = None
 
+                    logger.debug(data_str)
                     try:
                         lsp_response = json.loads(data_str)
                         keys         = lsp_response.keys()
                     except Exception as e:
-                        logger.debug( repr(e) )
-                        break
+                        raise e
 
                     if "result" in keys:
-                        lsp_response = LSPResponseRequest(**get_message_obj(data))
+                        lsp_response = LSPResponseRequest(**get_message_obj(data_str))
 
                     if "method" in keys:
-                        lsp_response = LSPResponseNotification(**get_message_obj(data))
+                        lsp_response = LSPResponseNotification(**get_message_obj(data_str))
 
                     if "notification" in keys:
                         ...
@@ -100,7 +104,7 @@ class ClientIPC:
                         ...
 
                     if lsp_response:
-                        self._event_system.emit("handle-lsp-message"), (lsp_response)
+                        self._event_system.emit("handle-lsp-message", (lsp_response,))
 
                 conn.close()
                 break
