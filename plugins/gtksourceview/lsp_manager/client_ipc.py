@@ -8,6 +8,8 @@ from multiprocessing.connection import Client
 from multiprocessing.connection import Listener
 
 # Lib imports
+import gi
+from gi.repository import GLib
 
 # Application imports
 from .lsp_message_structs import LSPResponseRequest, LSPResponseNotification, get_message_obj
@@ -103,7 +105,7 @@ class ClientIPC:
                         ...
 
                     if lsp_response:
-                        self._event_system.emit("handle-lsp-message", (lsp_response,))
+                        GLib.idle_add(self._do_emit, lsp_response)
 
                 conn.close()
                 break
@@ -118,6 +120,8 @@ class ClientIPC:
                 conn.close()
                 break
 
+    def _do_emit(self, lsp_response):
+        self._event_system.emit("handle-lsp-message", (lsp_response,))
 
     def send_manager_ipc_message(self, message: str) -> None:
         try:
