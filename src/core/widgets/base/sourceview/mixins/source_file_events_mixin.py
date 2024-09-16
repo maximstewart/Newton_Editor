@@ -11,8 +11,8 @@ from gi.repository import Gio
 from gi.repository import GtkSource
 
 # Application imports
-# from ..custom_completion_providers.lsp_completion_provider import LSPCompletionProvider
-from ..custom_completion_providers.python_completion_provider import PythonCompletionProvider
+from ..custom_completion_providers.lsp_completion_provider import LSPCompletionProvider
+# from ..custom_completion_providers.python_completion_provider import PythonCompletionProvider
 
 
 class FileEventsMixin:
@@ -153,8 +153,8 @@ class FileEventsMixin:
         word_completion.register(buffer)
         self._completion.add_provider(word_completion)
 
-        # lsp_completion_provider = LSPCompletionProvider(self)
-        # self._completion.add_provider(lsp_completion_provider)
+        lsp_completion_provider = LSPCompletionProvider(self)
+        self._completion.add_provider(lsp_completion_provider)
 
         # if self._current_filetype in ("python", "python3"):
         #     py_lsp_completion_provider = PythonCompletionProvider(uri)

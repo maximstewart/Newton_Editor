@@ -1,6 +1,11 @@
 # Python imports
 
 # Lib imports
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkSource', '4')
+from gi.repository import Gtk
+from gi.repository import GtkSource
 
 # Application imports
 from libs.dto.lsp_message_structs import LSPResponseTypes, LSPResponseRequest, LSPResponseNotification
@@ -39,60 +44,43 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
         page_num  = None
         container = None
 
-        # logger.debug( repr(message) )
+        logger.debug( repr(message) )
 
         if isinstance(message, dict):
             ...
 
-        if isinstance(message, LSPResponseRequest):
+        if hasattr(message, "result"):
             keys = message.result.keys()
+
             if "items" in keys:
-                self.handle_completion(message.result["items"])
+                buffer     = source_view.get_buffer()
+                completion = source_view.get_completion()
+                providers  = completion.get_providers()
+
+                for provider in providers:
+                    if provider.__class__.__name__ == 'LSPCompletionProvider':
+                        # context = completion.create_context( buffer.get_iter_at_mark( buffer.get_insert() ) )
+                        # context = completion.create_context( None )
+                        # provider.do_populate(context, message.result["items"])
+
+                        box  = Gtk.Box()
+                        box.set_homogeneous(True)
+                        # iter = buffer.get_iter_at_mark( buffer.get_insert() )
+                        # rects, recte = source_view.get_cursor_locations(iter)
+                        rect = source_view.get_allocation()
+
+                        box.set_orientation( Gtk.Orientation.VERTICAL )
+                        for item in message.result["items"]:
+                            box.add( provider.create_completion_item_button(item) )
+
+                        box.show_all()
+                        source_view.add_child_in_window(box, Gtk.TextWindowType.WIDGET, rect.width - 200, rect.height / 2)
+
             if "result" in keys:
                 ...
 
-        if isinstance(message, LSPResponseNotification):
+        if hasattr(message, "method"):
             if message.method == "textDocument/publshDiagnostics":
                 ...
 
         source_view = None
-
-
-	# export const Text = 1;
-	# export const Method = 2;
-	# export const Function = 3;
-	# export const Constructor = 4;
-	# export const Field = 5;
-	# export const Variable = 6;
-	# export const Class = 7;
-	# export const Interface = 8;
-	# export const Module = 9;
-	# export const Property = 10;
-	# export const Unit = 11;
-	# export const Value = 12;
-	# export const Enum = 13;
-	# export const Keyword = 14;
-	# export const Snippet = 15;
-	# export const Color = 16;
-	# export const File = 17;
-	# export const Reference = 18;
-	# export const Folder = 19;
-	# export const EnumMember = 20;
-	# export const Constant = 21;
-	# export const Struct = 22;
-	# export const Event = 23;
-	# export const Operator = 24;
-	# export const TypeParameter = 25;
-
-    def handle_completion(self, items):
-        print()
-        print()
-        print()
-        print(len(items))
-        print()
-        print()
-        print()
-        for item in items:
-            if item["kind"] in [2, 3, 4, 5, 6, 7, 8, 10, 15]:
-                # print(item)
-                ...

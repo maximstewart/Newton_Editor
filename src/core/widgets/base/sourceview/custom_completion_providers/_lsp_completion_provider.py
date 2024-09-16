@@ -25,7 +25,7 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
 
         self._theme       = Gtk.IconTheme.get_default()
         self._source_view = source_view
-
+        
 
     def do_get_name(self):
         return "LSP Code Completion"
@@ -54,13 +54,16 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
     def do_get_activation(self):
         return GtkSource.CompletionActivation.INTERACTIVE
 
-    def do_populate(self, context, items = None):
-        # result    = event_system.emit_and_await("textDocument/completion", (self._source_view,))
+    def do_populate(self, context, result = None):
+        result    = event_system.emit_and_await("textDocument/completion", (self._source_view,))
         proposals = []
 
-        if items:
-            for item in items:
-                proposals.append( self.create_completion_item(item) )
+        if result:
+            if not result.items is None:
+                for item in result.items:
+                    proposals.append( self.create_completion_item(item) )
+            else:
+                proposals.append( self.create_completion_item(result) )
 
         context.add_proposals(self, proposals, True)
 
@@ -77,24 +80,7 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
 
         return None
 
-
-
-    def create_completion_item_button(self, item):
-        comp_item = Gtk.Box()
-        button    = Gtk.Button(label = item["label"])
-        keys      = item.keys()
-
-        if "insertText" in keys:
-            button.set_tooltip_text( item["insertText"] )
-
-        button.set_hexpand(True)
-        comp_item.add(button)
-        return comp_item
-
-
-
-
-    def _create_completion_item(self, item):
+    def create_completion_item(self, item):
         comp_item = GtkSource.CompletionItem.new()
         comp_item.set_label(item.label)
 
