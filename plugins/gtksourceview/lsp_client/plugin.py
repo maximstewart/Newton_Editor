@@ -1,72 +1,183 @@
 # Python imports
-import os
+import signal
+import subprocess
 import json
-import threading
 
 # Lib imports
-from gi.repository import GLib
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 # Application imports
-
-
 from plugins.plugin_base import PluginBase
-from .lsp_controller import LSPController
-
-
-
-class LSPPliginException(Exception):
-    ...
+from .client_ipc import ClientIPC
 
 
 
 class Plugin(PluginBase):
     def __init__(self):
-        super().__init__()
 
-        self.name                     = "LSP Client"  # NOTE: Need to remove after establishing private bidirectional 1-1 message bus
-                                                      #       where self.name should not be needed for message comms
-        self.lsp_config_path: str     = os.path.dirname(os.path.realpath(__file__)) + "/../../lsp_servers_config.json"
-        self.lsp_servers_config: dict = {}
-        self.lsp_controller           = None
-        self.timer                    = None
+        super().__init__()
+        self.name            = "LSP Client"  # NOTE: Need to remove after establishing private bidirectional 1-1 message bus
+                                             #       where self.name should not be needed for message comms
+        self.config_file     = "config.json"
+        self.config: dict    = {}
+        self.lsp_client_proc = None
+        self.lsp_window      = None
 
 
     def generate_reference_ui_element(self):
         ...
 
     def run(self):
-        if os.path.exists(self.lsp_config_path):
-            with open(self.lsp_config_path, "r") as f:
-                self.lsp_servers_config = json.load(f)
-        else:
-            text      = f"LSP NOT Enabled.\nFile:\n\t{self.lsp_config_path}\ndoes no exsist..."
-            self._event_system.emit("bubble_message", ("warning", self.name, text,))
-            return
+        try:
+            with open(self.config_file) as f:
+                self.config = json.load(f)
+        except Exception as e:
+            raise Exception(f"Couldn't load config.json...\n{repr(e)}")
 
-        if len(self.lsp_servers_config.keys()) > 0:
-            self.lsp_controller = LSPController(self.lsp_servers_config)
-            self.inner_subscribe_to_events()
+        self.lsp_window = Gtk.Window()
+        box1            = Gtk.Box()
+        box2            = Gtk.Box()
+        start_btn       = Gtk.Button(label = "Start LSP Client")
+        stop_btn        = Gtk.Button(label = "Stop LSP Client")
+        pid_label       = Gtk.Label(label  = "LSP PID: ")
+
+        box1.set_orientation( Gtk.Orientation.VERTICAL )
+
+        self.lsp_window.set_deletable(False)
+        self.lsp_window.set_skip_pager_hint(True)
+        self.lsp_window.set_skip_taskbar_hint(True)
+        self.lsp_window.set_title("LSP Manager")
+        self.lsp_window.set_size_request(480, 320)
+
+        start_btn.connect("clicked", self.start_lsp_manager)
+        stop_btn.connect("clicked", self.stop_lsp_manager)
+
+        box1.add(pid_label)
+        box2.add(start_btn)
+        box2.add(stop_btn)
+        box1.add(box2)
+        self.lsp_window.add(box1)
+
+        box1.show_all()
+
+        self.inner_subscribe_to_events()
+
+    def _shutting_down(self):
+        self.stop_lsp_manager()
+
+    def _tear_down(self, widget, eve):
+        return True
+
+    def _tggl_lsp_window(self, widget = None):
+        if not self.lsp_window.is_visible():
+            self.lsp_window.show()
+        else:
+            self.lsp_window.hide()
+
 
     def subscribe_to_events(self):
-        ...
-    
+        self._event_system.subscribe("tggl_lsp_window", self._tggl_lsp_window)
+
     def inner_subscribe_to_events(self):
         self._event_system.subscribe("shutting_down", self._shutting_down)
 
-        # self._event_system.subscribe("buffer_changed", self._buffer_changed)
-        self._event_system.subscribe("textDocument/didChange",  self._buffer_changed)
-        self._event_system.subscribe("textDocument/didOpen",    self.lsp_controller.do_open)
-        self._event_system.subscribe("textDocument/didSave",    self.lsp_controller.do_save)
-        self._event_system.subscribe("textDocument/didClose",   self.lsp_controller.do_close)
-        self._event_system.subscribe("textDocument/definition", self._do_goto)
-        self._event_system.subscribe("textDocument/completion", self._do_completion)
+        self._event_system.subscribe("textDocument/didOpen",    self._lsp_did_open)
+        self._event_system.subscribe("textDocument/didSave",    self._lsp_did_save)
+        self._event_system.subscribe("textDocument/didClose",   self._lsp_did_close)
+        self._event_system.subscribe("textDocument/didChange",  self._lsp_did_change)
+        self._event_system.subscribe("textDocument/definition", self._lsp_goto)
+        self._event_system.subscribe("textDocument/completion", self._lsp_completion)
 
-    def _shutting_down(self):
-        self.lsp_controller._shutting_down()
+    def start_lsp_manager(self, button):
+        if self.lsp_client_proc: return
+        self.lsp_client_proc = subprocess.Popen(self.config["lsp_manager_start_command"])
+        self._load_client_ipc_server()
 
-    def _buffer_changed(self, file_type, buffer):
+    def _load_client_ipc_server(self):
+        self.client_ipc = ClientIPC()
+        self.client_ipc.set_event_system(self._event_system)
+        self._ipc_realization_check(self.client_ipc)
+
+        if not self.client_ipc.is_ipc_alive:
+            raise AppLaunchException(f"LSP IPC Server Already Exists...")
+
+    def _ipc_realization_check(self, ipc_server):
+        try:
+            ipc_server.create_ipc_listener()
+        except Exception:
+            ipc_server.send_test_ipc_message()
+
+        try:
+            ipc_server.create_ipc_listener()
+        except Exception as e:
+            ...
+
+    def stop_lsp_manager(self, button = None):
+        if not self.lsp_client_proc: return
+        if not self.lsp_client_proc.poll() is None:
+            self.lsp_client_proc = None
+            return
+
+        self.lsp_client_proc.terminate()
+        self.client_ipc.is_ipc_alive = False
+        self.lsp_client_proc = None
+
+    def _lsp_did_open(self, language_id: str, uri: str, text: str):
+        if not self.lsp_client_proc: return
+
+        data = {
+            "method": "textDocument/didOpen",
+            "language_id": language_id,
+            "uri": uri,
+            "version": -1,
+            "text": text,
+            "line": -1,
+            "column": -1,
+            "char": ""
+        }
+
+        self.send_message(data)
+
+    def _lsp_did_save(self, uri: str, text: str):
+        if not self.lsp_client_proc: return
+
+        data = {
+            "method": "textDocument/didSave",
+            "language_id": "",
+            "uri": uri,
+            "version": -1,
+            "text": text,
+            "line": -1,
+            "column": -1,
+            "char": ""
+        }
+
+        self.send_message(data)
+
+    def _lsp_did_close(self, uri: str):
+        if not self.lsp_client_proc: return
+
+        data = {
+            "method": "textDocument/didClose",
+            "language_id": "",
+            "uri": uri,
+            "version": -1,
+            "text": "",
+            "line": -1,
+            "column": -1,
+            "char": ""
+        }
+
+        self.send_message(data)
+
+    def _lsp_did_change(self, language_id: str, uri: str, buffer):
+        if not self.lsp_client_proc: return
+
         iter   = buffer.get_iter_at_mark( buffer.get_insert() )
         line   = iter.get_line()
+        column = iter.get_line_offset()
         start  = iter.copy()
         end    = iter.copy()
 
@@ -75,12 +186,39 @@ class Plugin(PluginBase):
         end.forward_to_line_end()
 
         text   = buffer.get_text(start, end, include_hidden_chars = False)
-        result = self.lsp_controller.do_change(buffer.uri, buffer.language_id, line, start, end, text)
+        data   = {
+            "method": "textDocument/didChange",
+            "language_id": language_id,
+            "uri": uri,
+            "version": buffer.version_id,
+            "text": text,
+            "line": line,
+            "column": column,
+            "char": ""
+        }
 
+        self.send_message(data)
 
-    def _do_completion(self, source_view):
+    def _lsp_goto(self, language_id: str, uri: str, line: int, column: int):
+        if not self.lsp_client_proc: return
+
+        data = {
+            "method": "textDocument/definition",
+            "language_id": language_id,
+            "uri": uri,
+            "version": -1,
+            "text": "",
+            "line": line,
+            "column": column,
+            "char": ""
+        }
+
+        self.send_message(data)
+
+    def _lsp_completion(self, source_view):
+        if not self.lsp_client_proc: return
+
         filepath  = source_view.get_current_file()
-
         if not filepath: return
 
         uri       = filepath.get_uri()
@@ -88,27 +226,23 @@ class Plugin(PluginBase):
         iter      = buffer.get_iter_at_mark( buffer.get_insert() )
         line      = iter.get_line()
 
-        _char     = iter.get_char()
+        char      = iter.get_char()
         if iter.backward_char():
-            _char = iter.get_char()
+            char = iter.get_char()
 
-        offset    = iter.get_line_offset()
-        result    = self.lsp_controller.do_completion(
-            source_view.get_filetype(),
-            uri,
-            line,
-            offset,
-            _char
-        )
+        column = iter.get_line_offset()
+        data   = {
+            "method": "textDocument/completion",
+            "language_id": source_view.get_filetype(),
+            "uri": uri,
+            "version": source_view.get_version_id(),
+            "text": "",
+            "line": line,
+            "column": column,
+            "char": char
+        }
 
-        return result
+        self.send_message(data)
 
-    def _do_goto(self, language_id, uri, line, offset):
-        results = self.lsp_controller.do_goto(language_id, uri, line, offset)
-
-        if len(results) == 1:
-            result  = results[0]
-            file    = result.uri[7:]
-            line    = result.range.end.line
-            message = f"FILE|{file}:{line}"
-            self._event_system.emit("post_file_to_ipc", message)
+    def send_message(self, data: dict):
+        self.client_ipc.send_manager_ipc_message( json.dumps(data) )

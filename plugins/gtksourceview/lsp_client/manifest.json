@@ -3,10 +3,16 @@
         "name": "LSP Client",
         "author": "ITDominator",
         "version": "0.0.1",
-        "credit": "Avi Yeger for the pylspclient used by this plugin. Link:  https://github.com/yeger00/pylspclient",
+        "credit": "",
         "support": "",
         "requests": {
-            "pass_events": "true"
+            "pass_events": "true",
+            "pass_ui_objects": [
+                "separator_right"
+            ],
+            "bind_keys": [
+                "LSP Client Toggle||tggl_lsp_window:<Control>l"
+            ]
         }
     }
 }
