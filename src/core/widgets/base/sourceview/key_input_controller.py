@@ -81,7 +81,7 @@ class KeyInputController:
 
                     return True
 
-            if keyname in ["z", "y", "m", "s", "h", "g", "d", "k", "u", "equal", "minus", "Up", "Down"]:
+            if keyname in ["z", "y", "m", "s", "h", "g", "d", "k", "u", "space", "equal", "minus", "Up", "Down"]:
                 if keyname == "z":
                     self.keyboard_undo()
                 if keyname == "y":
@@ -100,6 +100,8 @@ class KeyInputController:
                     self.cut_to_buffer()
                 if keyname == "u":
                     self.paste_cut_buffer()
+                if keyname == "space":
+                    event_system.emit("textDocument/completion", (self, ))
 
                 if keyname == "equal":
                     self.scale_up_text()

@@ -34,33 +34,21 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         return context.get_iter()[1] if isinstance(context.get_iter(), tuple) else context.get_iter()
 
     def do_match(self, context):
-        iter   = self.get_iter_correctly(context)
-        buffer = iter.get_buffer()
-        if buffer.get_context_classes_at_iter(iter) != ['no-spell-check']:
-            return False
-
-        ch = iter.get_char()
-        # NOTE: Look to re-add or apply supprting logic to use spaces
-        # As is it slows down the editor in certain contexts...
-        if not (ch in ('_', '.', ' ') or ch.isalnum()):
-        # if not (ch in ('_', '.') or ch.isalnum()):
-            return False
-
         return True
 
     def do_get_priority(self):
         return 1
 
     def do_get_activation(self):
-        return GtkSource.CompletionActivation.INTERACTIVE
+        return GtkSource.CompletionActivation.USER_REQUESTED
 
-    def do_populate(self, context, items = None):
-        # result    = event_system.emit_and_await("textDocument/completion", (self._source_view,))
+    def do_populate(self, context, items = []):
+        if hasattr(self._source_view, "completion_items"):
+            items = self._source_view.completion_items
+
         proposals = []
-
-        if items:
-            for item in items:
-                proposals.append( self.create_completion_item(item) )
+        for item in items:
+            proposals.append( self.create_completion_item(item) )
 
         context.add_proposals(self, proposals, True)
 
@@ -77,36 +65,30 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
 
         return None
 
-
-
-    def create_completion_item_button(self, item):
-        comp_item = Gtk.Box()
-        button    = Gtk.Button(label = item["label"])
+    def create_completion_item(self, item):
+        comp_item = GtkSource.CompletionItem.new()
         keys      = item.keys()
+        comp_item.set_label(item["label"])
 
         if "insertText" in keys:
-            button.set_tooltip_text( item["insertText"] )
-
-        button.set_hexpand(True)
-        comp_item.add(button)
-        return comp_item
-
-
-
-
-    def _create_completion_item(self, item):
-        comp_item = GtkSource.CompletionItem.new()
-        comp_item.set_label(item.label)
-
-        if item.textEdit:
-            if isinstance(item.textEdit, dict):
-                comp_item.set_text(item.textEdit["newText"])
-            else:
-                comp_item.set_text(item.textEdit)
-        else:
-            comp_item.set_text(item.insertText)
-
-        comp_item.set_icon( self.get_icon_for_type(item.kind) )
-        comp_item.set_info(item.documentation)
+            comp_item.set_text(item["insertText"])
 
         return comp_item
+
+
+    # def create_completion_item(self, item):
+    #     comp_item = GtkSource.CompletionItem.new()
+    #     comp_item.set_label(item.label)
+
+    #     if item.textEdit:
+    #         if isinstance(item.textEdit, dict):
+    #             comp_item.set_text(item.textEdit["newText"])
+    #         else:
+    #             comp_item.set_text(item.textEdit)
+    #     else:
+    #         comp_item.set_text(item.insertText)
+
+    #     comp_item.set_icon( self.get_icon_for_type(item.kind) )
+    #     comp_item.set_info(item.documentation)
+
+    #     return comp_item

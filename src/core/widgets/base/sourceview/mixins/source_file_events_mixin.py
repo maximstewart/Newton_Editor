@@ -156,9 +156,5 @@ class FileEventsMixin:
         lsp_completion_provider = LSPCompletionProvider(self)
         self._completion.add_provider(lsp_completion_provider)
 
-        # if self._current_filetype in ("python", "python3"):
-        #     py_lsp_completion_provider = PythonCompletionProvider(uri)
-        #     self._completion.add_provider(py_lsp_completion_provider)
-
         self.got_to_line(buffer, line)
         event_system.emit("buffer_changed_first_load", (buffer, ))

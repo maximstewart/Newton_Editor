@@ -46,6 +46,7 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self._px_value               = settings.theming.default_zoom
 
         self._multi_insert_marks      = []
+        self.completion_items         = []
         self.freeze_multi_line_insert = False
 
         self._setup_styling()
@@ -88,16 +89,12 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self.connect("key-release-event", self._key_release_event)
         self.connect("button-press-event", self._button_press_event)
         self.connect("scroll-event", self._scroll_event)
-        self.connect("show-completion", self._show_completion)
 
         buffer = self.get_buffer()
         buffer.connect('changed', self._is_modified)
         buffer.connect("mark-set", self._on_cursor_move)
         buffer.connect('insert-text', self._insert_text)
         buffer.connect('modified-changed', self._buffer_modified_changed)
-
-    def _show_completion(self, source_view):
-        event_system.emit("textDocument/completion", (source_view, ))
 
     def _subscribe_to_events(self):
         ...

@@ -53,28 +53,13 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
             keys = message.result.keys()
 
             if "items" in keys:
-                buffer     = source_view.get_buffer()
                 completion = source_view.get_completion()
                 providers  = completion.get_providers()
 
                 for provider in providers:
                     if provider.__class__.__name__ == 'LSPCompletionProvider':
-                        # context = completion.create_context( buffer.get_iter_at_mark( buffer.get_insert() ) )
-                        # context = completion.create_context( None )
-                        # provider.do_populate(context, message.result["items"])
-
-                        box  = Gtk.Box()
-                        box.set_homogeneous(True)
-                        # iter = buffer.get_iter_at_mark( buffer.get_insert() )
-                        # rects, recte = source_view.get_cursor_locations(iter)
-                        rect = source_view.get_allocation()
-
-                        box.set_orientation( Gtk.Orientation.VERTICAL )
-                        for item in message.result["items"]:
-                            box.add( provider.create_completion_item_button(item) )
-
-                        box.show_all()
-                        source_view.add_child_in_window(box, Gtk.TextWindowType.WIDGET, rect.width - 200, rect.height / 2)
+                        source_view.completion_items = message.result["items"]
+                        source_view.emit("show-completion")
 
             if "result" in keys:
                 ...
