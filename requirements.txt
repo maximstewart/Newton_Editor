@@ -1,3 +1,5 @@
 PyGObject
 pyxdg
 setproctitle
+python-lsp-server[all]
+python-lsp-server[websockets]
