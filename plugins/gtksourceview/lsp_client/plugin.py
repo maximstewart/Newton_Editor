@@ -175,17 +175,13 @@ class Plugin(PluginBase):
     def _lsp_did_change(self, language_id: str, uri: str, buffer):
         if not self.lsp_client_proc: return
 
-        iter   = buffer.get_iter_at_mark( buffer.get_insert() )
-        line   = iter.get_line()
-        column = iter.get_line_offset()
-        start  = iter.copy()
-        end    = iter.copy()
+        iter       = buffer.get_iter_at_mark( buffer.get_insert() )
+        line       = iter.get_line()
+        column     = iter.get_line_offset()
 
-        start.backward_line()
-        start.forward_line()
-        end.forward_to_line_end()
+        start, end = buffer.get_bounds()
 
-        text   = buffer.get_text(start, end, include_hidden_chars = False)
+        text   = buffer.get_text(start, end, include_hidden_chars = True)
         data   = {
             "method": "textDocument/didChange",
             "language_id": language_id,
@@ -198,6 +194,35 @@ class Plugin(PluginBase):
         }
 
         self.send_message(data)
+
+
+#    def _lsp_did_change(self, language_id: str, uri: str, buffer):
+#        if not self.lsp_client_proc: return
+
+#        iter   = buffer.get_iter_at_mark( buffer.get_insert() )
+#        line   = iter.get_line()
+#        column = iter.get_line_offset()
+#        start  = iter.copy()
+#        end    = iter.copy()
+
+#        start.backward_line()
+#        start.forward_line()
+#        end.forward_line()
+
+#        text   = buffer.get_text(start, end, include_hidden_chars = True)
+#        data   = {
+#            "method": "textDocument/didChange",
+#            "language_id": language_id,
+#            "uri": uri,
+#            "version": buffer.version_id,
+#            "text": text,
+#            "line": line,
+#            "column": column,
+#            "char": ""
+#        }
+
+#        self.send_message(data)
+
 
     def _lsp_goto(self, language_id: str, uri: str, line: int, column: int):
         if not self.lsp_client_proc: return
@@ -225,12 +250,9 @@ class Plugin(PluginBase):
         buffer    = source_view.get_buffer()
         iter      = buffer.get_iter_at_mark( buffer.get_insert() )
         line      = iter.get_line()
-
+        column    = iter.get_line_offset()
         char      = iter.get_char()
-        if iter.backward_char():
-            char = iter.get_char()
 
-        column = iter.get_line_offset()
         data   = {
             "method": "textDocument/completion",
             "language_id": source_view.get_filetype(),

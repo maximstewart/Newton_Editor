@@ -1,4 +1,5 @@
 # Python imports
+import traceback
 import os
 import threading
 import time
@@ -12,7 +13,9 @@ import gi
 from gi.repository import GLib
 
 # Application imports
-from .lsp_message_structs import LSPResponseRequest, LSPResponseNotification, get_message_obj
+from .lsp_message_structs import LSPResponseRequest
+from .lsp_message_structs import LSPResponseNotification
+from .lsp_message_structs import get_message_obj
 
 
 
@@ -126,13 +129,17 @@ class ClientIPC:
     def send_manager_ipc_message(self, message: str) -> None:
         try:
             if self._conn_type == "socket":
+                if not os.path.exists(self._manager_ipc_address):
+                    logger.error(f"Socket:  {self._manager_ipc_address}  doesn't exist. NOT sending message...")
+                    return
+
                 conn = Client(address=self._manager_ipc_address, family="AF_UNIX", authkey=self._manager_ipc_authkey)
             elif "unsecured" not in self._conn_type:
                 conn = Client((self._ipc_address, self._ipc_port), authkey=self._ipc_authkey)
             else:
                 conn = Client((self._ipc_address, self._ipc_port))
 
-            conn.send( f"CLIENT|{ base64.b64encode(message.encode("utf-8")).decode("utf-8")  }" )
+            conn.send( f"CLIENT|{ base64.b64encode(message.encode('utf-8')).decode('utf-8')  }" )
             conn.close()
         except ConnectionRefusedError as e:
             logger.error("Connection refused...")
