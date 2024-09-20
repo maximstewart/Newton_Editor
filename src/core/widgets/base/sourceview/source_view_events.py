@@ -26,11 +26,11 @@ class SourceViewEvents(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
 
         if not self._loading_file:
             buffer.version_id = self._version_id
+            self._version_id += 1
 
             event_system.emit("buffer_changed", (buffer, ))
             event_system.emit("textDocument/didChange", (file_type, self.get_current_file().get_uri(), buffer, ))
-
-            self._version_id += 1
+            # event_system.emit("textDocument/completion", (self, ))
 
         self.update_cursor_position(buffer)
 

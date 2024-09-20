@@ -38,7 +38,7 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
         if action == "set_buffer_style":
             self.set_buffer_style(source_view, query)
 
-    def _handle_lsp_message(self, message: dict or LSPResponseTypes):
+    def _handle_lsp_message(self, message: dict or LSPResponseType):
         if not self.is_editor_focused: return # TODO: Find way to converge this
         page_num, container, source_view = self.get_active_view()
         page_num  = None
@@ -50,18 +50,22 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
             ...
 
         if hasattr(message, "result"):
-            keys = message.result.keys()
+            if message.result is dict:
+                keys = message.result.keys()
 
-            if "items" in keys:
-                completion = source_view.get_completion()
-                providers  = completion.get_providers()
+                if "items" in keys:
+                    completion = source_view.get_completion()
+                    providers  = completion.get_providers()
 
-                for provider in providers:
-                    if provider.__class__.__name__ == 'LSPCompletionProvider':
-                        source_view.completion_items = message.result["items"]
-                        source_view.emit("show-completion")
+                    for provider in providers:
+                        if provider.__class__.__name__ == 'LSPCompletionProvider':
+                            source_view.completion_items = message.result["items"]
+                            source_view.emit("show-completion")
 
-            if "result" in keys:
+                if "result" in keys:
+                    ...
+
+            if message.result is list:
                 ...
 
         if hasattr(message, "method"):
