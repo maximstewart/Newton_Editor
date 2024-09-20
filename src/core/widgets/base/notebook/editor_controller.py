@@ -50,10 +50,10 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
             ...
 
         if hasattr(message, "result"):
-            if message.result is dict:
+            if type(message.result) is dict:
                 keys = message.result.keys()
 
-                if "items" in keys:
+                if "items" in keys:  # completion
                     completion = source_view.get_completion()
                     providers  = completion.get_providers()
 
@@ -65,8 +65,13 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
                 if "result" in keys:
                     ...
 
-            if message.result is list:
-                ...
+            if type(message.result) is list:
+                if len(message.result) == 1:  # goto/aka definition
+                    result = message.result[0]
+                    line   = result["range"]["start"]["line"]
+                    uri    = result["uri"].replace("file://", "")
+                    file   = f"{uri}:{line}"
+                    event_system.emit("handle_file_from_ipc", file)
 
         if hasattr(message, "method"):
             if message.method == "textDocument/publshDiagnostics":
