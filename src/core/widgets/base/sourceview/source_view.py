@@ -88,6 +88,7 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self.connect("key-press-event", self._key_press_event)
         self.connect("key-release-event", self._key_release_event)
         self.connect("button-press-event", self._button_press_event)
+        self.connect("button-release-event", self._button_release_event)
         self.connect("scroll-event", self._scroll_event)
 
         buffer = self.get_buffer()

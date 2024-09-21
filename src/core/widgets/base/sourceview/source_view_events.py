@@ -47,13 +47,23 @@ class SourceViewEvents(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
 
 
     def _button_press_event(self, widget = None, eve = None, user_data = None):
-        if eve.type == Gdk.EventType.BUTTON_PRESS and eve.button == 1 :   # l-click
+        if eve.button == 1 :  # l-click
+            ...
+        elif eve.button == 2: # m-click
+            ...
+        elif eve.button == 3: # r-click
+            ...
+
+    def _button_release_event(self, widget = None, eve = None, user_data = None):
+        if eve.button == 1 :   # l-click
+            self.keyboard_clear_marks()
+            if eve.state & Gdk.ModifierType.CONTROL_MASK:
+                self.go_to_call()
+        elif eve.button == 2: # m-click
             if eve.state & Gdk.ModifierType.CONTROL_MASK:
                 self.button_press_insert_mark(eve)
                 return True
-            else:
-                self.keyboard_clear_marks()
-        elif eve.type == Gdk.EventType.BUTTON_RELEASE and eve.button == 3: # r-click
+        elif eve.button == 3: # r-click
             ...
 
     def _scroll_event(self, widget, eve):
