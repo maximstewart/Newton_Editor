@@ -14,6 +14,7 @@ from .mixins.source_file_events_mixin import FileEventsMixin
 from .mixins.source_mark_events_mixin import MarkEventsMixin
 
 
+
 class SourceViewEvents(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
     def _create_default_tag(self, buffer):
         general_style_tag = buffer.create_tag('general_style')
@@ -55,7 +56,7 @@ class SourceViewEvents(SourceViewDnDMixin, MarkEventsMixin, FileEventsMixin):
             ...
 
     def _button_release_event(self, widget = None, eve = None, user_data = None):
-        if eve.button == 1 :   # l-click
+        if eve.button == 1 :  # l-click
             self.keyboard_clear_marks()
             if eve.state & Gdk.ModifierType.CONTROL_MASK:
                 self.go_to_call()

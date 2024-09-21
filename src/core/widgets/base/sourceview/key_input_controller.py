@@ -31,6 +31,11 @@ class KeyInputController:
                     return True
 
             if keyname in [ "slash", "Up", "Down", "m", "z", "y" ]:
+                if keyname == "Up":
+                    self.keyboard_move_lines_up()
+                if keyname == "Down":
+                    self.keyboard_move_lines_down()
+
                 return True
 
         if is_alt:
@@ -81,7 +86,7 @@ class KeyInputController:
 
                     return True
 
-            if keyname in ["z", "y", "m", "s", "h", "g", "d", "k", "u", "space", "equal", "minus", "Up", "Down"]:
+            if keyname in ["z", "y", "m", "s", "h", "g", "d", "k", "u", "space", "equal", "minus"]:
                 if keyname == "z":
                     self.keyboard_undo()
                 if keyname == "y":
@@ -107,11 +112,6 @@ class KeyInputController:
                     self.scale_up_text()
                 if keyname == "minus":
                     self.scale_down_text()
-
-                if keyname == "Up":
-                    self.keyboard_move_lines_up()
-                if keyname == "Down":
-                    self.keyboard_move_lines_down()
 
                 return True
 
