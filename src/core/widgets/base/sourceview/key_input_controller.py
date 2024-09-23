@@ -36,6 +36,11 @@ class KeyInputController:
                 if keyname == "Down":
                     self.keyboard_move_lines_down()
 
+                if keyname == "z":
+                    self.keyboard_undo()
+                if keyname == "y":
+                    self.keyboard_redo()
+
                 return True
 
         if is_alt:
@@ -87,10 +92,6 @@ class KeyInputController:
                     return True
 
             if keyname in ["z", "y", "m", "s", "h", "g", "d", "k", "u", "space", "equal", "minus"]:
-                if keyname == "z":
-                    self.keyboard_undo()
-                if keyname == "y":
-                    self.keyboard_redo()
                 if keyname == "m":
                     self.keyboard_insert_mark()
                 if keyname == "s":
