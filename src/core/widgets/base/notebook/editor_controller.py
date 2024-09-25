@@ -11,6 +11,7 @@ from gi.repository import GtkSource
 from libs.dto.lsp_message_structs import LSPResponseTypes, LSPResponseRequest, LSPResponseNotification
 from .key_input_controller import KeyInputController
 from .editor_events import EditorEventsMixin
+from ...completion_item import CompletionItem
 
 
 
@@ -44,7 +45,7 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
         page_num  = None
         container = None
 
-        logger.debug( repr(message) )
+        logger.debug( f"\n\n{repr(message)}\n\n" )
 
         if isinstance(message, dict):
             ...
@@ -53,14 +54,30 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
             if type(message.result) is dict:
                 keys = message.result.keys()
 
-                if "items" in keys:  # completion
-                    completion = source_view.get_completion()
-                    providers  = completion.get_providers()
+                if "items" in keys: # completion
+                    if source_view.completion_view.get_parent():
+                        source_view.remove(source_view.completion_view)
 
-                    for provider in providers:
-                        if provider.__class__.__name__ == 'LSPCompletionProvider':
-                            source_view.completion_items = message.result["items"]
-                            source_view.emit("show-completion")
+                    source_view.completion_view.clear_items()
+                    x, y = self._get_insert_line_xy(source_view)
+                    source_view.add_child_in_window(source_view.completion_view,  Gtk.TextWindowType.WIDGET, x, y)
+
+                    for item in message.result["items"]:
+                        ci = CompletionItem()
+                        ci.populate_completion_item(item)
+                        source_view.completion_view.add_completion_item(ci)
+
+                    source_view.completion_view.show_all()
+
+
+                    # completion = source_view.get_completion()
+                    # providers  = completion.get_providers()
+
+                    # for provider in providers:
+                    #     if provider.__class__.__name__ == 'LSPCompletionProvider':
+                    #         source_view.completion_items = message.result["items"]
+                    #         source_view.emit("show-completion")
+
 
                 if "result" in keys:
                     ...
@@ -78,3 +95,22 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
                 ...
 
         source_view = None
+
+
+
+    # Gotten logic from:
+    # https://stackoverflow.com/questions/7139645/find-the-cursor-position-on-a-gtksourceview-window
+    def _get_insert_line_xy(self, source_view):
+        buffer   = source_view.get_buffer()
+        iter     = buffer.get_iter_at_mark( buffer.get_insert() )
+        iter_loc = source_view.get_iter_location(iter)
+
+        win_loc  = source_view.buffer_to_window_coords(Gtk.TextWindowType.WIDGET, iter_loc.x, iter_loc.y)
+
+        win      = source_view.get_window( Gtk.TextWindowType.WIDGET )
+        view_pos = win.get_position()
+
+        xx = win_loc[0] + view_pos[0]
+        yy = win_loc[1] + view_pos[1] + iter_loc.height
+
+        return xx, yy

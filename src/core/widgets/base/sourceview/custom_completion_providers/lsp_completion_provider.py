@@ -73,6 +73,9 @@ class LSPCompletionProvider(GObject.Object, GtkSource.CompletionProvider):
         if "insertText" in keys:
             comp_item.set_text(item["insertText"])
 
+        if "additionalTextEdits" in keys:
+            comp_item.additionalTextEdits = item["additionalTextEdits"]
+
         return comp_item
 
 

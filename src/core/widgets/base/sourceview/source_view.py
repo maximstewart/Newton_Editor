@@ -17,6 +17,7 @@ from .source_view_controller import SourceViewControllerMixin
 
 # from .custom_completion_providers.example_completion_provider import ExampleCompletionProvider
 # from .custom_completion_providers.python_completion_provider import PythonCompletionProvider
+from ...completion_view import CompletionView
 
 
 
@@ -46,8 +47,10 @@ class SourceView(SourceViewControllerMixin, GtkSource.View):
         self._px_value               = settings.theming.default_zoom
 
         self._multi_insert_marks      = []
-        self.completion_items         = []
         self.freeze_multi_line_insert = False
+
+        self.completion_view          = CompletionView()
+        # self.completion_items         = []
 
         self._setup_styling()
         self._setup_signals()

@@ -47,6 +47,10 @@ class KeyInputController:
             if keyname in [ "Up", "Down", "Left", "Right" ]:
                 return True
 
+        if keyname in [ "Return", "Enter", "Up", "Down" ]:
+            if self.completion_view.get_parent() and self.completion_view.is_visible():
+                return True
+
 
         if len(self._multi_insert_marks) > 0:
             if keyname == "BackSpace":
@@ -123,6 +127,22 @@ class KeyInputController:
         if is_alt:
             if keyname == "m":
                 self.keyboard_clear_marks()
+
+
+        if keyname in [ "Return", "Enter", "Up", "Down", "Left", "Right" ]:
+            if self.completion_view.get_parent() and self.completion_view.is_visible():
+                if keyname in {"Return", "Enter"}:
+                    self.completion_view.activate_completion()
+                if keyname == "UP":
+                    self.completion_view.move_selection_up()
+                if keyname == "Down":
+                    self.completion_view.move_selection_down()
+                if keyname == "Left":
+                    self.remove( self.completion_view )
+                if keyname == "Right":
+                    self.remove( self.completion_view )
+
+                return True
 
 
         if keyname in {"Return", "Enter"}:

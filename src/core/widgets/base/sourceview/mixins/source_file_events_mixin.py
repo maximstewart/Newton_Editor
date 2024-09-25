@@ -149,12 +149,12 @@ class FileEventsMixin:
 
         event_system.emit("textDocument/didOpen", (self._current_filetype, uri, self.get_text()))
 
-        word_completion = GtkSource.CompletionWords.new("word_completion")
-        word_completion.register(buffer)
-        self._completion.add_provider(word_completion)
+        # word_completion = GtkSource.CompletionWords.new("word_completion")
+        # word_completion.register(buffer)
+        # self._completion.add_provider(word_completion)
 
-        lsp_completion_provider = LSPCompletionProvider(self)
-        self._completion.add_provider(lsp_completion_provider)
+        # lsp_completion_provider = LSPCompletionProvider(self)
+        # self._completion.add_provider(lsp_completion_provider)
 
         self.got_to_line(buffer, line)
         event_system.emit("buffer_changed_first_load", (buffer, ))
