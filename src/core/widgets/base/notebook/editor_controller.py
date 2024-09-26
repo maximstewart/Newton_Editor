@@ -5,6 +5,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '4')
 from gi.repository import Gtk
+from gi.repository import GLib
 from gi.repository import GtkSource
 
 # Application imports
@@ -68,6 +69,7 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
                         source_view.completion_view.add_completion_item(ci)
 
                     source_view.completion_view.show_all()
+                    GLib.idle_add( source_view.completion_view.select_first_row )
 
 
                     # completion = source_view.get_completion()

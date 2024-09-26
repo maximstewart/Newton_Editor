@@ -31,9 +31,9 @@ class KeyInputController:
                     return True
 
             if keyname in [ "slash", "Up", "Down", "m", "z", "y" ]:
-                if keyname == "Up":
+                if keyname == "Up" and not self.completion_view.get_parent():
                     self.keyboard_move_lines_up()
-                if keyname == "Down":
+                if keyname == "Down" and not self.completion_view.get_parent():
                     self.keyboard_move_lines_down()
 
                 if keyname == "z":
@@ -47,10 +47,22 @@ class KeyInputController:
             if keyname in [ "Up", "Down", "Left", "Right" ]:
                 return True
 
-        if keyname in [ "Return", "Enter", "Up", "Down" ]:
+        if keyname in [ "Left", "Right" ]:
             if self.completion_view.get_parent() and self.completion_view.is_visible():
+                # Needed to escape our completion widget and get back ibeam
+                if keyname == "Left":
+                    self.remove( self.completion_view )
+                    GLib.idle_add(self.grab_focus)
+                if keyname == "Right":
+                    self.remove( self.completion_view )
+                    GLib.idle_add(self.grab_focus)
+                # ^ Needed to escape our completion widget and get back ibeam
+
                 return True
 
+        if keyname in [ "Return", "Enter" ]:
+            if self.completion_view.get_parent() and self.completion_view.is_visible():
+                return True
 
         if len(self._multi_insert_marks) > 0:
             if keyname == "BackSpace":
@@ -129,23 +141,12 @@ class KeyInputController:
                 self.keyboard_clear_marks()
 
 
-        if keyname in [ "Return", "Enter", "Up", "Down", "Left", "Right" ]:
+        if keyname in [ "Return", "Enter" ]:
             if self.completion_view.get_parent() and self.completion_view.is_visible():
-                if keyname in {"Return", "Enter"}:
-                    self.completion_view.activate_completion()
-                if keyname == "UP":
-                    self.completion_view.move_selection_up()
-                if keyname == "Down":
-                    self.completion_view.move_selection_down()
-                if keyname == "Left":
-                    self.remove( self.completion_view )
-                if keyname == "Right":
-                    self.remove( self.completion_view )
+                self.completion_view.activate_completion()
 
                 return True
 
-
-        if keyname in {"Return", "Enter"}:
             if len(self._multi_insert_marks) > 0:
                 self.begin_user_action(buffer)
                 with buffer.freeze_notify():

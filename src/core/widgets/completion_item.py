@@ -9,7 +9,7 @@ from gi.repository import Gtk
 
 
 
-class CompletionItem(Gtk.Button):
+class CompletionItem(Gtk.Label):
     def __init__(self):
         super(CompletionItem, self).__init__()
 
@@ -27,7 +27,7 @@ class CompletionItem(Gtk.Button):
         ctx.add_class("completion-item")
 
     def _setup_signals(self):
-        self.connect("clicked", self._do_completion)
+        ...
 
 
     def populate_completion_item(self, item):
@@ -39,6 +39,3 @@ class CompletionItem(Gtk.Button):
 
         if "additionalTextEdits" in keys:
             self.additionalTextEdits = item["additionalTextEdits"]
-
-    def _do_completion(self, button):
-        ...
