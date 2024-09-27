@@ -52,6 +52,7 @@ class CompletionView(Gtk.ScrolledWindow):
         self.button_box.set_selection_mode( Gtk.SelectionMode.BROWSE )
 
         self.button_box.connect("key-press-event", self._key_press_event)
+        self.button_box.connect("key-release-event", self._key_release_event)
 
         viewport.add(self.button_box)
         self.add(viewport)
@@ -76,6 +77,15 @@ class CompletionView(Gtk.ScrolledWindow):
             self.move_selection_down()
             return True
 
+    def _key_release_event(self, widget, eve):
+        keyname    = Gdk.keyval_name(eve.keyval)
+        modifiers  = Gdk.ModifierType(eve.get_state() & ~Gdk.ModifierType.LOCK_MASK)
+        is_control = True if modifiers & Gdk.ModifierType.CONTROL_MASK else False
+        is_shift   = True if modifiers & Gdk.ModifierType.SHIFT_MASK else False
+
+        if is_control:
+            return True
+
         if keyname in [ "Enter", "Return" ]:
             self.activate_completion()
             return True
@@ -90,13 +100,48 @@ class CompletionView(Gtk.ScrolledWindow):
 
     def activate_completion(self):
         completion_item = self.button_box.get_selected_row().get_child()
-        print()
-        print()
-        print(completion_item)
-        print(completion_item.insertText)
-        print(completion_item.additionalTextEdits)
-        print()
-        print()
+        source_view     = self.get_parent()
+        buffer          = source_view.get_buffer()
+        siter           = buffer.get_iter_at_mark( buffer.get_insert() )
+        pre_char        = self.get_pre_char(siter)
+
+        if siter.inside_word() or siter.ends_word() or pre_char == '_':
+            eiter = siter.copy()
+            siter.backward_visible_word_start()
+            self.get_word_start(siter)
+
+            if not eiter.ends_word() and not pre_char == '_':
+            # if not eiter.ends_word() and not pre_char == '_' and not pre_char == '_':
+                eiter.forward_word_end()
+
+            buffer.delete(siter, eiter)
+
+        buffer.insert(siter, completion_item.insertText, -1)
+
+        for edit in completion_item.additionalTextEdits:
+            print()
+            print()
+            print(edit)
+            print()
+            print()
+
+        source_view.remove(self)
+        GLib.idle_add( source_view.grab_focus )
+
+    def get_word_start(self, iter):
+        pre_char = self.get_pre_char(iter)
+        while pre_char == '_':
+            iter.backward_visible_word_start()
+            pre_char = self.get_pre_char(iter)
+
+    def get_pre_char(self, iter):
+        pre_char = None
+        if iter.backward_char():
+            pre_char = iter.get_char()
+            iter.forward_char()
+
+        return pre_char
+
 
     def move_selection_up(self):
         srow  = self.button_box.get_selected_row()
