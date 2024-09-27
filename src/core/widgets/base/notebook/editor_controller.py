@@ -68,7 +68,7 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
                         ci.populate_completion_item(item)
                         source_view.completion_view.add_completion_item(ci)
 
-                    if message.result["items"].size() > 0:
+                    if len( message.result["items"] ) > 0:
                         source_view.completion_view.show_all()
                         GLib.idle_add( source_view.completion_view.select_first_row )
 

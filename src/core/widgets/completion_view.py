@@ -17,7 +17,8 @@ class CompletionView(Gtk.ScrolledWindow):
     def __init__(self):
         super(CompletionView, self).__init__()
 
-        self.button_box = None
+        self.vadjustment = self.get_vadjustment()
+        self.button_box  = None
 
         self._setup_styling()
         self._setup_signals()
@@ -51,31 +52,10 @@ class CompletionView(Gtk.ScrolledWindow):
         self.button_box.set_placeholder( Gtk.Label(label = "No completion data...") )
         self.button_box.set_selection_mode( Gtk.SelectionMode.BROWSE )
 
-        self.button_box.connect("key-press-event", self._key_press_event)
         self.button_box.connect("key-release-event", self._key_release_event)
 
         viewport.add(self.button_box)
         self.add(viewport)
-
-
-    # This is depressing but only way I can get to scroll with items getting selected.
-    # Cannot figure out how to just manually scroll widget into view with code.
-    def _key_press_event(self, widget, eve):
-        keyname    = Gdk.keyval_name(eve.keyval)
-        modifiers  = Gdk.ModifierType(eve.get_state() & ~Gdk.ModifierType.LOCK_MASK)
-        is_control = True if modifiers & Gdk.ModifierType.CONTROL_MASK else False
-        is_shift   = True if modifiers & Gdk.ModifierType.SHIFT_MASK else False
-
-        if is_control:
-            return True
-
-        if keyname in [ "Up" ]:
-            self.move_selection_up()
-            return True
-
-        if keyname in [ "Down" ]:
-            self.move_selection_down()
-            return True
 
     def _key_release_event(self, widget, eve):
         keyname    = Gdk.keyval_name(eve.keyval)
@@ -91,12 +71,55 @@ class CompletionView(Gtk.ScrolledWindow):
             return True
 
 
-    def add_completion_item(self, item: CompletionItem):
-        self.button_box.add(item)
-
     def clear_items(self):
         for child in self.button_box.get_children():
             self.button_box.remove(child)
+
+    def add_completion_item(self, item: CompletionItem):
+        self.button_box.add(item)
+
+    def move_selection_up(self):
+        srow  = self.button_box.get_selected_row()
+        if not srow:
+            self.select_last_row()
+            return
+
+        index = srow.get_index() - 1
+        if index == -1:
+            self.select_last_row()
+            return
+
+        row = self.button_box.get_row_at_index(index)
+        self.select_and_scroll_to_view(row, self.vadjustment.get_value() - row.get_allocation().height)
+
+    def move_selection_down(self):
+        srow  = self.button_box.get_selected_row()
+        if not srow:
+            self.select_first_row()
+            return
+
+        index = srow.get_index() + 1
+        if index > (len( self.button_box.get_children() ) - 1):
+            index = 0
+            self.select_first_row()
+            return
+
+        row = self.button_box.get_row_at_index(index)
+        self.select_and_scroll_to_view(row, self.vadjustment.get_value() + row.get_allocation().height)
+
+    def select_first_row(self):
+        row = self.button_box.get_row_at_index(0)
+        if not row: return
+        self.select_and_scroll_to_view(row, self.vadjustment.get_lower())
+
+    def select_last_row(self):
+        row = self.button_box.get_row_at_index( len( self.button_box.get_children() ) - 1 )
+        if not row: return
+        self.select_and_scroll_to_view(row, self.vadjustment.get_upper())
+
+    def select_and_scroll_to_view(self, row, adjustment: float):
+        self.button_box.select_row(row)
+        self.vadjustment.set_value( adjustment )
 
     def activate_completion(self):
         completion_item = self.button_box.get_selected_row().get_child()
@@ -111,7 +134,6 @@ class CompletionView(Gtk.ScrolledWindow):
             self.get_word_start(siter)
 
             if not eiter.ends_word() and not pre_char == '_':
-            # if not eiter.ends_word() and not pre_char == '_' and not pre_char == '_':
                 eiter.forward_word_end()
 
             buffer.delete(siter, eiter)
@@ -141,47 +163,3 @@ class CompletionView(Gtk.ScrolledWindow):
             iter.forward_char()
 
         return pre_char
-
-
-    def move_selection_up(self):
-        srow  = self.button_box.get_selected_row()
-        if not srow:
-            self.select_last_row()
-            return
-
-        index = srow.get_index() - 1
-        if index == -1:
-            index = len( self.button_box.get_children() ) - 1
-
-        self.select_and_scroll_to_view(
-            self.button_box.get_row_at_index(index)
-        )
-
-    def move_selection_down(self):
-        srow  = self.button_box.get_selected_row()
-        if not srow:
-            self.select_first_row()
-            return
-
-        index = srow.get_index() + 1
-        if index > (len( self.button_box.get_children() ) - 1):
-            index = 0
-
-        self.select_and_scroll_to_view(
-            self.button_box.get_row_at_index(index)
-        )
-
-
-    def select_first_row(self):
-        row = self.button_box.get_row_at_y(0)
-        if not row: return
-        self.select_and_scroll_to_view(row)
-
-    def select_last_row(self):
-        row = self.button_box.get_row_at_y( len( self.button_box.get_children() ) - 1)
-        if not row: return
-        self.select_and_scroll_to_view(row)
-
-    def select_and_scroll_to_view(self, row):
-        self.button_box.select_row(row)
-        GLib.idle_add( row.grab_focus )

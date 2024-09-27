@@ -47,16 +47,16 @@ class KeyInputController:
             if keyname in [ "Up", "Down", "Left", "Right" ]:
                 return True
 
-        if keyname in [ "Left", "Right" ]:
+        if keyname in [ "Up", "Down", "Left", "Right" ]:
             if self.completion_view.get_parent() and self.completion_view.is_visible():
-                # Needed to escape our completion widget and get back ibeam
+                if keyname == "Up":
+                    self.completion_view.move_selection_up()
+                if keyname == "Down":
+                    self.completion_view.move_selection_down()
                 if keyname == "Left":
                     self.remove( self.completion_view )
-                    GLib.idle_add(self.grab_focus)
                 if keyname == "Right":
                     self.remove( self.completion_view )
-                    GLib.idle_add(self.grab_focus)
-                # ^ Needed to escape our completion widget and get back ibeam
 
                 return True
 
