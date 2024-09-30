@@ -9,7 +9,7 @@ from gi.repository import GLib
 from gi.repository import GtkSource
 
 # Application imports
-from libs.dto.lsp_message_structs import LSPResponseTypes, LSPResponseRequest, LSPResponseNotification
+from libs.dto.lsp_message_structs import LSPResponseTypes, LSPResponseRequest, LSPResponseNotification, LSPIDResponseNotification
 from .key_input_controller import KeyInputController
 from .editor_events import EditorEventsMixin
 from ...completion_item import CompletionItem
