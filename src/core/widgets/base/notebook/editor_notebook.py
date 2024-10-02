@@ -1,4 +1,5 @@
 # Python imports
+import zipfile
 
 # Lib imports
 import gi
@@ -122,12 +123,22 @@ class EditorNotebook(EditorControllerMixin, Gtk.Notebook):
             return
 
         if isinstance(gfile, str):
-            parts = gfile.split(":")
-            gfile = Gio.File.new_for_path(parts[0])
-            try:
-                line = int(parts[1]) if len(parts) > 1 else 0
-            except Exception:
-                ...
+            parts = gfile.replace("file://", "").split(":")
+            if len(parts) > 2:
+                with zipfile.ZipFile(parts[0], 'r') as file:
+                    file.extract(parts[1][1:], "/tmp/newton_extracts")
+
+                gfile = Gio.File.new_for_path( f"/tmp/newton_extracts/{ parts[1][1:] }" )
+                try:
+                    line = int(parts[2])
+                except Exception:
+                    ...
+            else:
+                gfile = Gio.File.new_for_path(parts[0])
+                try:
+                    line = int(parts[1]) if len(parts) > 1 else 0
+                except Exception:
+                    ...
 
         self.create_view(None, None, gfile, line)
 

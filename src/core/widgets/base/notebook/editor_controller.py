@@ -1,4 +1,5 @@
 # Python imports
+import urllib.parse as url_parse
 
 # Lib imports
 import gi
@@ -89,7 +90,10 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
                     result = message.result[0]
                     line   = result["range"]["start"]["line"]
                     uri    = result["uri"].replace("file://", "")
-                    file   = f"{uri}:{line}"
+                    if "jdt:" in uri:
+                        uri = self.parse_java_jdt_to_uri(uri)
+
+                    file = f"{uri}:{line}"
                     event_system.emit("handle_file_from_ipc", file)
 
         if hasattr(message, "method"):
@@ -98,7 +102,25 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
 
         source_view = None
 
+    def parse_java_jdt_to_uri(self, uri):
+        parse_str     = url_parse.unquote(uri)
+        post_stub, \
+        pre_stub      = parse_str.split("?=")
 
+        post_stub     = post_stub.replace("jdt://contents/", "")
+        replace_stub  = post_stub[
+            post_stub.index(".jar") + 4 : post_stub.index(".class")
+        ]
+        post_stub     = post_stub.replace(replace_stub, replace_stub.replace(".", "/") ) \
+                            .replace(".jar", "-sources.jar:")
+        post_stub     = post_stub.replace(".class", ".java")
+
+        pre_stub      = pre_stub[
+            pre_stub.index("/\\/") + 2 : pre_stub.index(".jar")
+        ]
+        pre_stub      = pre_stub[: pre_stub.rfind("/") + 1 ].replace("\\", "")
+
+        return f"file://{pre_stub}{post_stub}"
 
     # Gotten logic from:
     # https://stackoverflow.com/questions/7139645/find-the-cursor-position-on-a-gtksourceview-window
