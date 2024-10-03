@@ -53,6 +53,7 @@ class CompletionView(Gtk.ScrolledWindow):
         self.button_box.set_selection_mode( Gtk.SelectionMode.BROWSE )
 
         self.button_box.connect("key-release-event", self._key_release_event)
+        self.button_box.connect("button-release-event", self._button_release_event)
 
         viewport.add(self.button_box)
         self.add(viewport)
@@ -70,6 +71,10 @@ class CompletionView(Gtk.ScrolledWindow):
             self.activate_completion()
             return True
 
+    def _button_release_event(self, widget, eve):
+        if eve.button == 1: # lclick
+            self.activate_completion()
+            return True
 
     def clear_items(self):
         for child in self.button_box.get_children():
@@ -128,6 +133,30 @@ class CompletionView(Gtk.ScrolledWindow):
         siter           = buffer.get_iter_at_mark( buffer.get_insert() )
         pre_char        = self.get_pre_char(siter)
 
+        if completion_item.textEdit:
+            sline = completion_item.textEdit["range"]["start"]["line"]
+            schar = completion_item.textEdit["range"]["start"]["character"]
+            eline = completion_item.textEdit["range"]["end"]["line"]
+            echar = completion_item.textEdit["range"]["end"]["character"]
+            siter = buffer.get_iter_at_line_offset( sline, schar )
+            eiter = buffer.get_iter_at_line_offset( eline, echar )
+
+            buffer.delete(siter, eiter)
+            buffer.insert(siter, completion_item.newText, -1)
+
+            source_view.remove(self)
+            GLib.idle_add( source_view.grab_focus )
+
+            return
+
+        if pre_char == '.':
+            buffer.insert(siter, completion_item.insertText, -1)
+
+            source_view.remove(self)
+            GLib.idle_add( source_view.grab_focus )
+
+            return
+
         if siter.inside_word() or siter.ends_word() or pre_char == '_':
             eiter = siter.copy()
             siter.backward_visible_word_start()
@@ -139,7 +168,6 @@ class CompletionView(Gtk.ScrolledWindow):
             buffer.delete(siter, eiter)
 
         buffer.insert(siter, completion_item.insertText, -1)
-
         for edit in completion_item.additionalTextEdits:
             print()
             print()

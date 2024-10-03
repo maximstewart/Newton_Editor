@@ -13,7 +13,9 @@ class CompletionItem(Gtk.Label):
     def __init__(self):
         super(CompletionItem, self).__init__()
 
-        self.insertText: str = ""
+        self.newText: str            = ""
+        self.insertText: str         = ""
+        self.textEdit: []            = []
         self.additionalTextEdits: [] = []
 
         self._setup_styling()
@@ -34,8 +36,13 @@ class CompletionItem(Gtk.Label):
         keys      = item.keys()
         self.set_label(item["label"])
 
+
         if "insertText" in keys:
             self.insertText = item["insertText"]
+
+        if "textEdit" in keys:
+            self.textEdit = item["textEdit"]
+            self.newText  = item["textEdit"]["newText"]
 
         if "additionalTextEdits" in keys:
             self.additionalTextEdits = item["additionalTextEdits"]
