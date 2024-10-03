@@ -14,7 +14,7 @@ from gi.repository import GLib
 
 # Application imports
 from .lsp_message_structs import LSPResponseRequest
-from .lsp_message_structs import LSPResponseNotification
+from .lsp_message_structs import LSPResponseNotification, LSPIDResponseNotification
 from .lsp_message_structs import get_message_obj
 
 
@@ -70,7 +70,7 @@ class ClientIPC:
                 start_time = time.perf_counter()
                 self._handle_ipc_message(conn, start_time)
             except Exception as e:
-                logger.debug( repr(e) )
+                logger.debug( traceback.print_exc() )
 
         listener.close()
 
@@ -96,7 +96,7 @@ class ClientIPC:
                         lsp_response = LSPResponseRequest(**get_message_obj(data_str))
 
                     if "method" in keys:
-                        lsp_response = LSPResponseNotification(**get_message_obj(data_str))
+                        lsp_response = LSPResponseNotification( **get_message_obj(data_str) ) if not "id" in keys else LSPIDResponseNotification( **get_message_obj(data_str) )
 
                     if "notification" in keys:
                         ...

@@ -36,6 +36,19 @@ class LSPResponseNotification(object):
         method: str
         params: dict
 
+@dataclass
+class LSPIDResponseNotification(object):
+        """
+        Constructs a new LSP Response Notification instance.
 
-class LSPResponseTypes(LSPResponseRequest, LSPResponseNotification):
+        :param str method: The type of lsp notification being made.
+        :params dict result: The arguments of the given method.
+        """
+        jsonrpc: str
+        id: int
+        method: str
+        params: dict
+
+
+class LSPResponseTypes(LSPResponseRequest, LSPResponseNotification, LSPIDResponseNotification):
     ...
