@@ -134,15 +134,10 @@ class CompletionView(Gtk.ScrolledWindow):
         pre_char        = self.get_pre_char(siter)
 
         if completion_item.textEdit:
-            sline = completion_item.textEdit["range"]["start"]["line"]
-            schar = completion_item.textEdit["range"]["start"]["character"]
-            eline = completion_item.textEdit["range"]["end"]["line"]
-            echar = completion_item.textEdit["range"]["end"]["character"]
-            siter = buffer.get_iter_at_line_offset( sline, schar )
-            eiter = buffer.get_iter_at_line_offset( eline, echar )
+            self.process_range_insert(buffer, completion_item.textEdit, completion_item.newText)
 
-            buffer.delete(siter, eiter)
-            buffer.insert(siter, completion_item.newText, -1)
+            for edit in completion_item.additionalTextEdits:
+                self.process_range_insert(buffer, edit, edit["newText"])
 
             source_view.remove(self)
             GLib.idle_add( source_view.grab_focus )
@@ -168,15 +163,20 @@ class CompletionView(Gtk.ScrolledWindow):
             buffer.delete(siter, eiter)
 
         buffer.insert(siter, completion_item.insertText, -1)
-        for edit in completion_item.additionalTextEdits:
-            print()
-            print()
-            print(edit)
-            print()
-            print()
 
         source_view.remove(self)
         GLib.idle_add( source_view.grab_focus )
+
+    def process_range_insert(self, buffer, insert_data: {}, text: str):
+        sline = insert_data["range"]["start"]["line"]
+        schar = insert_data["range"]["start"]["character"]
+        eline = insert_data["range"]["end"]["line"]
+        echar = insert_data["range"]["end"]["character"]
+        siter = buffer.get_iter_at_line_offset( sline, schar )
+        eiter = buffer.get_iter_at_line_offset( eline, echar )
+
+        buffer.delete(siter, eiter)
+        buffer.insert(siter, text, -1)
 
     def get_word_start(self, iter):
         pre_char = self.get_pre_char(iter)
