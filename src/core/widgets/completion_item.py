@@ -13,6 +13,7 @@ class CompletionItem(Gtk.Label):
     def __init__(self):
         super(CompletionItem, self).__init__()
 
+        self.kind: int               = -1
         self.newText: str            = ""
         self.insertText: str         = ""
         self.textEdit: []            = []
@@ -36,6 +37,8 @@ class CompletionItem(Gtk.Label):
         keys      = item.keys()
         self.set_label(item["label"])
 
+        if "kind" in keys:
+            self.kind = item["kind"]
 
         if "insertText" in keys:
             self.insertText = item["insertText"]

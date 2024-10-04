@@ -60,18 +60,21 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
                     if source_view.completion_view.get_parent():
                         source_view.remove(source_view.completion_view)
 
+                    if len( message.result["items"] ) == 0:
+                        return
+
                     source_view.completion_view.clear_items()
                     x, y = self._get_insert_line_xy(source_view)
                     source_view.add_child_in_window(source_view.completion_view,  Gtk.TextWindowType.WIDGET, x, y)
+                    completion_list = self.filter_completion_list( message.result["items"] )
 
-                    for item in message.result["items"]:
+                    for item in completion_list:
                         ci = CompletionItem()
                         ci.populate_completion_item(item)
                         source_view.completion_view.add_completion_item(ci)
 
-                    if len( message.result["items"] ) > 0:
-                        source_view.completion_view.show_all()
-                        GLib.idle_add( source_view.completion_view.select_first_row )
+                    source_view.completion_view.show_all()
+                    GLib.idle_add( source_view.completion_view.select_first_row )
 
                     # completion = source_view.get_completion()
                     # providers  = completion.get_providers()
@@ -138,3 +141,15 @@ class EditorControllerMixin(KeyInputController, EditorEventsMixin):
         yy = win_loc[1] + view_pos[1] + iter_loc.height
 
         return xx, yy
+
+    # Note: What I really need to do (long term) is keep all results and then just
+    # toggle show/hide of the CompletionItems relevent to the request context.
+    def filter_completion_list(self, completion_list: list) -> list:
+        filtered_list = []
+
+        for item in completion_list:
+            keys = item.keys()
+            if "insertText" in keys or "textEdit" in keys:
+                filtered_list.append(item)
+
+        return filtered_list
